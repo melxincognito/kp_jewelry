@@ -1,65 +1,155 @@
-import Image from "next/image";
+import Link from "next/link";
+import { auth } from "@/lib/auth";
+import { db } from "@/lib/db";
+import { Navbar } from "@/components/store/Navbar";
+import { Footer } from "@/components/store/Footer";
+import { ProductCard } from "@/components/store/ProductCard";
+import type { Metadata } from "next";
 
-export default function Home() {
+export const metadata: Metadata = {
+  title: "KP Jewlrs — Handpicked Jewelry",
+};
+
+async function getFeaturedProducts() {
+  return db.product.findMany({
+    where: { status: "AVAILABLE" },
+    orderBy: { createdAt: "desc" },
+    take: 8,
+  });
+}
+
+export default async function LandingPage() {
+  const [session, featured] = await Promise.all([
+    auth(),
+    getFeaturedProducts(),
+  ]);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+    <div className="flex flex-col min-h-screen">
+      <Navbar session={session} />
+      <main className="flex-1">
+        {/* Hero */}
+        <section className="relative overflow-hidden bg-[var(--black-soft)] border-b border-[var(--black-border)]">
+          <div
+            aria-hidden
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background:
+                "radial-gradient(ellipse 80% 50% at 50% 0%, rgba(201,168,76,0.08) 0%, transparent 70%)",
+            }}
+          />
+          <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-28 text-center flex flex-col items-center gap-8">
+            <p className="text-xs tracking-[0.4em] text-[var(--gold)] uppercase font-medium">
+              Handpicked from Mexico
+            </p>
+            <h1 className="text-5xl sm:text-6xl font-light tracking-tight">
+              <span className="text-gold-gradient font-semibold">KP JEWLRS</span>
+            </h1>
+            <p className="text-base sm:text-lg text-[var(--white-dim)] max-w-xl leading-relaxed">
+              Curated jewelry for every style. Necklaces, bracelets, rings, earrings and more —
+              all unisex, all authentic.
+            </p>
+            <div className="flex items-center gap-4">
+              <Link
+                href="/shop"
+                className="px-8 py-3 bg-[var(--gold)] text-[var(--black)] text-sm font-semibold rounded-sm hover:bg-[var(--gold-light)] transition-colors"
+              >
+                Browse Collection
+              </Link>
+              <Link
+                href="/register"
+                className="px-8 py-3 border border-[var(--black-border)] text-sm text-[var(--white-dim)] rounded-sm hover:border-[var(--gold)]/50 hover:text-[var(--white)] transition-colors"
+              >
+                Create Account
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* Category Quick Links */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+          <h2 className="text-xs tracking-[0.3em] text-[var(--gold)] uppercase mb-8">
+            Shop by Category
+          </h2>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {CATEGORIES.map(({ label, type }) => (
+              <Link
+                key={type}
+                href={`/shop?type=${type}`}
+                className="group flex flex-col items-center justify-center gap-2 py-6 bg-[var(--black-card)] border border-[var(--black-border)] rounded-sm hover:border-[var(--gold)]/40 transition-colors"
+              >
+                <span className="text-2xl">{getCategoryEmoji(type)}</span>
+                <span className="text-xs font-medium text-[var(--white-dim)] group-hover:text-[var(--gold)] transition-colors tracking-wide">
+                  {label}
+                </span>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        <hr className="divider-gold max-w-7xl mx-auto w-full" />
+
+        {/* New Arrivals */}
+        {featured.length > 0 && (
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+            <div className="flex items-end justify-between mb-8">
+              <h2 className="text-xs tracking-[0.3em] text-[var(--gold)] uppercase">
+                New Arrivals
+              </h2>
+              <Link
+                href="/shop"
+                className="text-xs text-[var(--white-dim)] hover:text-[var(--gold)] transition-colors"
+              >
+                View all →
+              </Link>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+              {featured.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* About strip */}
+        <section className="border-t border-[var(--black-border)] bg-[var(--black-soft)] py-14">
+          <div className="max-w-3xl mx-auto px-4 text-center flex flex-col gap-4">
+            <p className="text-xs tracking-[0.3em] text-[var(--gold)] uppercase">About Us</p>
+            <p className="text-[var(--white-dim)] leading-relaxed text-sm">
+              Every piece in our collection is personally sourced from Mexico. We specialize
+              in styles like Cubano, Torso, and Cartier chains, as well as charms, rings,
+              earrings and more. Interested in a piece? Create an account and send us a
+              message to coordinate.
+            </p>
+          </div>
+        </section>
       </main>
+      <Footer />
     </div>
   );
+}
+
+const CATEGORIES = [
+  { label: "Necklaces", type: "NECKLACE" },
+  { label: "Bracelets", type: "BRACELET" },
+  { label: "Rings", type: "RING" },
+  { label: "Earrings", type: "EARRING" },
+  { label: "Charms", type: "CHARM" },
+  { label: "Nose Rings", type: "NOSE_RING" },
+  { label: "Clips", type: "CLIP" },
+  { label: "Other", type: "OTHER" },
+];
+
+function getCategoryEmoji(type: string): string {
+  const map: Record<string, string> = {
+    NECKLACE: "📿",
+    BRACELET: "💎",
+    RING: "💍",
+    EARRING: "✨",
+    CHARM: "🔮",
+    NOSE_RING: "⭐",
+    CLIP: "📎",
+    OTHER: "🪙",
+  };
+  return map[type] ?? "💎";
 }

@@ -1,0 +1,140 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+
+// Note: SQL Server does not support native enums.
+// Role, JewelryType, and ProductStatus are stored as String.
+// Valid values are enforced in the application layer via Zod.
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  role          String    @default("CUSTOMER") // "CUSTOMER" | "ADMIN"
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts         Account[]
+  sessions         Session[]
+  purchases        Sale[]    @relation("Buyer")
+  sentMessages     Message[] @relation("Sender")
+  receivedMessages Message[] @relation("Recipient")
+
+  @@index([email])
+}
+
+// Auth.js required tables
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.NVarChar(Max)
+  access_token      String? @db.NVarChar(Max)
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.NVarChar(Max)
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Product {
+  id          String  @id @default(cuid())
+  name        String
+  description String? @db.NVarChar(Max)
+  images      String  @db.NVarChar(Max) // JSON array of Azure Blob URLs
+
+  // Cost tracking
+  costMXN        Float    // What she paid in Mexican pesos
+  costUSD        Float    // Converted at purchase-date exchange rate
+  exchangeRate   Float    // MXN per 1 USD on purchaseDate
+  purchaseDate   DateTime // Date she bought the item
+  shippingFees   Float    @default(0) // USD
+  wholesalePrice Float    // USD — floor/break-even price
+  sellingPrice   Float    // USD — listed price for customers
+
+  // Categorization — "NECKLACE" | "BRACELET" | "RING" | "EARRING" | "CHARM" | "NOSE_RING" | "CLIP" | "OTHER"
+  jewelryType String
+  styles      String @db.NVarChar(Max) // JSON array of style tags e.g. ["Cubano","Cartier"]
+
+  // "AVAILABLE" | "RESERVED" | "SOLD"
+  status   String @default("AVAILABLE")
+  quantity Int    @default(1)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  sale     Sale?
+  messages Message[]
+
+  @@index([status])
+  @@index([jewelryType])
+}
+
+model Sale {
+  id        String   @id @default(cuid())
+  productId String   @unique
+  buyerId   String?  // null = sold in person / off-platform
+  salePrice Float    // actual price (may differ from product.sellingPrice)
+  notes     String?  @db.NVarChar(Max)
+  soldAt    DateTime @default(now())
+
+  product Product @relation(fields: [productId], references: [id])
+  buyer   User?   @relation("Buyer", fields: [buyerId], references: [id])
+
+  @@index([soldAt])
+  @@index([buyerId])
+}
+
+model Message {
+  id          String   @id @default(cuid())
+  productId   String
+  senderId    String
+  recipientId String
+  body        String   @db.NVarChar(Max)
+  read        Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  product   Product @relation(fields: [productId], references: [id])
+  // NoAction required — SQL Server does not allow multiple cascade paths to the same table
+  sender    User    @relation("Sender", fields: [senderId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  recipient User    @relation("Recipient", fields: [recipientId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([productId])
+  @@index([senderId])
+  @@index([recipientId])
+}

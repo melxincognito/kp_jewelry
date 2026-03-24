@@ -1,26 +1,81 @@
 @import "tailwindcss";
 
+/* ─── KP Jewlrs Design Tokens ─────────────────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Brand */
+  --gold:        #C9A84C;
+  --gold-light:  #E5C97A;
+  --gold-dark:   #9E7B2F;
+  --black:       #0A0A0A;
+  --black-soft:  #111111;
+  --black-card:  #161616;
+  --black-border:#242424;
+  --white:       #F5F0E8;    /* warm white, not pure white */
+  --white-dim:   #C0BAB0;
+
+  /* Functional */
+  --background:  var(--black);
+  --foreground:  var(--white);
+  --muted:       var(--white-dim);
+  --accent:      var(--gold);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-background:    var(--background);
+  --color-foreground:    var(--foreground);
+  --color-gold:          var(--gold);
+  --color-gold-light:    var(--gold-light);
+  --color-gold-dark:     var(--gold-dark);
+  --color-black:         var(--black);
+  --color-black-soft:    var(--black-soft);
+  --color-black-card:    var(--black-card);
+  --color-black-border:  var(--black-border);
+  --color-white-warm:    var(--white);
+  --color-white-dim:     var(--white-dim);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ─── Base ──────────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--black);
+  color: var(--white);
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Scrollbar ──────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--black-soft); }
+::-webkit-scrollbar-thumb { background: var(--gold-dark); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold); }
+
+/* ─── Gold text gradient utility ───────────────────────────────── */
+.text-gold-gradient {
+  background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold) 50%, var(--gold-dark) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─── Gold border glow ──────────────────────────────────────────── */
+.gold-glow {
+  box-shadow: 0 0 12px rgba(201, 168, 76, 0.25);
+}
+
+/* ─── Divider ───────────────────────────────────────────────────── */
+.divider-gold {
+  border: none;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
 }

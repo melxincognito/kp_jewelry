@@ -8,6 +8,13 @@ export const authConfig = {
     error: "/login",
   },
   callbacks: {
+    async session({ session, token }) {
+      if (token) {
+        session.user.id = token.id as string;
+        session.user.role = token.role as string;
+      }
+      return session;
+    },
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;
       const isAdmin = auth?.user?.role === "ADMIN";

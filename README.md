@@ -102,12 +102,12 @@ cp .env.example .env
 
 Fill in your values in `.env`:
 
-| Variable                                    | Where to find it                                              |
-| ------------------------------------------- | ------------------------------------------------------------- |
-| `DATABASE_URL`                              | See Database Setup section below                              |
-| `AUTH_SECRET`                               | Run `openssl rand -base64 32`                                 |
-| `AZURE_STORAGE_CONNECTION_STRING`           | Azure Portal → Storage Account → Access Keys                  |
-| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Google Cloud Console (optional — for "Continue with Google")  |
+| Variable                                    | Where to find it                                             |
+| ------------------------------------------- | ------------------------------------------------------------ |
+| `DATABASE_URL`                              | See Database Setup section below                             |
+| `AUTH_SECRET`                               | Run `openssl rand -base64 32`                                |
+| `AZURE_STORAGE_CONNECTION_STRING`           | Azure Portal → Storage Account → Access Keys                 |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Google Cloud Console (optional — for "Continue with Google") |
 
 ### 3. Push the database schema
 
@@ -166,7 +166,7 @@ sqlserver://YOUR_SERVER.database.windows.net:1433;database=YOUR_DB;user=YOUR_USE
 5. **Find your admin username:**
    Azure Portal → SQL Server → Settings → Properties → Server admin login
 
-> **Username format:** Azure SQL requires the username in the format `username@servername` (e.g. `CloudSA0145a138@kp-jewelry`).
+> **Username format:** Azure SQL requires the username in the format `username@servername`).
 
 ---
 

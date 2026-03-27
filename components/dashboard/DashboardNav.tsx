@@ -16,7 +16,7 @@ export function DashboardNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="w-52 flex-shrink-0 flex flex-col bg-[var(--black-soft)] border-r border-[var(--black-border)] min-h-screen sticky top-0">
+    <nav aria-label="Dashboard navigation" className="w-52 flex-shrink-0 flex flex-col bg-[var(--black-soft)] border-r border-[var(--black-border)] min-h-screen sticky top-0">
       {/* Logo */}
       <div className="px-5 py-5 border-b border-[var(--black-border)]">
         <Link href="/" className="text-sm font-semibold tracking-[0.15em] text-gold-gradient">
@@ -38,6 +38,7 @@ export function DashboardNav() {
             <Link
               key={item.href}
               href={item.href}
+              aria-current={isActive ? "page" : undefined}
               className={[
                 "flex items-center gap-3 px-3 py-2.5 rounded-sm text-sm transition-colors",
                 isActive
@@ -45,7 +46,7 @@ export function DashboardNav() {
                   : "text-[var(--white-dim)] hover:text-[var(--white)] hover:bg-white/5",
               ].join(" ")}
             >
-              <span className="text-xs opacity-70">{item.icon}</span>
+              <span aria-hidden="true" className="text-xs opacity-70">{item.icon}</span>
               {item.label}
             </Link>
           );
@@ -59,7 +60,7 @@ export function DashboardNav() {
             href="/"
             className="text-xs text-[var(--white-dim)]/50 hover:text-[var(--white-dim)] transition-colors"
           >
-            ← View Store
+            <span aria-hidden="true">← </span>View Store
           </Link>
           <button
             onClick={() => signOut({ callbackUrl: "/" })}

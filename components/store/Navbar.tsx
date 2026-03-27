@@ -28,7 +28,7 @@ export function Navbar({ session }: NavbarProps) {
           </Link>
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-6">
+          <nav aria-label="Main navigation" className="hidden md:flex items-center gap-6">
             <NavLink href="/shop" active={pathname.startsWith("/shop")}>
               Shop
             </NavLink>
@@ -80,18 +80,20 @@ export function Navbar({ session }: NavbarProps) {
           <button
             className="md:hidden p-2 text-[var(--white-dim)] hover:text-[var(--white)]"
             onClick={() => setMenuOpen((v) => !v)}
-            aria-label="Toggle menu"
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={menuOpen}
+            aria-controls="mobile-menu"
           >
-            <span className="block w-5 h-0.5 bg-current mb-1" />
-            <span className="block w-5 h-0.5 bg-current mb-1" />
-            <span className="block w-5 h-0.5 bg-current" />
+            <span aria-hidden="true" className="block w-5 h-0.5 bg-current mb-1" />
+            <span aria-hidden="true" className="block w-5 h-0.5 bg-current mb-1" />
+            <span aria-hidden="true" className="block w-5 h-0.5 bg-current" />
           </button>
         </div>
       </div>
 
       {/* Mobile menu */}
       {menuOpen && (
-        <div className="md:hidden border-t border-[var(--black-border)] bg-[var(--black-soft)] px-4 py-4 flex flex-col gap-4">
+        <div id="mobile-menu" role="navigation" aria-label="Mobile navigation" className="md:hidden border-t border-[var(--black-border)] bg-[var(--black-soft)] px-4 py-4 flex flex-col gap-4">
           <Link href="/shop" className="text-sm text-[var(--white-dim)]" onClick={() => setMenuOpen(false)}>Shop</Link>
           {session && (
             <Link href="/messages" className="text-sm text-[var(--white-dim)]" onClick={() => setMenuOpen(false)}>Messages</Link>
@@ -128,6 +130,7 @@ function NavLink({
   return (
     <Link
       href={href}
+      aria-current={active ? "page" : undefined}
       className={[
         "text-sm tracking-wide transition-colors duration-150",
         active

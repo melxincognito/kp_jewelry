@@ -66,15 +66,16 @@ export function FilterSidebar({ availableStyles }: FilterSidebarProps) {
   const activeStatus = searchParams.get("status") ?? "";
 
   return (
-    <aside className="w-56 flex-shrink-0 flex flex-col gap-6">
+    <aside aria-label="Product filters" className="w-56 flex-shrink-0 flex flex-col gap-6">
       {/* Sort */}
-      <div>
-        <p className="text-[10px] tracking-[0.25em] text-[var(--gold)] uppercase mb-3">Sort</p>
+      <div role="group" aria-labelledby="filter-sort-label">
+        <p id="filter-sort-label" className="text-[10px] tracking-[0.25em] text-[var(--gold)] uppercase mb-3">Sort</p>
         <div className="flex flex-col gap-1">
           {SORT_OPTIONS.map((opt) => (
             <button
               key={opt.value}
               onClick={() => setParam("sort", opt.value)}
+              aria-pressed={activeSort === opt.value}
               className={[
                 "text-left text-sm px-3 py-2 rounded-sm transition-colors",
                 activeSort === opt.value
@@ -89,8 +90,8 @@ export function FilterSidebar({ availableStyles }: FilterSidebarProps) {
       </div>
 
       {/* Status */}
-      <div>
-        <p className="text-[10px] tracking-[0.25em] text-[var(--gold)] uppercase mb-3">
+      <div role="group" aria-labelledby="filter-availability-label">
+        <p id="filter-availability-label" className="text-[10px] tracking-[0.25em] text-[var(--gold)] uppercase mb-3">
           Availability
         </p>
         <div className="flex flex-col gap-1">
@@ -102,6 +103,7 @@ export function FilterSidebar({ availableStyles }: FilterSidebarProps) {
             <button
               key={opt.value}
               onClick={() => setParam("status", opt.value)}
+              aria-pressed={activeStatus === opt.value}
               className={[
                 "text-left text-sm px-3 py-2 rounded-sm transition-colors",
                 activeStatus === opt.value
@@ -116,8 +118,8 @@ export function FilterSidebar({ availableStyles }: FilterSidebarProps) {
       </div>
 
       {/* Jewelry Type */}
-      <div>
-        <p className="text-[10px] tracking-[0.25em] text-[var(--gold)] uppercase mb-3">
+      <div role="group" aria-labelledby="filter-category-label">
+        <p id="filter-category-label" className="text-[10px] tracking-[0.25em] text-[var(--gold)] uppercase mb-3">
           Category
         </p>
         <div className="flex flex-col gap-1">
@@ -125,6 +127,7 @@ export function FilterSidebar({ availableStyles }: FilterSidebarProps) {
             <button
               key={type.value}
               onClick={() => setParam("type", type.value)}
+              aria-pressed={activeType === type.value}
               className={[
                 "text-left text-sm px-3 py-2 rounded-sm transition-colors",
                 activeType === type.value
@@ -140,8 +143,8 @@ export function FilterSidebar({ availableStyles }: FilterSidebarProps) {
 
       {/* Style Tags */}
       {availableStyles.length > 0 && (
-        <div>
-          <p className="text-[10px] tracking-[0.25em] text-[var(--gold)] uppercase mb-3">
+        <div role="group" aria-labelledby="filter-style-label">
+          <p id="filter-style-label" className="text-[10px] tracking-[0.25em] text-[var(--gold)] uppercase mb-3">
             Style
           </p>
           <div className="flex flex-wrap gap-2">
@@ -149,6 +152,7 @@ export function FilterSidebar({ availableStyles }: FilterSidebarProps) {
               <button
                 key={style}
                 onClick={() => toggleStyle(style)}
+                aria-pressed={activeStyles.includes(style)}
                 className={[
                   "text-xs px-2.5 py-1 rounded-sm border transition-colors",
                   activeStyles.includes(style)
@@ -167,6 +171,7 @@ export function FilterSidebar({ availableStyles }: FilterSidebarProps) {
       {(activeType || activeStyles.length > 0 || activeStatus) && (
         <button
           onClick={() => router.push("/shop")}
+          aria-label="Clear all filters"
           className="text-xs text-[var(--white-dim)]/50 hover:text-[var(--white-dim)] transition-colors text-left"
         >
           Clear all filters ×

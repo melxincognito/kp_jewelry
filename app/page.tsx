@@ -27,11 +27,11 @@ export default async function LandingPage() {
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar session={session} />
-      <main className="flex-1">
+      <main id="main-content" className="flex-1" tabIndex={-1}>
         {/* Hero */}
-        <section className="relative overflow-hidden bg-[var(--black-soft)] border-b border-[var(--black-border)]">
+        <section aria-label="Hero" className="relative overflow-hidden bg-[var(--black-soft)] border-b border-[var(--black-border)]">
           <div
-            aria-hidden
+            aria-hidden="true"
             className="absolute inset-0 pointer-events-none"
             style={{
               background:
@@ -71,6 +71,7 @@ export default async function LandingPage() {
           <h2 className="text-xs tracking-[0.3em] text-[var(--gold)] uppercase mb-8">
             Shop by Category
           </h2>
+
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {CATEGORIES.map(({ label, type }) => (
               <Link
@@ -78,7 +79,7 @@ export default async function LandingPage() {
                 href={`/shop?type=${type}`}
                 className="group flex flex-col items-center justify-center gap-2 py-6 bg-[var(--black-card)] border border-[var(--black-border)] rounded-sm hover:border-[var(--gold)]/40 transition-colors"
               >
-                <span className="text-2xl">{getCategoryEmoji(type)}</span>
+                <span aria-hidden="true" className="text-2xl">{getCategoryEmoji(type)}</span>
                 <span className="text-xs font-medium text-[var(--white-dim)] group-hover:text-[var(--gold)] transition-colors tracking-wide">
                   {label}
                 </span>

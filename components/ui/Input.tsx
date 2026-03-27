@@ -1,4 +1,4 @@
-import { InputHTMLAttributes, forwardRef } from "react";
+import { InputHTMLAttributes, forwardRef, useId } from "react";
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -8,7 +8,14 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
   ({ label, error, hint, className = "", id, ...props }, ref) => {
-    const inputId = id ?? label?.toLowerCase().replace(/\s+/g, "-");
+    const generatedId = useId();
+    const inputId = id ?? (label ? `input-${label.toLowerCase().replace(/\s+/g, "-")}` : generatedId);
+    const errorId = `${inputId}-error`;
+    const hintId = `${inputId}-hint`;
+    const describedBy = [error ? errorId : null, hint && !error ? hintId : null]
+      .filter(Boolean)
+      .join(" ") || undefined;
+
     return (
       <div className="flex flex-col gap-1.5">
         {label && (
@@ -22,6 +29,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         <input
           ref={ref}
           id={inputId}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={describedBy}
+          aria-required={props.required || undefined}
           className={[
             "w-full rounded-sm px-3 py-2.5 text-sm",
             "bg-[var(--black-card)] border border-[var(--black-border)]",
@@ -33,8 +43,16 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           ].join(" ")}
           {...props}
         />
-        {error && <p className="text-xs text-red-400">{error}</p>}
-        {hint && !error && <p className="text-xs text-[var(--white-dim)]/60">{hint}</p>}
+        {error && (
+          <p id={errorId} role="alert" className="text-xs text-red-400">
+            {error}
+          </p>
+        )}
+        {hint && !error && (
+          <p id={hintId} className="text-xs text-[var(--white-dim)]/60">
+            {hint}
+          </p>
+        )}
       </div>
     );
   }

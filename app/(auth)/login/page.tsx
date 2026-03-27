@@ -46,12 +46,12 @@ export default function LoginPage() {
 
         <div className="bg-[var(--black-card)] border border-[var(--black-border)] rounded-sm p-6">
           {error && (
-            <div className="mb-4 px-3 py-2 bg-red-500/10 border border-red-500/30 rounded-sm text-xs text-red-400">
+            <div role="alert" aria-live="assertive" className="mb-4 px-3 py-2 bg-red-500/10 border border-red-500/30 rounded-sm text-xs text-red-400">
               {error}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <form onSubmit={handleSubmit} aria-label="Sign in" className="flex flex-col gap-4">
             <Input name="email" label="Email" type="email" autoComplete="email" required />
             <Input
               name="password"

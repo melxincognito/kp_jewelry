@@ -1,4 +1,4 @@
-import { TextareaHTMLAttributes, forwardRef } from "react";
+import { TextareaHTMLAttributes, forwardRef, useId } from "react";
 
 interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   label?: string;
@@ -7,7 +7,10 @@ interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
 
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
   ({ label, error, className = "", id, ...props }, ref) => {
-    const inputId = id ?? label?.toLowerCase().replace(/\s+/g, "-");
+    const generatedId = useId();
+    const inputId = id ?? (label ? `textarea-${label.toLowerCase().replace(/\s+/g, "-")}` : generatedId);
+    const errorId = `${inputId}-error`;
+
     return (
       <div className="flex flex-col gap-1.5">
         {label && (
@@ -22,6 +25,9 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           ref={ref}
           id={inputId}
           rows={4}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? errorId : undefined}
+          aria-required={props.required || undefined}
           className={[
             "w-full rounded-sm px-3 py-2.5 text-sm resize-y",
             "bg-[var(--black-card)] border border-[var(--black-border)]",
@@ -33,7 +39,11 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           ].join(" ")}
           {...props}
         />
-        {error && <p className="text-xs text-red-400">{error}</p>}
+        {error && (
+          <p id={errorId} role="alert" className="text-xs text-red-400">
+            {error}
+          </p>
+        )}
       </div>
     );
   }

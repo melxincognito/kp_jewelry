@@ -25,9 +25,13 @@ export function ProductCard({ product }: ProductCardProps) {
   const firstImage = images[0] ?? null;
   const styles: string[] = JSON.parse(product.styles || "[]");
 
+  const statusText = statusLabel[product.status as ProductStatus] ?? product.status;
+  const typeText = product.jewelryType.replace("_", " ").toLowerCase();
+
   return (
     <Link
       href={`/shop/${product.id}`}
+      aria-label={`${product.name} — $${product.sellingPrice.toFixed(2)} — ${statusText}`}
       className="group flex flex-col bg-[var(--black-card)] border border-[var(--black-border)] rounded-sm overflow-hidden hover:border-[var(--gold)]/40 transition-colors"
     >
       {/* Image */}
@@ -35,13 +39,13 @@ export function ProductCard({ product }: ProductCardProps) {
         {firstImage ? (
           <Image
             src={firstImage}
-            alt={product.name}
+            alt={`${product.name}, ${typeText}, ${statusText}`}
             fill
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             className="object-cover group-hover:scale-105 transition-transform duration-300"
           />
         ) : (
-          <div className="flex items-center justify-center h-full text-3xl opacity-20">
+          <div aria-hidden="true" className="flex items-center justify-center h-full text-3xl opacity-20">
             💎
           </div>
         )}

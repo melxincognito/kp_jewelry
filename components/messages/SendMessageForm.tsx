@@ -39,7 +39,11 @@ export function SendMessageForm({ productId, recipientId }: SendMessageFormProps
 
   if (sent) {
     return (
-      <div className="px-4 py-3 bg-emerald-500/10 border border-emerald-500/20 rounded-sm text-sm text-emerald-400">
+      <div
+        role="status"
+        aria-live="polite"
+        className="px-4 py-3 bg-emerald-500/10 border border-emerald-500/20 rounded-sm text-sm text-emerald-400"
+      >
         Message sent! The seller will get back to you soon.
         <button
           className="ml-2 text-xs underline opacity-70 hover:opacity-100"
@@ -54,9 +58,10 @@ export function SendMessageForm({ productId, recipientId }: SendMessageFormProps
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-3">
       {error && (
-        <p className="text-xs text-red-400">{error}</p>
+        <p role="alert" aria-live="assertive" className="text-xs text-red-400">{error}</p>
       )}
       <Textarea
+        label="Message to seller"
         placeholder="I'm interested in this item. Is it still available?"
         value={body}
         onChange={(e) => setBody(e.target.value)}

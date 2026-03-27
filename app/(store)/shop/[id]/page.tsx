@@ -64,28 +64,29 @@ export default async function ProductDetailPage({
             {images[0] ? (
               <Image
                 src={images[0]}
-                alt={product.name}
+                alt={`${product.name} — main photo`}
                 fill
                 sizes="(max-width: 768px) 100vw, 50vw"
                 className="object-cover"
                 priority
               />
             ) : (
-              <div className="flex items-center justify-center h-full text-5xl opacity-20">
+              <div aria-hidden="true" className="flex items-center justify-center h-full text-5xl opacity-20">
                 💎
               </div>
             )}
           </div>
           {images.length > 1 && (
-            <div className="grid grid-cols-4 gap-2">
+            <div className="grid grid-cols-4 gap-2" role="list" aria-label="Additional photos">
               {images.slice(1).map((img, i) => (
                 <div
                   key={i}
+                  role="listitem"
                   className="relative aspect-square bg-[var(--black-soft)] rounded-sm overflow-hidden"
                 >
                   <Image
                     src={img}
-                    alt={`${product.name} ${i + 2}`}
+                    alt={`${product.name} — photo ${i + 2}`}
                     fill
                     sizes="80px"
                     className="object-cover"

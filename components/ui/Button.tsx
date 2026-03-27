@@ -45,6 +45,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       <button
         ref={ref}
         disabled={disabled || loading}
+        aria-busy={loading || undefined}
+        aria-disabled={disabled || loading || undefined}
         className={[
           "inline-flex items-center justify-center gap-2 rounded-sm transition-colors duration-150 cursor-pointer",
           variantClasses[variant],
@@ -54,7 +56,10 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         {...props}
       >
         {loading && (
-          <span className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+          <span
+            aria-hidden="true"
+            className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin"
+          />
         )}
         {children}
       </button>

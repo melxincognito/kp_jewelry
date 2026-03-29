@@ -23,22 +23,31 @@ export function Navbar({ session }: NavbarProps) {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
             <span className="text-xl font-semibold tracking-[0.15em] text-gold-gradient">
-              KP JEWLRS
+              KP JEWELRS
             </span>
           </Link>
 
           {/* Desktop Nav */}
-          <nav aria-label="Main navigation" className="hidden md:flex items-center gap-6">
+          <nav
+            aria-label="Main navigation"
+            className="hidden md:flex items-center gap-6"
+          >
             <NavLink href="/shop" active={pathname.startsWith("/shop")}>
               Shop
             </NavLink>
             {session && (
-              <NavLink href="/messages" active={pathname.startsWith("/messages")}>
+              <NavLink
+                href="/messages"
+                active={pathname.startsWith("/messages")}
+              >
                 Messages
               </NavLink>
             )}
             {isAdmin && (
-              <NavLink href="/dashboard" active={pathname.startsWith("/dashboard")}>
+              <NavLink
+                href="/dashboard"
+                active={pathname.startsWith("/dashboard")}
+              >
                 Dashboard
               </NavLink>
             )}
@@ -84,8 +93,14 @@ export function Navbar({ session }: NavbarProps) {
             aria-expanded={menuOpen}
             aria-controls="mobile-menu"
           >
-            <span aria-hidden="true" className="block w-5 h-0.5 bg-current mb-1" />
-            <span aria-hidden="true" className="block w-5 h-0.5 bg-current mb-1" />
+            <span
+              aria-hidden="true"
+              className="block w-5 h-0.5 bg-current mb-1"
+            />
+            <span
+              aria-hidden="true"
+              className="block w-5 h-0.5 bg-current mb-1"
+            />
             <span aria-hidden="true" className="block w-5 h-0.5 bg-current" />
           </button>
         </div>
@@ -93,23 +108,61 @@ export function Navbar({ session }: NavbarProps) {
 
       {/* Mobile menu */}
       {menuOpen && (
-        <div id="mobile-menu" role="navigation" aria-label="Mobile navigation" className="md:hidden border-t border-[var(--black-border)] bg-[var(--black-soft)] px-4 py-4 flex flex-col gap-4">
-          <Link href="/shop" className="text-sm text-[var(--white-dim)]" onClick={() => setMenuOpen(false)}>Shop</Link>
+        <div
+          id="mobile-menu"
+          role="navigation"
+          aria-label="Mobile navigation"
+          className="md:hidden border-t border-[var(--black-border)] bg-[var(--black-soft)] px-4 py-4 flex flex-col gap-4"
+        >
+          <Link
+            href="/shop"
+            className="text-sm text-[var(--white-dim)]"
+            onClick={() => setMenuOpen(false)}
+          >
+            Shop
+          </Link>
           {session && (
-            <Link href="/messages" className="text-sm text-[var(--white-dim)]" onClick={() => setMenuOpen(false)}>Messages</Link>
+            <Link
+              href="/messages"
+              className="text-sm text-[var(--white-dim)]"
+              onClick={() => setMenuOpen(false)}
+            >
+              Messages
+            </Link>
           )}
           {isAdmin && (
-            <Link href="/dashboard" className="text-sm text-[var(--white-dim)]" onClick={() => setMenuOpen(false)}>Dashboard</Link>
+            <Link
+              href="/dashboard"
+              className="text-sm text-[var(--white-dim)]"
+              onClick={() => setMenuOpen(false)}
+            >
+              Dashboard
+            </Link>
           )}
           <hr className="divider-gold" />
           {session ? (
-            <button onClick={() => signOut({ callbackUrl: "/" })} className="text-sm text-left text-[var(--white-dim)]">
+            <button
+              onClick={() => signOut({ callbackUrl: "/" })}
+              className="text-sm text-left text-[var(--white-dim)]"
+            >
               Sign out
             </button>
           ) : (
             <>
-              <Link href="/login" className="text-sm text-[var(--white-dim)]" onClick={() => setMenuOpen(false)}>Sign in</Link>
-              <Link href="/register" className="text-sm text-[var(--gold)]" onClick={() => setMenuOpen(false)}>Create account</Link>
+              <Link
+                href="/login"
+                className="text-sm text-[var(--white-dim)]"
+                onClick={() => setMenuOpen(false)}
+              >
+                Sign in
+              </Link>
+              <Link
+                href="/register"
+                className="text-sm text-[var(--gold)]"
+                onClick={() => setMenuOpen(false)}
+              >
+                Create account
+              </Link>
             </>
           )}
         </div>

@@ -51,22 +51,47 @@ export default function RegisterPage() {
     <div className="min-h-screen flex items-center justify-center px-4 bg-[var(--black)]">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <Link href="/" className="text-xl font-semibold tracking-[0.15em] text-gold-gradient">
-            KP JEWLRS
+          <Link
+            href="/"
+            className="text-xl font-semibold tracking-[0.15em] text-gold-gradient"
+          >
+            KP JEWELRS
           </Link>
-          <p className="text-sm text-[var(--white-dim)] mt-2">Create your account</p>
+          <p className="text-sm text-[var(--white-dim)] mt-2">
+            Create your account
+          </p>
         </div>
 
         <div className="bg-[var(--black-card)] border border-[var(--black-border)] rounded-sm p-6">
           {error && (
-            <div role="alert" aria-live="assertive" className="mb-4 px-3 py-2 bg-red-500/10 border border-red-500/30 rounded-sm text-xs text-red-400">
+            <div
+              role="alert"
+              aria-live="assertive"
+              className="mb-4 px-3 py-2 bg-red-500/10 border border-red-500/30 rounded-sm text-xs text-red-400"
+            >
               {error}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} aria-label="Create account" className="flex flex-col gap-4">
-            <Input name="name" label="Full Name" type="text" autoComplete="name" required />
-            <Input name="email" label="Email" type="email" autoComplete="email" required />
+          <form
+            onSubmit={handleSubmit}
+            aria-label="Create account"
+            className="flex flex-col gap-4"
+          >
+            <Input
+              name="name"
+              label="Full Name"
+              type="text"
+              autoComplete="name"
+              required
+            />
+            <Input
+              name="email"
+              label="Email"
+              type="email"
+              autoComplete="email"
+              required
+            />
             <Input
               name="password"
               label="Password"

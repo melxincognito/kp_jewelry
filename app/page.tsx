@@ -7,7 +7,7 @@ import { ProductCard } from "@/components/store/ProductCard";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "KP Jewlrs — Handpicked Jewelry",
+  title: "KP Jewelrs — Handpicked Jewelry",
 };
 
 async function getFeaturedProducts() {
@@ -29,7 +29,10 @@ export default async function LandingPage() {
       <Navbar session={session} />
       <main id="main-content" className="flex-1" tabIndex={-1}>
         {/* Hero */}
-        <section aria-label="Hero" className="relative overflow-hidden bg-[var(--black-soft)] border-b border-[var(--black-border)]">
+        <section
+          aria-label="Hero"
+          className="relative overflow-hidden bg-[var(--black-soft)] border-b border-[var(--black-border)]"
+        >
           <div
             aria-hidden="true"
             className="absolute inset-0 pointer-events-none"
@@ -43,11 +46,13 @@ export default async function LandingPage() {
               Handpicked from Mexico
             </p>
             <h1 className="text-5xl sm:text-6xl font-light tracking-tight">
-              <span className="text-gold-gradient font-semibold">KP JEWLRS</span>
+              <span className="text-gold-gradient font-semibold">
+                KP JEWELRS
+              </span>
             </h1>
             <p className="text-base sm:text-lg text-[var(--white-dim)] max-w-xl leading-relaxed">
-              Curated jewelry for every style. Necklaces, bracelets, rings, earrings and more —
-              all unisex, all authentic.
+              Curated jewelry for every style. Necklaces, bracelets, rings,
+              earrings and more — all unisex, all authentic.
             </p>
             <div className="flex items-center gap-4">
               <Link
@@ -79,7 +84,9 @@ export default async function LandingPage() {
                 href={`/shop?type=${type}`}
                 className="group flex flex-col items-center justify-center gap-2 py-6 bg-[var(--black-card)] border border-[var(--black-border)] rounded-sm hover:border-[var(--gold)]/40 transition-colors"
               >
-                <span aria-hidden="true" className="text-2xl">{getCategoryEmoji(type)}</span>
+                <span aria-hidden="true" className="text-2xl">
+                  {getCategoryEmoji(type)}
+                </span>
                 <span className="text-xs font-medium text-[var(--white-dim)] group-hover:text-[var(--gold)] transition-colors tracking-wide">
                   {label}
                 </span>
@@ -115,12 +122,14 @@ export default async function LandingPage() {
         {/* About strip */}
         <section className="border-t border-[var(--black-border)] bg-[var(--black-soft)] py-14">
           <div className="max-w-3xl mx-auto px-4 text-center flex flex-col gap-4">
-            <p className="text-xs tracking-[0.3em] text-[var(--gold)] uppercase">About Us</p>
+            <p className="text-xs tracking-[0.3em] text-[var(--gold)] uppercase">
+              About Us
+            </p>
             <p className="text-[var(--white-dim)] leading-relaxed text-sm">
-              Every piece in our collection is personally sourced from Mexico. We specialize
-              in styles like Cubano, Torso, and Cartier chains, as well as charms, rings,
-              earrings and more. Interested in a piece? Create an account and send us a
-              message to coordinate.
+              Every piece in our collection is personally sourced from Mexico.
+              We specialize in styles like Cubano, Torso, and Cartier chains, as
+              well as charms, rings, earrings and more. Interested in a piece?
+              Create an account and send us a message to coordinate.
             </p>
           </div>
         </section>

@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: { default: "KP Jewlrs", template: "%s | KP Jewlrs" },
+  title: { default: "KP Jewelrs", template: "%s | KP Jewelrs" },
   description:
     "Handpicked jewelry — necklaces, bracelets, rings, earrings and more. Browse our curated collection.",
 };
@@ -22,7 +22,10 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full`}>
+    <html
+      lang="en"
+      className={`${geistSans.variable} ${geistMono.variable} h-full`}
+    >
       <body className="min-h-full flex flex-col antialiased">
         <a href="#main-content" className="skip-link">
           Skip to main content

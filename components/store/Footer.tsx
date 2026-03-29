@@ -14,7 +14,7 @@ export function Footer() {
             coordinate payment.
           </p>
           <p className="text-xs text-[var(--white-dim)]/40">
-            © {new Date().getFullYear()} KP Jewlrs
+            © {new Date().getFullYear()} KP Jewelrs
           </p>
         </div>
       </div>

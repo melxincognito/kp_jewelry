@@ -30,14 +30,20 @@ export default async function LandingPage() {
       <main id="main-content" className="flex-1" tabIndex={-1}>
         {/* Hero */}
         <section
-          aria-label="Hero"
+          aria-labelledby="hero-heading"
           className="bg-[var(--black-soft)] border-b border-[var(--black-border)]"
         >
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-32 text-center flex flex-col items-center gap-6">
-            <p className="text-[10px] tracking-[0.5em] text-[var(--gold)] uppercase font-medium">
+            <p
+              className="text-[10px] tracking-[0.5em] text-[var(--gold)] uppercase font-medium"
+              aria-hidden="true"
+            >
               Handpicked from Mexico
             </p>
-            <h1 className="font-serif text-6xl sm:text-7xl font-light tracking-wide text-[var(--white)]">
+            <h1
+              id="hero-heading"
+              className="font-serif text-6xl sm:text-7xl font-light tracking-wide text-[var(--white)]"
+            >
               KP <span className="text-gold">Jewelrs</span>
             </h1>
             <p className="text-sm text-[var(--white-dim)] max-w-md leading-loose tracking-wide">
@@ -63,23 +69,34 @@ export default async function LandingPage() {
 
         {/* Category Quick Links */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <h2 className="text-[10px] tracking-[0.4em] text-[var(--white-dim)] uppercase mb-10">
+          <h2
+            id="category-heading"
+            className="text-[10px] tracking-[0.4em] text-[var(--white-dim)] uppercase mb-10"
+          >
             Shop by Category
           </h2>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-[var(--black-border)]">
+          <ul
+            role="list"
+            className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-[var(--black-border)] list-none p-0 m-0"
+          >
             {CATEGORIES.map(({ label, type }) => (
-              <Link
-                key={type}
-                href={`/shop?type=${type}`}
-                className="group flex items-center justify-center py-7 bg-[var(--black-card)] hover:bg-[var(--black-soft)] transition-colors"
-              >
-                <span className="text-xs tracking-[0.25em] uppercase text-[var(--white-dim)] group-hover:text-[var(--gold)] transition-colors">
-                  {label}
-                </span>
-              </Link>
+              <li key={type}>
+                <Link
+                  href={`/shop?type=${type}`}
+                  aria-label={`Shop by Category: ${label}`}
+                  className="group flex items-center justify-center py-7 bg-[var(--black-card)] hover:bg-[var(--black-soft)] transition-colors"
+                >
+                  <span
+                    aria-hidden="true"
+                    className="text-xs tracking-[0.25em] uppercase text-[var(--white-dim)] group-hover:text-[var(--gold)] transition-colors"
+                  >
+                    {label}
+                  </span>
+                </Link>
+              </li>
             ))}
-          </div>
+          </ul>
         </section>
 
         <hr className="divider-gold max-w-7xl mx-auto w-full" />
@@ -93,6 +110,7 @@ export default async function LandingPage() {
               </h2>
               <Link
                 href="/shop"
+                aria-label="View all new arrivals"
                 className="text-[10px] tracking-[0.25em] uppercase text-[var(--white-dim)] border-b border-[var(--black-border)] pb-0.5 hover:border-[var(--gold)] hover:text-[var(--gold)] transition-colors"
               >
                 View All

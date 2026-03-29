@@ -23,10 +23,7 @@ export function Navbar({ session }: NavbarProps) {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
             <span className="font-serif text-lg font-light tracking-[0.25em] text-[var(--white)] uppercase">
-              KP{" "}
-              <span className="text-gold-gradient italic">
-                Jewelrs
-              </span>
+              KP <span className="text-gold">Jewelrs</span>
             </span>
           </Link>
 
@@ -80,7 +77,7 @@ export function Navbar({ session }: NavbarProps) {
                 </Link>
                 <Link
                   href="/register"
-                  className="text-xs px-4 py-2 tracking-[0.15em] uppercase border border-[var(--white)] text-[var(--white)] hover:bg-[var(--gold)] hover:border-[var(--gold)] hover:text-[var(--black-card)] transition-colors"
+                  className="text-xs px-4 py-2 tracking-[0.15em] uppercase border border-[var(--white)] text-[var(--white)] hover:bg-[var(--gold-light)] hover:border-[var(--gold-light)] hover:text-[var(--black-card)] transition-colors"
                 >
                   Create account
                 </Link>

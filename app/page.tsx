@@ -38,10 +38,7 @@ export default async function LandingPage() {
               Handpicked from Mexico
             </p>
             <h1 className="font-serif text-6xl sm:text-7xl font-light tracking-wide text-[var(--white)]">
-              KP{" "}
-              <span className="text-gold-gradient italic">
-                Jewelrs
-              </span>
+              KP <span className="text-gold">Jewelrs</span>
             </h1>
             <p className="text-sm text-[var(--white-dim)] max-w-md leading-loose tracking-wide">
               Curated jewelry for every style. Necklaces, bracelets, rings,
@@ -141,4 +138,3 @@ const CATEGORIES = [
   { label: "Clips", type: "CLIP" },
   { label: "Other", type: "OTHER" },
 ];
-

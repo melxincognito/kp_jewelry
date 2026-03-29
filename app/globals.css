@@ -3,39 +3,39 @@
 /* ─── KP Jewlrs Design Tokens ─────────────────────────────────── */
 :root {
   /* Gold — darkened for contrast on cream backgrounds */
-  --gold:        #7A5C10;
-  --gold-light:  #C9A84C;
-  --gold-dark:   #4A380A;
+  --gold: #7a5c10;
+  --gold-light: #c9a84c;
+  --gold-dark: #4a380a;
 
   /* Cream backgrounds (replaces dark blacks) */
-  --black:       #F7F4EF;    /* main background — warm cream */
-  --black-soft:  #EDE9E3;    /* section backgrounds */
-  --black-card:  #FDFBF8;    /* card backgrounds */
-  --black-border:#DDD6CC;    /* hairline borders */
+  --black: #f7f4ef; /* main background — warm cream */
+  --black-soft: #ede9e3; /* section backgrounds */
+  --black-card: #fdfbf8; /* card backgrounds */
+  --black-border: #ddd6cc; /* hairline borders */
 
   /* Charcoal text (replaces whites) */
-  --white:       #1A1714;    /* main text — warm near-black */
-  --white-dim:   #7A7470;    /* muted/secondary text */
+  --white: #1a1714; /* main text — warm near-black */
+  --white-dim: #7a7470; /* muted/secondary text */
 
   /* Functional */
-  --background:  var(--black);
-  --foreground:  var(--white);
-  --muted:       var(--white-dim);
-  --accent:      var(--gold);
+  --background: var(--black);
+  --foreground: var(--white);
+  --muted: var(--white-dim);
+  --accent: var(--gold);
 }
 
 @theme inline {
-  --color-background:    var(--background);
-  --color-foreground:    var(--foreground);
-  --color-gold:          var(--gold);
-  --color-gold-light:    var(--gold-light);
-  --color-gold-dark:     var(--gold-dark);
-  --color-black:         var(--black);
-  --color-black-soft:    var(--black-soft);
-  --color-black-card:    var(--black-card);
-  --color-black-border:  var(--black-border);
-  --color-white-warm:    var(--white);
-  --color-white-dim:     var(--white-dim);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-gold: var(--gold);
+  --color-gold-light: var(--gold-light);
+  --color-gold-dark: var(--gold-dark);
+  --color-black: var(--black);
+  --color-black-soft: var(--black-soft);
+  --color-black-card: var(--black-card);
+  --color-black-border: var(--black-border);
+  --color-white-warm: var(--white);
+  --color-white-dim: var(--white-dim);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-serif: var(--font-cormorant);
@@ -60,14 +60,24 @@ body {
 }
 
 /* ─── Scrollbar ──────────────────────────────────────────────────── */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: var(--black-soft); }
-::-webkit-scrollbar-thumb { background: var(--black-border); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--gold-light); }
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--black-soft);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--black-border);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gold-light);
+}
 
 /* ─── Gold text gradient utility ───────────────────────────────── */
-.text-gold-gradient {
-  background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold) 60%, var(--gold-dark) 100%);
+.text-gold {
+  background: rgb(170, 148, 22);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

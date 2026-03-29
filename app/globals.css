@@ -2,6 +2,8 @@
 
 /* ─── KP Jewlrs Design Tokens ─────────────────────────────────── */
 :root {
+  color-scheme: light;
+
   /* Gold — darkened for contrast on cream backgrounds */
   --gold: #7a5c10;
   --gold-light: #c9a84c;

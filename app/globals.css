@@ -2,16 +2,20 @@
 
 /* ─── KP Jewlrs Design Tokens ─────────────────────────────────── */
 :root {
-  /* Brand */
-  --gold:        #C9A84C;
-  --gold-light:  #E5C97A;
-  --gold-dark:   #9E7B2F;
-  --black:       #0A0A0A;
-  --black-soft:  #111111;
-  --black-card:  #161616;
-  --black-border:#242424;
-  --white:       #F5F0E8;    /* warm white, not pure white */
-  --white-dim:   #C0BAB0;
+  /* Gold — darkened for contrast on cream backgrounds */
+  --gold:        #7A5C10;
+  --gold-light:  #C9A84C;
+  --gold-dark:   #4A380A;
+
+  /* Cream backgrounds (replaces dark blacks) */
+  --black:       #F7F4EF;    /* main background — warm cream */
+  --black-soft:  #EDE9E3;    /* section backgrounds */
+  --black-card:  #FDFBF8;    /* card backgrounds */
+  --black-border:#DDD6CC;    /* hairline borders */
+
+  /* Charcoal text (replaces whites) */
+  --white:       #1A1714;    /* main text — warm near-black */
+  --white-dim:   #7A7470;    /* muted/secondary text */
 
   /* Functional */
   --background:  var(--black);
@@ -34,6 +38,7 @@
   --color-white-dim:     var(--white-dim);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-serif: var(--font-cormorant);
 }
 
 /* ─── Base ──────────────────────────────────────────────────────── */
@@ -57,12 +62,12 @@ body {
 /* ─── Scrollbar ──────────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: var(--black-soft); }
-::-webkit-scrollbar-thumb { background: var(--gold-dark); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--gold); }
+::-webkit-scrollbar-thumb { background: var(--black-border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold-light); }
 
 /* ─── Gold text gradient utility ───────────────────────────────── */
 .text-gold-gradient {
-  background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold) 50%, var(--gold-dark) 100%);
+  background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold) 60%, var(--gold-dark) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -70,7 +75,7 @@ body {
 
 /* ─── Gold border glow ──────────────────────────────────────────── */
 .gold-glow {
-  box-shadow: 0 0 12px rgba(201, 168, 76, 0.25);
+  box-shadow: 0 0 16px rgba(122, 92, 16, 0.15);
 }
 
 /* ─── Divider ───────────────────────────────────────────────────── */

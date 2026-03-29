@@ -35,7 +35,7 @@ export function ProductCard({ product }: ProductCardProps) {
       className="group flex flex-col bg-[var(--black-card)] border border-[var(--black-border)] rounded-sm overflow-hidden hover:border-[var(--gold)]/40 transition-colors"
     >
       {/* Image */}
-      <div className="relative aspect-square bg-[var(--black-soft)] overflow-hidden">
+      <div className="relative aspect-square bg-[var(--black-border)] overflow-hidden">
         {firstImage ? (
           <Image
             src={firstImage}

@@ -17,13 +17,16 @@ export function Navbar({ session }: NavbarProps) {
   const isAdmin = session?.user?.role === "ADMIN";
 
   return (
-    <header className="sticky top-0 z-50 bg-[var(--black)]/90 backdrop-blur-md border-b border-[var(--black-border)]">
+    <header className="sticky top-0 z-50 bg-[var(--black)]/95 backdrop-blur-md border-b border-[var(--black-border)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
-            <span className="text-xl font-semibold tracking-[0.15em] text-gold-gradient">
-              KP JEWELRS
+            <span className="font-serif text-lg font-light tracking-[0.25em] text-[var(--white)] uppercase">
+              KP{" "}
+              <span className="text-gold-gradient italic">
+                Jewelrs
+              </span>
             </span>
           </Link>
 
@@ -77,7 +80,7 @@ export function Navbar({ session }: NavbarProps) {
                 </Link>
                 <Link
                   href="/register"
-                  className="text-sm px-4 py-2 border border-[var(--gold)] text-[var(--gold)] hover:bg-[var(--gold)]/10 rounded-sm transition-colors"
+                  className="text-xs px-4 py-2 tracking-[0.15em] uppercase border border-[var(--white)] text-[var(--white)] hover:bg-[var(--gold)] hover:border-[var(--gold)] hover:text-[var(--black-card)] transition-colors"
                 >
                   Create account
                 </Link>
@@ -187,7 +190,7 @@ function NavLink({
       className={[
         "text-sm tracking-wide transition-colors duration-150",
         active
-          ? "text-[var(--gold)] font-medium"
+          ? "text-[var(--gold)]"
           : "text-[var(--white-dim)] hover:text-[var(--white)]",
       ].join(" ")}
     >

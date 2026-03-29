@@ -31,39 +31,32 @@ export default async function LandingPage() {
         {/* Hero */}
         <section
           aria-label="Hero"
-          className="relative overflow-hidden bg-[var(--black-soft)] border-b border-[var(--black-border)]"
+          className="bg-[var(--black-soft)] border-b border-[var(--black-border)]"
         >
-          <div
-            aria-hidden="true"
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              background:
-                "radial-gradient(ellipse 80% 50% at 50% 0%, rgba(201,168,76,0.08) 0%, transparent 70%)",
-            }}
-          />
-          <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-28 text-center flex flex-col items-center gap-8">
-            <p className="text-xs tracking-[0.4em] text-[var(--gold)] uppercase font-medium">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-32 text-center flex flex-col items-center gap-6">
+            <p className="text-[10px] tracking-[0.5em] text-[var(--gold)] uppercase font-medium">
               Handpicked from Mexico
             </p>
-            <h1 className="text-5xl sm:text-6xl font-light tracking-tight">
-              <span className="text-gold-gradient font-semibold">
-                KP JEWELRS
+            <h1 className="font-serif text-6xl sm:text-7xl font-light tracking-wide text-[var(--white)]">
+              KP{" "}
+              <span className="text-gold-gradient italic">
+                Jewelrs
               </span>
             </h1>
-            <p className="text-base sm:text-lg text-[var(--white-dim)] max-w-xl leading-relaxed">
+            <p className="text-sm text-[var(--white-dim)] max-w-md leading-loose tracking-wide">
               Curated jewelry for every style. Necklaces, bracelets, rings,
               earrings and more — all unisex, all authentic.
             </p>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-6 pt-2">
               <Link
                 href="/shop"
-                className="px-8 py-3 bg-[var(--gold)] text-[var(--black)] text-sm font-semibold rounded-sm hover:bg-[var(--gold-light)] transition-colors"
+                className="px-10 py-3 bg-[var(--white)] text-[var(--black-card)] text-xs tracking-[0.2em] uppercase font-medium hover:bg-[var(--gold)] hover:text-[var(--black-card)] transition-colors"
               >
                 Browse Collection
               </Link>
               <Link
                 href="/register"
-                className="px-8 py-3 border border-[var(--black-border)] text-sm text-[var(--white-dim)] rounded-sm hover:border-[var(--gold)]/50 hover:text-[var(--white)] transition-colors"
+                className="text-xs tracking-[0.2em] uppercase text-[var(--white-dim)] border-b border-[var(--black-border)] pb-0.5 hover:border-[var(--gold)] hover:text-[var(--gold)] transition-colors"
               >
                 Create Account
               </Link>
@@ -72,22 +65,19 @@ export default async function LandingPage() {
         </section>
 
         {/* Category Quick Links */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
-          <h2 className="text-xs tracking-[0.3em] text-[var(--gold)] uppercase mb-8">
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <h2 className="text-[10px] tracking-[0.4em] text-[var(--white-dim)] uppercase mb-10">
             Shop by Category
           </h2>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-[var(--black-border)]">
             {CATEGORIES.map(({ label, type }) => (
               <Link
                 key={type}
                 href={`/shop?type=${type}`}
-                className="group flex flex-col items-center justify-center gap-2 py-6 bg-[var(--black-card)] border border-[var(--black-border)] rounded-sm hover:border-[var(--gold)]/40 transition-colors"
+                className="group flex items-center justify-center py-7 bg-[var(--black-card)] hover:bg-[var(--black-soft)] transition-colors"
               >
-                <span aria-hidden="true" className="text-2xl">
-                  {getCategoryEmoji(type)}
-                </span>
-                <span className="text-xs font-medium text-[var(--white-dim)] group-hover:text-[var(--gold)] transition-colors tracking-wide">
+                <span className="text-xs tracking-[0.25em] uppercase text-[var(--white-dim)] group-hover:text-[var(--gold)] transition-colors">
                   {label}
                 </span>
               </Link>
@@ -99,16 +89,16 @@ export default async function LandingPage() {
 
         {/* New Arrivals */}
         {featured.length > 0 && (
-          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
-            <div className="flex items-end justify-between mb-8">
-              <h2 className="text-xs tracking-[0.3em] text-[var(--gold)] uppercase">
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            <div className="flex items-end justify-between mb-10">
+              <h2 className="font-serif text-2xl font-light tracking-wide text-[var(--white)]">
                 New Arrivals
               </h2>
               <Link
                 href="/shop"
-                className="text-xs text-[var(--white-dim)] hover:text-[var(--gold)] transition-colors"
+                className="text-[10px] tracking-[0.25em] uppercase text-[var(--white-dim)] border-b border-[var(--black-border)] pb-0.5 hover:border-[var(--gold)] hover:text-[var(--gold)] transition-colors"
               >
-                View all →
+                View All
               </Link>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -120,13 +110,15 @@ export default async function LandingPage() {
         )}
 
         {/* About strip */}
-        <section className="border-t border-[var(--black-border)] bg-[var(--black-soft)] py-14">
-          <div className="max-w-3xl mx-auto px-4 text-center flex flex-col gap-4">
-            <p className="text-xs tracking-[0.3em] text-[var(--gold)] uppercase">
-              About Us
+        <section className="border-t border-[var(--black-border)] bg-[var(--black-soft)] py-20">
+          <div className="max-w-2xl mx-auto px-4 text-center flex flex-col gap-6">
+            <p className="text-[10px] tracking-[0.5em] text-[var(--gold)] uppercase">
+              Our Story
             </p>
-            <p className="text-[var(--white-dim)] leading-relaxed text-sm">
+            <p className="font-serif text-xl font-light text-[var(--white)] leading-relaxed">
               Every piece in our collection is personally sourced from Mexico.
+            </p>
+            <p className="text-xs text-[var(--white-dim)] leading-loose tracking-wide max-w-lg mx-auto">
               We specialize in styles like Cubano, Torso, and Cartier chains, as
               well as charms, rings, earrings and more. Interested in a piece?
               Create an account and send us a message to coordinate.
@@ -150,16 +142,3 @@ const CATEGORIES = [
   { label: "Other", type: "OTHER" },
 ];
 
-function getCategoryEmoji(type: string): string {
-  const map: Record<string, string> = {
-    NECKLACE: "📿",
-    BRACELET: "💎",
-    RING: "💍",
-    EARRING: "✨",
-    CHARM: "🔮",
-    NOSE_RING: "⭐",
-    CLIP: "📎",
-    OTHER: "🪙",
-  };
-  return map[type] ?? "💎";
-}

@@ -135,6 +135,14 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
+_If it throws an error, run the following_
+
+```bash
+rm -rf app/generated/prisma .next
+npx prisma gnererate
+npm run dev
+```
+
 ---
 
 ## Database Setup (Azure SQL)

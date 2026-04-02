@@ -17,6 +17,7 @@ export function DashboardNav() {
 
   return (
     <nav
+      role="navigation"
       aria-label="Dashboard navigation"
       className="w-52 flex-shrink-0 flex flex-col bg-[var(--black-soft)] border-r border-[var(--black-border)] min-h-screen sticky top-0"
     >

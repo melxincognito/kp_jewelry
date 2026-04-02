@@ -31,6 +31,7 @@ export function Navbar({ session }: NavbarProps) {
           <nav
             aria-label="Main navigation"
             className="hidden md:flex items-center gap-6"
+            role="navigation"
           >
             <NavLink href="/shop" active={pathname.startsWith("/shop")}>
               Shop

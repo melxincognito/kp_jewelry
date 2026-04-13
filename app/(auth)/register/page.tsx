@@ -131,7 +131,11 @@ export default function RegisterPage() {
 
         <p className="text-center text-xs text-[var(--white-dim)]/50 mt-4">
           Already have an account?{" "}
-          <Link href="/login" className="text-[var(--gold)] hover:underline">
+          <Link
+            aria-label=""
+            href="/login"
+            className="text-[var(--gold)] hover:underline"
+          >
             Sign in
           </Link>
         </p>

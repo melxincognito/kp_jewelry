@@ -44,7 +44,10 @@ export default function LoginPage() {
           >
             KP JEWELRS
           </Link>
-          <p className="text-sm text-[var(--white-dim)] mt-2">
+          <p
+            className="text-sm text-[var(--white-dim)] mt-2"
+            aria-label="Sign in to your account"
+          >
             Sign in to your account
           </p>
         </div>
@@ -102,7 +105,11 @@ export default function LoginPage() {
 
         <p className="text-center text-xs text-[var(--white-dim)]/50 mt-4">
           Don&apos;t have an account?{" "}
-          <Link href="/register" className="text-[var(--gold)] hover:underline">
+          <Link
+            href="/register"
+            className="text-[var(--gold)] hover:underline"
+            aria-label="Don't have an account? Create one."
+          >
             Create one
           </Link>
         </p>

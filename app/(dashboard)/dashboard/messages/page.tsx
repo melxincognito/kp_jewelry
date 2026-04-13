@@ -1,7 +1,8 @@
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { redirect } from "next/navigation";
-import { MessageThread } from "@/components/messages/MessageThread";
+import { MessagesLayout } from "@/components/messages/MessagesLayout";
+import type { ThreadData } from "@/components/messages/MessagesLayout";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Messages" };
@@ -48,47 +49,28 @@ export default async function AdminMessagesPage() {
     threadMap.get(key)!.messages.push(msg);
   }
 
-  const threads = [...threadMap.entries()];
+  const threadData: ThreadData[] = [...threadMap.entries()].map(([key, thread]) => {
+    const [productId] = key.split(":");
+    return {
+      key,
+      messages: thread.messages,
+      recipientId: thread.customerId,
+      productId,
+      productName: thread.productName,
+      recipientName: thread.customerName,
+    };
+  });
 
   return (
-    <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-xl font-light tracking-wide text-[var(--white)]">Messages</h1>
-        <p className="text-xs text-[var(--white-dim)]/40 mt-1">
-          {threads.length} conversation{threads.length !== 1 ? "s" : ""}
-        </p>
-      </div>
-
-      {threads.length === 0 ? (
+    <div className="flex flex-col gap-4">
+      <h1 className="text-xl font-light tracking-wide text-[var(--white)]">Messages</h1>
+      {threadData.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-24 gap-3 text-center">
           <p className="text-4xl opacity-10">◇</p>
           <p className="text-[var(--white-dim)]">No messages yet</p>
         </div>
       ) : (
-        <div className="flex flex-col gap-4">
-          {threads.map(([key, thread]) => {
-            const [productId] = key.split(":");
-            return (
-              <div
-                key={key}
-                className="bg-[var(--black-card)] border border-[var(--black-border)] rounded-sm overflow-hidden"
-                style={{ minHeight: "280px" }}
-              >
-                <div className="px-4 py-2 bg-[var(--black-soft)] border-b border-[var(--black-border)] flex items-center gap-2">
-                  <span className="text-xs text-[var(--white-dim)]/50">From:</span>
-                  <span className="text-xs font-medium text-[var(--white)]">{thread.customerName}</span>
-                </div>
-                <MessageThread
-                  messages={thread.messages}
-                  currentUserId={adminId}
-                  productId={productId}
-                  recipientId={thread.customerId}
-                  productName={thread.productName}
-                />
-              </div>
-            );
-          })}
-        </div>
+        <MessagesLayout initialThreads={threadData} currentUserId={adminId} />
       )}
     </div>
   );

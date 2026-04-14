@@ -2,6 +2,7 @@ import Link from "next/link";
 import { db } from "@/lib/db";
 import { Button } from "@/components/ui/Button";
 import { InventoryTable } from "@/components/dashboard/InventoryTable";
+import { BulkImportButton } from "@/components/dashboard/BulkImportButton";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Inventory" };
@@ -25,9 +26,12 @@ export default async function InventoryPage() {
             {products.length} items · ${totalValue.toFixed(2)} listed value
           </p>
         </div>
-        <Link href="/dashboard/inventory/new">
-          <Button size="sm">+ Add Item</Button>
-        </Link>
+        <div className="flex items-center gap-2">
+          <BulkImportButton />
+          <Link href="/dashboard/inventory/new">
+            <Button size="sm">+ Add Item</Button>
+          </Link>
+        </div>
       </div>
 
       {products.length === 0 ? (

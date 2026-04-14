@@ -34,9 +34,17 @@ export async function POST(req: NextRequest) {
     if (body.exchangeRate) exchangeRate = body.exchangeRate;
   }
 
+  if (data.sku) {
+    const existing = await db.product.findFirst({ where: { sku: data.sku } });
+    if (existing) {
+      return NextResponse.json({ error: `SKU "${data.sku}" is already in use` }, { status: 400 });
+    }
+  }
+
   const product = await db.product.create({
     data: {
       name: data.name,
+      sku: data.sku || null,
       description: data.description,
       images: JSON.stringify(body.images ?? []),
       costMXN: data.costMXN,

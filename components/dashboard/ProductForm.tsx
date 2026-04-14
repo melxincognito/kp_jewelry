@@ -36,6 +36,7 @@ interface ProductFormProps {
   defaultValues?: {
     id?: string;
     name?: string;
+    sku?: string;
     description?: string;
     images?: string[];
     costMXN?: number;
@@ -60,6 +61,7 @@ export function ProductForm({ defaultValues, mode }: ProductFormProps) {
 
   // Form state
   const [name, setName] = useState(defaultValues?.name ?? "");
+  const [sku, setSku] = useState(defaultValues?.sku ?? "");
   const [description, setDescription] = useState(defaultValues?.description ?? "");
   const [jewelryType, setJewelryType] = useState(defaultValues?.jewelryType ?? "NECKLACE");
   const [selectedStyles, setSelectedStyles] = useState<string[]>(defaultValues?.styles ?? []);
@@ -161,6 +163,7 @@ export function ProductForm({ defaultValues, mode }: ProductFormProps) {
 
       const payload = {
         name,
+        sku: sku.trim() || undefined,
         description,
         images: allImages,
         costMXN: parseFloat(costMXN),
@@ -213,7 +216,15 @@ export function ProductForm({ defaultValues, mode }: ProductFormProps) {
       {/* Basic Info */}
       <section className="bg-[var(--black-card)] border border-[var(--black-border)] rounded-sm p-5 flex flex-col gap-4">
         <p className="text-xs tracking-[0.25em] text-[var(--gold)] uppercase">Basic Info</p>
-        <Input label="Item Name" value={name} onChange={(e) => setName(e.target.value)} required />
+        <div className="grid grid-cols-2 gap-4">
+          <Input label="Item Name" value={name} onChange={(e) => setName(e.target.value)} required />
+          <Input
+            label="SKU (optional)"
+            placeholder="e.g. NKL-001"
+            value={sku}
+            onChange={(e) => setSku(e.target.value)}
+          />
+        </div>
         <Textarea label="Description (optional)" value={description} onChange={(e) => setDescription(e.target.value)} />
         <div className="grid grid-cols-2 gap-4">
           <Select

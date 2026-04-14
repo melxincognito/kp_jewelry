@@ -13,6 +13,7 @@ export const loginSchema = z.object({
 
 export const productSchema = z.object({
   name: z.string().min(1, "Name is required"),
+  sku: z.string().optional(),
   description: z.string().optional(),
   costMXN: z.coerce.number().positive("Cost in pesos must be positive"),
   purchaseDate: z.string().min(1, "Purchase date is required"),

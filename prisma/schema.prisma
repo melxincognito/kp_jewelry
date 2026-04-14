@@ -87,6 +87,8 @@ model Product {
   wholesalePrice Float    // USD — floor/break-even price
   sellingPrice   Float    // USD — listed price for customers
 
+  sku String? // Optional — e.g. "NKL-001"
+
   // Categorization — "NECKLACE" | "BRACELET" | "RING" | "EARRING" | "CHARM" | "NOSE_RING" | "CLIP" | "OTHER"
   jewelryType String
   styles      String @db.NVarChar(Max) // JSON array of style tags e.g. ["Cubano","Cartier"]

@@ -20,10 +20,18 @@ export async function PUT(
   }
 
   const data = result.data;
+  if (data.sku) {
+    const existing = await db.product.findFirst({ where: { sku: data.sku, NOT: { id } } });
+    if (existing) {
+      return NextResponse.json({ error: `SKU "${data.sku}" is already in use` }, { status: 400 });
+    }
+  }
+
   const product = await db.product.update({
     where: { id },
     data: {
       name: data.name,
+      sku: data.sku || null,
       description: data.description,
       images: JSON.stringify(body.images ?? []),
       costMXN: data.costMXN,

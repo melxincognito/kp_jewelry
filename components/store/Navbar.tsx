@@ -8,13 +8,16 @@ import type { Session } from "next-auth";
 
 interface NavbarProps {
   session: Session | null;
+  unreadCount?: number;
 }
 
-export function Navbar({ session }: NavbarProps) {
+export function Navbar({ session, unreadCount = 0 }: NavbarProps) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
 
   const isAdmin = session?.user?.role === "ADMIN";
+  const isCustomer = session?.user?.role === "CUSTOMER";
+  const displayCount = unreadCount > 99 ? "99+" : unreadCount;
 
   return (
     <header className="sticky top-0 z-50 bg-[var(--black)]/95 backdrop-blur-md border-b border-[var(--black-border)]">
@@ -36,12 +39,29 @@ export function Navbar({ session }: NavbarProps) {
             <NavLink href="/shop" active={pathname.startsWith("/shop")}>
               Shop
             </NavLink>
-            {session && (
+
+            {/* Want to keep it so only customers see this messages tab on the navigation bar since it looks cleaner on the admin dashboard to keep the location of their messages thread within the dashboard and not having two different messages views/links */}
+            {isCustomer && (
               <NavLink
                 href="/messages"
                 active={pathname.startsWith("/messages")}
+                aria-label={
+                  unreadCount > 0
+                    ? `Messages, ${unreadCount} unread message${unreadCount !== 1 ? "s" : ""}`
+                    : undefined
+                }
               >
-                Messages
+                <span className="relative inline-flex items-center gap-1">
+                  Messages
+                  {unreadCount > 0 && (
+                    <span
+                      aria-hidden="true"
+                      className="inline-flex items-center justify-center min-w-[1.1rem] h-[1.1rem] px-1 rounded-full bg-red-500 text-white text-[10px] font-semibold leading-none"
+                    >
+                      {displayCount}
+                    </span>
+                  )}
+                </span>
               </NavLink>
             )}
             {isAdmin && (
@@ -125,10 +145,23 @@ export function Navbar({ session }: NavbarProps) {
           {session && (
             <Link
               href="/messages"
-              className="text-sm text-[var(--white-dim)]"
+              className="text-sm text-[var(--white-dim)] flex items-center gap-2"
+              aria-label={
+                unreadCount > 0
+                  ? `Messages, ${unreadCount} unread message${unreadCount !== 1 ? "s" : ""}`
+                  : undefined
+              }
               onClick={() => setMenuOpen(false)}
             >
               Messages
+              {unreadCount > 0 && (
+                <span
+                  aria-hidden="true"
+                  className="inline-flex items-center justify-center min-w-[1.1rem] h-[1.1rem] px-1 rounded-full bg-red-500 text-white text-[10px] font-semibold leading-none"
+                >
+                  {displayCount}
+                </span>
+              )}
             </Link>
           )}
           {isAdmin && (
@@ -175,16 +208,19 @@ export function Navbar({ session }: NavbarProps) {
 function NavLink({
   href,
   active,
+  "aria-label": ariaLabel,
   children,
 }: {
   href: string;
   active: boolean;
+  "aria-label"?: string;
   children: React.ReactNode;
 }) {
   return (
     <Link
       href={href}
       aria-current={active ? "page" : undefined}
+      aria-label={ariaLabel}
       className={[
         "text-sm tracking-wide transition-colors duration-150",
         active

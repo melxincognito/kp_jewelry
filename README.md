@@ -1,4 +1,4 @@
-# KP Jewlers
+# KP Jewelrs
 
 A full-stack jewelry storefront and inventory management system. Customers can browse handpicked jewelry, create accounts, and message the seller to coordinate purchases. The owner manages inventory, tracks costs in both MXN and USD, records sales, and handles all customer messages from a private dashboard.
 
@@ -16,17 +16,23 @@ A full-stack jewelry storefront and inventory management system. Customers can b
 ### Messaging
 
 - Customers can send messages to the seller about specific items
-- Async inbox for both customers (`/messages`) and the seller (`/dashboard/messages`)
+- Split-pane iMessage-style inbox for both customers (`/messages`) and the seller (`/dashboard/messages`) — conversation list on the left, thread on the right
+- Conversations sorted by most recent message; new messages bubble the thread to the top automatically
+- Unread message badge on the nav bar for both customers and the admin dashboard — shows count, clears when inbox is opened
+- Full keyboard and screen reader accessibility: selecting a conversation shifts focus into the thread, each message is individually focusable, new messages are announced via a live region
 - No payment processing — seller and buyer coordinate payment directly
 
 ### Inventory Management (Admin Only)
 
 - Add, edit, and delete items with full cost tracking
+- **SKU field** — optional unique identifier per item (e.g. `NKL-001`), shown in the inventory table and filterable
+- **Bulk import** — upload a `.xlsx`, `.xls`, or `.csv` spreadsheet to create multiple items at once; a downloadable CSV template is provided; each row is validated and errors are reported per-row without blocking successful rows
 - Enter purchase cost in **Mexican Pesos (MXN)** — click **Fetch** to auto-load the historical exchange rate for the exact purchase date
 - Tracks: cost in MXN, cost in USD, exchange rate used, shipping/import fees, wholesale price, and selling price
 - Real-time margin and markup preview while filling in prices
 - Tag items by jewelry type (necklace, bracelet, ring, earring, charm, nose ring, clip) and style (Cubano, Torso, Cartier, Franco, etc.)
 - Upload product photos to Azure Blob Storage
+- **Inventory filters** — filter the inventory table by name, SKU, jewelry type, and status simultaneously; live match count updates as you type
 
 ### Sales & Analytics
 
@@ -34,12 +40,6 @@ A full-stack jewelry storefront and inventory management system. Customers can b
 - Dashboard overview: total revenue, monthly revenue, items sold, available inventory
 - Sales history table with per-item profit tracking
 - Unread message alerts on the dashboard
-
-### User Management
-
-- Role-based access: `ADMIN` and `CUSTOMER`
-- Owner can promote any registered user to admin from `/dashboard/users`
-- Admins cannot accidentally demote themselves
 
 ---
 
@@ -56,6 +56,7 @@ A full-stack jewelry storefront and inventory management system. Customers can b
 | Image Storage  | Azure Blob Storage                      |
 | Exchange Rates | Frankfurter API (free, no key required) |
 | Validation     | Zod                                     |
+| Spreadsheet    | xlsx (SheetJS)                          |
 
 ---
 
@@ -71,8 +72,8 @@ app/
 components/
 ├── ui/                   # Reusable: Button, Input, Badge, Modal, StatCard
 ├── store/                # ProductCard, FilterSidebar, Navbar, Footer
-├── dashboard/            # ProductForm, DashboardNav, RecordSaleButton
-└── messages/             # MessageThread, SendMessageForm
+├── dashboard/            # ProductForm, DashboardNav, RecordSaleButton, InventoryTable, BulkImportButton
+└── messages/             # MessageThread, MessagesLayout
 
 lib/
 ├── auth.ts               # Auth.js config
@@ -139,7 +140,7 @@ _If it throws an error, run the following_
 
 ```bash
 rm -rf app/generated/prisma .next
-npx prisma gnererate
+npx prisma generate
 npm run dev
 ```
 

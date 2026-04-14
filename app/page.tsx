@@ -24,7 +24,9 @@ export default async function LandingPage() {
     getFeaturedProducts(),
   ]);
 
+  const noUserDetected = session?.user?.id == null;
   const userId = session?.user?.id;
+
   const unreadCount = userId
     ? await db.message.count({ where: { recipientId: userId, read: false } })
     : 0;
@@ -62,12 +64,14 @@ export default async function LandingPage() {
               >
                 Browse Collection
               </Link>
-              <Link
-                href="/register"
-                className="text-xs tracking-[0.2em] uppercase text-[var(--white-dim)] border-b border-[var(--black-border)] pb-0.5 hover:border-[var(--gold)] hover:text-[var(--gold)] transition-colors"
-              >
-                Create Account
-              </Link>
+              {noUserDetected && (
+                <Link
+                  href="/register"
+                  className="text-xs tracking-[0.2em] uppercase text-[var(--white-dim)] border-b border-[var(--black-border)] pb-0.5 hover:border-[var(--gold)] hover:text-[var(--gold)] transition-colors"
+                >
+                  Create Account
+                </Link>
+              )}
             </div>
           </div>
         </section>

@@ -12,8 +12,13 @@ const NAV_ITEMS = [
   { href: "/dashboard/users", label: "Users", icon: "◉" },
 ];
 
-export function DashboardNav() {
+interface DashboardNavProps {
+  unreadCount?: number;
+}
+
+export function DashboardNav({ unreadCount = 0 }: DashboardNavProps) {
   const pathname = usePathname();
+  const displayCount = unreadCount > 99 ? "99+" : unreadCount;
 
   return (
     <nav
@@ -41,11 +46,19 @@ export function DashboardNav() {
             item.href === "/dashboard"
               ? pathname === "/dashboard"
               : pathname.startsWith(item.href);
+          const isMessages = item.href === "/dashboard/messages";
+          const showBadge = isMessages && unreadCount > 0;
+
           return (
             <Link
               key={item.href}
               href={item.href}
               aria-current={isActive ? "page" : undefined}
+              aria-label={
+                showBadge
+                  ? `${item.label}, ${unreadCount} unread message${unreadCount !== 1 ? "s" : ""}`
+                  : undefined
+              }
               className={[
                 "flex items-center gap-3 px-3 py-2.5 rounded-sm text-sm transition-colors",
                 isActive
@@ -57,6 +70,14 @@ export function DashboardNav() {
                 {item.icon}
               </span>
               {item.label}
+              {showBadge && (
+                <span
+                  aria-hidden="true"
+                  className="ml-auto min-w-[1.25rem] h-5 px-1 rounded-full bg-red-500 text-white text-[10px] font-semibold flex items-center justify-center leading-none"
+                >
+                  {displayCount}
+                </span>
+              )}
             </Link>
           );
         })}

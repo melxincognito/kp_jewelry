@@ -24,9 +24,14 @@ export default async function LandingPage() {
     getFeaturedProducts(),
   ]);
 
+  const userId = session?.user?.id;
+  const unreadCount = userId
+    ? await db.message.count({ where: { recipientId: userId, read: false } })
+    : 0;
+
   return (
     <div className="flex flex-col min-h-screen">
-      <Navbar session={session} />
+      <Navbar session={session} unreadCount={unreadCount} />
       <main id="main-content" className="flex-1" tabIndex={-1}>
         {/* Hero */}
         <section

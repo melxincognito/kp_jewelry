@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { MessageThread, type MessageWithRelations } from "./MessageThread";
+import { useState, useCallback, useRef, useEffect } from "react";
+import { MessageThread, type MessageWithRelations, type MessageThreadHandle } from "./MessageThread";
 
 export interface ThreadData {
   key: string;
@@ -49,10 +49,20 @@ export function MessagesLayout({ initialThreads, currentUserId }: MessagesLayout
   const [selectedKey, setSelectedKey] = useState<string | null>(
     () => sortByLatest(initialThreads)[0]?.key ?? null
   );
-  // Mobile: show thread panel instead of list
   const [showThread, setShowThread] = useState(false);
 
+  const threadRef = useRef<MessageThreadHandle>(null);
+
   const selectedThread = threads.find((t) => t.key === selectedKey) ?? null;
+
+  // Move focus into the thread panel whenever the selection changes
+  useEffect(() => {
+    if (selectedKey) {
+      // Small timeout lets React finish rendering the new thread before focusing
+      const id = setTimeout(() => threadRef.current?.focusThread(), 50);
+      return () => clearTimeout(id);
+    }
+  }, [selectedKey]);
 
   const handleMessageSent = useCallback((threadKey: string, msg: MessageWithRelations) => {
     setThreads((prev) =>
@@ -98,8 +108,7 @@ export function MessagesLayout({ initialThreads, currentUserId }: MessagesLayout
             const lastTime = lastMsg ? relativeTime(lastMsg.createdAt) : "";
             const preview = lastMsg?.body ?? "";
 
-            // Derive the other person's name from messages, not from the prop,
-            // so we never accidentally show the current user's own name.
+            // Always derive name from the other person in the messages
             const anyMsg = thread.messages.find(
               (m) => m.senderId !== currentUserId || m.recipientId !== currentUserId
             );
@@ -117,7 +126,7 @@ export function MessagesLayout({ initialThreads, currentUserId }: MessagesLayout
                 <button
                   type="button"
                   aria-current={isSelected ? "true" : undefined}
-                  aria-label={`${displayName}, ${thread.productName}${preview ? `, last message: ${preview.slice(0, 60)}` : ""}`}
+                  aria-label={`${displayName}, ${thread.productName}${preview ? `, last message: ${preview.slice(0, 60)}` : ""}. Press Enter to open.`}
                   onClick={() => selectThread(thread.key)}
                   className={[
                     "w-full px-4 py-3.5 flex items-start gap-3 text-left transition-colors border-l-2",
@@ -142,7 +151,11 @@ export function MessagesLayout({ initialThreads, currentUserId }: MessagesLayout
                   {/* Text */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-baseline justify-between gap-2">
-                      <p className={`text-sm truncate ${isSelected ? "text-[var(--white)] font-medium" : "text-[var(--white-dim)]"}`}>
+                      <p
+                        className={`text-sm truncate ${
+                          isSelected ? "text-[var(--white)] font-medium" : "text-[var(--white-dim)]"
+                        }`}
+                      >
                         {displayName}
                       </p>
                       {lastTime && (
@@ -172,7 +185,11 @@ export function MessagesLayout({ initialThreads, currentUserId }: MessagesLayout
 
       {/* ── Right panel: message thread ── */}
       <section
-        aria-label={selectedThread ? `Conversation with ${selectedThread.recipientName}` : "No conversation selected"}
+        aria-label={
+          selectedThread
+            ? `Conversation with ${selectedThread.recipientName}`
+            : "No conversation selected"
+        }
         className={`flex-1 min-w-0 flex flex-col ${showThread ? "flex" : "hidden sm:flex"}`}
       >
         {/* Mobile back button */}
@@ -180,7 +197,7 @@ export function MessagesLayout({ initialThreads, currentUserId }: MessagesLayout
           <button
             type="button"
             onClick={() => setShowThread(false)}
-            aria-label="Back to conversations"
+            aria-label="Back to conversations list"
             className="text-xs text-[var(--gold)]"
           >
             ← Conversations
@@ -189,6 +206,7 @@ export function MessagesLayout({ initialThreads, currentUserId }: MessagesLayout
 
         {selectedThread ? (
           <MessageThread
+            ref={threadRef}
             key={selectedThread.key}
             messages={selectedThread.messages}
             currentUserId={currentUserId}

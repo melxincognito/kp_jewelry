@@ -17,7 +17,14 @@ export async function POST(req: NextRequest) {
 
   const { productId, salePrice, buyerEmail, notes, soldAt } = result.data;
 
-  // Optionally resolve buyer by email
+  const product = await db.product.findUnique({ where: { id: productId } });
+  if (!product) {
+    return NextResponse.json({ error: "Product not found" }, { status: 404 });
+  }
+  if (product.status === "SOLD" || product.quantity < 1) {
+    return NextResponse.json({ error: "This item is out of stock" }, { status: 400 });
+  }
+
   let buyerId: string | null = null;
   if (buyerEmail) {
     const buyer = await db.user.findUnique({
@@ -27,7 +34,8 @@ export async function POST(req: NextRequest) {
     buyerId = buyer?.id ?? null;
   }
 
-  // Create sale and mark product as SOLD in a transaction
+  const newQuantity = product.quantity - 1;
+
   const sale = await db.$transaction(async (tx) => {
     const s = await tx.sale.create({
       data: {
@@ -40,7 +48,11 @@ export async function POST(req: NextRequest) {
     });
     await tx.product.update({
       where: { id: productId },
-      data: { status: "SOLD" },
+      data: {
+        quantity: newQuantity,
+        // Only mark sold when the last unit is gone
+        ...(newQuantity === 0 ? { status: "SOLD" } : {}),
+      },
     });
     return s;
   });

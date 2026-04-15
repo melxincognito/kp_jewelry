@@ -10,7 +10,6 @@ export const metadata: Metadata = { title: "Inventory" };
 export default async function InventoryPage() {
   const products = await db.product.findMany({
     orderBy: { createdAt: "desc" },
-    include: { sale: true },
   });
 
   const totalValue = products

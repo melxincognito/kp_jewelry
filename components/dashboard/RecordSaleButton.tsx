@@ -12,6 +12,7 @@ interface AvailableProduct {
   id: string;
   name: string;
   sellingPrice: number;
+  quantity: number;
 }
 
 export function RecordSaleButton({ availableProducts }: { availableProducts: AvailableProduct[] }) {
@@ -79,7 +80,7 @@ export function RecordSaleButton({ availableProducts }: { availableProducts: Ava
             label="Item Sold"
             options={availableProducts.map((p) => ({
               value: p.id,
-              label: `${p.name} ($${p.sellingPrice})`,
+              label: `${p.name} — $${p.sellingPrice} (${p.quantity} left)`,
             }))}
             value={selectedProductId}
             onChange={(e) => handleProductChange(e.target.value)}

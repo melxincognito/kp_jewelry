@@ -16,7 +16,7 @@ export default async function SalesPage() {
     }),
     db.product.findMany({
       where: { status: { not: "SOLD" } },
-      select: { id: true, name: true, sellingPrice: true },
+      select: { id: true, name: true, sellingPrice: true, quantity: true },
       orderBy: { name: "asc" },
     }),
   ]);

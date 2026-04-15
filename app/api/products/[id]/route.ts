@@ -45,6 +45,7 @@ export async function PUT(
       styles: JSON.stringify(data.styles),
       quantity: data.quantity,
       status: body.status,
+      showOnStorefront: data.showOnStorefront,
     },
   });
 

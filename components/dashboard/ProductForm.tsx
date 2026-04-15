@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
@@ -32,6 +32,10 @@ const COMMON_STYLES = [
   "Herringbone",
 ];
 
+function fmt2(v: number | undefined, fallback = "") {
+  return v !== undefined ? v.toFixed(2) : fallback;
+}
+
 interface ProductFormProps {
   defaultValues?: {
     id?: string;
@@ -50,6 +54,7 @@ interface ProductFormProps {
     styles?: string[];
     quantity?: number;
     status?: string;
+    showOnStorefront?: boolean;
   };
   mode: "create" | "edit";
 }
@@ -71,14 +76,15 @@ export function ProductForm({ defaultValues, mode }: ProductFormProps) {
       ? defaultValues.purchaseDate.split("T")[0]
       : new Date().toISOString().split("T")[0]
   );
-  const [costMXN, setCostMXN] = useState(String(defaultValues?.costMXN ?? ""));
-  const [costUSD, setCostUSD] = useState(String(defaultValues?.costUSD ?? ""));
+  const [costMXN, setCostMXN] = useState(fmt2(defaultValues?.costMXN));
+  const [costUSD, setCostUSD] = useState(fmt2(defaultValues?.costUSD));
   const [exchangeRate, setExchangeRate] = useState(String(defaultValues?.exchangeRate ?? ""));
-  const [shippingFees, setShippingFees] = useState(String(defaultValues?.shippingFees ?? "0"));
-  const [wholesalePrice, setWholesalePrice] = useState(String(defaultValues?.wholesalePrice ?? ""));
-  const [sellingPrice, setSellingPrice] = useState(String(defaultValues?.sellingPrice ?? ""));
+  const [shippingFees, setShippingFees] = useState(fmt2(defaultValues?.shippingFees, "0"));
+  const [wholesalePrice, setWholesalePrice] = useState(fmt2(defaultValues?.wholesalePrice));
+  const [sellingPrice, setSellingPrice] = useState(fmt2(defaultValues?.sellingPrice));
   const [quantity, setQuantity] = useState(String(defaultValues?.quantity ?? "1"));
   const [status, setStatus] = useState(defaultValues?.status ?? "AVAILABLE");
+  const [showOnStorefront, setShowOnStorefront] = useState(defaultValues?.showOnStorefront ?? true);
 
   // Images
   const [existingImages, setExistingImages] = useState<string[]>(defaultValues?.images ?? []);
@@ -86,7 +92,7 @@ export function ProductForm({ defaultValues, mode }: ProductFormProps) {
   const [fetchingRate, setFetchingRate] = useState(false);
 
   // Fetch historical exchange rate
-  const fetchRate = useCallback(async () => {
+  async function fetchRate() {
     if (!purchaseDate) return;
     setFetchingRate(true);
     try {
@@ -95,8 +101,7 @@ export function ProductForm({ defaultValues, mode }: ProductFormProps) {
       if (data.mxnPerUsd) {
         setExchangeRate(data.mxnPerUsd.toFixed(4));
         if (costMXN) {
-          const usd = parseFloat(costMXN) / data.mxnPerUsd;
-          setCostUSD(usd.toFixed(2));
+          setCostUSD((parseFloat(costMXN) / data.mxnPerUsd).toFixed(2));
         }
       }
     } catch {
@@ -104,7 +109,13 @@ export function ProductForm({ defaultValues, mode }: ProductFormProps) {
     } finally {
       setFetchingRate(false);
     }
-  }, [purchaseDate, costMXN]);
+  }
+
+  // Round a money string to 2 decimal places on blur
+  const roundMoney = (val: string, setter: (v: string) => void) => {
+    const n = parseFloat(val);
+    if (!isNaN(n)) setter(n.toFixed(2));
+  };
 
   // Recalculate USD when MXN or rate changes
   const recalcUSD = (mxn: string, rate: string) => {
@@ -165,6 +176,7 @@ export function ProductForm({ defaultValues, mode }: ProductFormProps) {
         name,
         sku: sku.trim() || undefined,
         description,
+        showOnStorefront,
         images: allImages,
         costMXN: parseFloat(costMXN),
         costUSD: parseFloat(costUSD),
@@ -254,6 +266,37 @@ export function ProductForm({ defaultValues, mode }: ProductFormProps) {
             onChange={(e) => setStatus(e.target.value)}
           />
         )}
+
+        {/* Storefront visibility */}
+        <div className="flex items-start justify-between gap-4 pt-1">
+          <div>
+            <p className="text-sm font-medium text-[var(--white-dim)] tracking-wide">
+              Show on storefront
+            </p>
+            <p className="text-xs text-[var(--white-dim)]/40 mt-0.5">
+              When off, this item is only visible to you in the dashboard.
+            </p>
+          </div>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={showOnStorefront}
+            aria-label="Show on storefront"
+            onClick={() => setShowOnStorefront((v) => !v)}
+            className={[
+              "relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gold)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--black-card)]",
+              showOnStorefront ? "bg-[var(--gold)]" : "bg-[var(--black-border)]",
+            ].join(" ")}
+          >
+            <span
+              aria-hidden="true"
+              className={[
+                "pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-sm transition-transform",
+                showOnStorefront ? "translate-x-5" : "translate-x-0",
+              ].join(" ")}
+            />
+          </button>
+        </div>
       </section>
 
       {/* Styles */}
@@ -347,6 +390,7 @@ export function ProductForm({ defaultValues, mode }: ProductFormProps) {
               setCostMXN(e.target.value);
               recalcUSD(e.target.value, exchangeRate);
             }}
+            onBlur={() => roundMoney(costMXN, setCostMXN)}
             required
           />
           <Input
@@ -356,6 +400,7 @@ export function ProductForm({ defaultValues, mode }: ProductFormProps) {
             min="0"
             value={costUSD}
             onChange={(e) => setCostUSD(e.target.value)}
+            onBlur={() => roundMoney(costUSD, setCostUSD)}
             hint="Editable — override if needed"
             required
           />
@@ -369,6 +414,7 @@ export function ProductForm({ defaultValues, mode }: ProductFormProps) {
           placeholder="0.00"
           value={shippingFees}
           onChange={(e) => setShippingFees(e.target.value)}
+          onBlur={() => roundMoney(shippingFees, setShippingFees)}
         />
 
         <div className="grid grid-cols-2 gap-4">
@@ -380,6 +426,7 @@ export function ProductForm({ defaultValues, mode }: ProductFormProps) {
             placeholder="Your break-even price"
             value={wholesalePrice}
             onChange={(e) => setWholesalePrice(e.target.value)}
+            onBlur={() => roundMoney(wholesalePrice, setWholesalePrice)}
             required
           />
           <Input
@@ -390,6 +437,7 @@ export function ProductForm({ defaultValues, mode }: ProductFormProps) {
             placeholder="Listed price for customers"
             value={sellingPrice}
             onChange={(e) => setSellingPrice(e.target.value)}
+            onBlur={() => roundMoney(sellingPrice, setSellingPrice)}
             required
           />
         </div>

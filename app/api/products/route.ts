@@ -57,6 +57,7 @@ export async function POST(req: NextRequest) {
       jewelryType: data.jewelryType,
       styles: JSON.stringify(data.styles),
       quantity: data.quantity,
+      showOnStorefront: data.showOnStorefront,
     },
   });
 

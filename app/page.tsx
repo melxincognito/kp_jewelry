@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 async function getFeaturedProducts() {
   return db.product.findMany({
-    where: { status: "AVAILABLE" },
+    where: { status: "AVAILABLE", showOnStorefront: true },
     orderBy: { createdAt: "desc" },
     take: 8,
   });

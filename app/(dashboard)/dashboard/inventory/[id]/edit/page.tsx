@@ -28,6 +28,7 @@ export default async function EditInventoryItemPage({
         defaultValues={{
           id: product.id,
           name: product.name,
+          sku: product.sku ?? "",
           description: product.description ?? "",
           images,
           costMXN: product.costMXN,
@@ -41,6 +42,7 @@ export default async function EditInventoryItemPage({
           styles,
           quantity: product.quantity,
           status: product.status,
+          showOnStorefront: product.showOnStorefront,
         }}
       />
     </div>

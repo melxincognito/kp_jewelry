@@ -27,6 +27,7 @@ async function getProducts(params: ShopSearchParams) {
     : [];
 
   const where = {
+    showOnStorefront: true,
     ...(params.type ? { jewelryType: params.type as JewelryType } : {}),
     ...(params.status
       ? { status: params.status as ProductStatus }
@@ -61,7 +62,7 @@ async function getProducts(params: ShopSearchParams) {
 
 async function getAvailableStyles(): Promise<string[]> {
   const products = await db.product.findMany({
-    where: { status: { not: "SOLD" } },
+    where: { status: { not: "SOLD" }, showOnStorefront: true },
     select: { styles: true },
   });
   const allStyles = products.flatMap((p) => {

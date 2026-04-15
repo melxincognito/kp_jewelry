@@ -44,7 +44,7 @@ export default async function ProductDetailPage({
     auth(),
   ]);
 
-  if (!product) notFound();
+  if (!product || !product.showOnStorefront) notFound();
 
   const images: string[] = JSON.parse(product.images || "[]");
   const styles: string[] = JSON.parse(product.styles || "[]");

@@ -94,8 +94,9 @@ model Product {
   styles      String @db.NVarChar(Max) // JSON array of style tags e.g. ["Cubano","Cartier"]
 
   // "AVAILABLE" | "RESERVED" | "SOLD"
-  status   String @default("AVAILABLE")
-  quantity Int    @default(1)
+  status          String  @default("AVAILABLE")
+  quantity        Int     @default(1)
+  showOnStorefront Boolean @default(true) // false = hidden from shop/landing page
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

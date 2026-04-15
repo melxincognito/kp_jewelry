@@ -32,6 +32,7 @@ export const productSchema = z.object({
   ]),
   styles: z.array(z.string()).default([]),
   quantity: z.coerce.number().int().positive().default(1),
+  showOnStorefront: z.boolean().default(true),
 });
 
 export const saleSchema = z.object({

@@ -133,6 +133,8 @@ export async function POST(req: NextRequest) {
     const description = String(row["description"] ?? "").trim() || null;
     const stylesRaw = String(row["styles"] ?? "").trim();
     const styles = stylesRaw ? stylesRaw.split(",").map((s) => s.trim()).filter(Boolean) : [];
+    const showOnStorefrontRaw = String(row["showonstorefront"] ?? "true").trim().toLowerCase();
+    const showOnStorefront = showOnStorefrontRaw !== "false" && showOnStorefrontRaw !== "0" && showOnStorefrontRaw !== "no";
 
     if (isNaN(costMXN) || costMXN <= 0) {
       results.push({ row: rowNum, name, status: "error", error: "costMXN must be a positive number" });
@@ -174,6 +176,7 @@ export async function POST(req: NextRequest) {
           styles: JSON.stringify(styles),
           quantity,
           status: "AVAILABLE",
+          showOnStorefront,
         },
       });
       results.push({ row: rowNum, name, status: "created" });

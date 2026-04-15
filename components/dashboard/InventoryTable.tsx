@@ -48,6 +48,7 @@ export interface InventoryProduct {
   shippingFees: number;
   wholesalePrice: number;
   sellingPrice: number;
+  showOnStorefront: boolean;
 }
 
 interface InventoryTableProps {
@@ -211,6 +212,7 @@ export function InventoryTable({ products }: InventoryTableProps) {
                 <th scope="col" className="text-left px-4 py-3 text-xs text-[var(--white-dim)]/50 font-normal tracking-widest uppercase">SKU</th>
                 <th scope="col" className="text-left px-4 py-3 text-xs text-[var(--white-dim)]/50 font-normal tracking-widest uppercase">Type</th>
                 <th scope="col" className="text-left px-4 py-3 text-xs text-[var(--white-dim)]/50 font-normal tracking-widest uppercase">Status</th>
+                <th scope="col" className="text-left px-4 py-3 text-xs text-[var(--white-dim)]/50 font-normal tracking-widest uppercase">Storefront</th>
                 <th scope="col" className="text-right px-4 py-3 text-xs text-[var(--white-dim)]/50 font-normal tracking-widest uppercase">Cost USD</th>
                 <th scope="col" className="text-right px-4 py-3 text-xs text-[var(--white-dim)]/50 font-normal tracking-widest uppercase">List Price</th>
                 <th scope="col" className="text-right px-4 py-3 text-xs text-[var(--white-dim)]/50 font-normal tracking-widest uppercase">Margin</th>
@@ -258,6 +260,13 @@ export function InventoryTable({ products }: InventoryTableProps) {
                       <Badge variant={statusVariant[product.status as ProductStatus]}>
                         {product.status.charAt(0) + product.status.slice(1).toLowerCase()}
                       </Badge>
+                    </td>
+                    <td className="px-4 py-3">
+                      {product.showOnStorefront ? (
+                        <span className="text-xs text-emerald-400">Visible</span>
+                      ) : (
+                        <span className="text-xs text-[var(--white-dim)]/30">Hidden</span>
+                      )}
                     </td>
                     <td className="px-4 py-3 text-right text-[var(--white-dim)]">
                       <p>${totalCost.toFixed(2)}</p>

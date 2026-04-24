@@ -9,6 +9,8 @@ export type MessageWithRelations = Message & {
   sender: Pick<User, "id" | "name" | "email">;
   recipient: Pick<User, "id" | "name" | "email">;
   product: Pick<Product, "id" | "name">;
+  deletedBySenderAt: Date | null;
+  deletedByRecipientAt: Date | null;
 };
 
 export interface MessageThreadHandle {

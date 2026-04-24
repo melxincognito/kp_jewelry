@@ -132,6 +132,11 @@ model Message {
   read        Boolean  @default(false)
   createdAt   DateTime @default(now())
 
+  // Soft-delete: set when the respective party deletes the thread.
+  // Permanently removed by the cleanup job after both are set for 30+ days.
+  deletedBySenderAt     DateTime?
+  deletedByRecipientAt  DateTime?
+
   product   Product @relation(fields: [productId], references: [id])
   // NoAction required — SQL Server does not allow multiple cascade paths to the same table
   sender    User    @relation("Sender", fields: [senderId], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -140,4 +145,6 @@ model Message {
   @@index([productId])
   @@index([senderId])
   @@index([recipientId])
+  @@index([deletedBySenderAt])
+  @@index([deletedByRecipientAt])
 }

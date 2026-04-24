@@ -1,4 +1,4 @@
-# KP Jewelrs
+# KP Jewelry
 
 A full-stack jewelry storefront and inventory management system. Customers can browse handpicked jewelry, create accounts, and message the seller to coordinate purchases. The owner manages inventory, tracks costs in both MXN and USD, records sales, and handles all customer messages from a private dashboard.
 

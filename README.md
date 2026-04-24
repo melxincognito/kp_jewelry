@@ -221,6 +221,7 @@ HEALTH_API_KEY=""
 | `/dashboard/sales`               | Admin     | Sales history and recording   |
 | `/dashboard/messages`            | Admin     | All customer conversations    |
 | `/dashboard/users`               | Admin     | Manage user roles             |
+| `/api/health?key=secret-key`     | Admin     | Health endpoint w/ key        |
 
 ---
 

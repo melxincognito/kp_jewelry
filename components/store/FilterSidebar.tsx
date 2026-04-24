@@ -41,7 +41,7 @@ export function FilterSidebar({ availableStyles }: FilterSidebarProps) {
       params.delete("page");
       router.push(`/shop?${params.toString()}`);
     },
-    [router, searchParams]
+    [router, searchParams],
   );
 
   const toggleStyle = useCallback(
@@ -50,14 +50,16 @@ export function FilterSidebar({ availableStyles }: FilterSidebarProps) {
       const current = params.getAll("style");
       if (current.includes(style)) {
         params.delete("style");
-        current.filter((s) => s !== style).forEach((s) => params.append("style", s));
+        current
+          .filter((s) => s !== style)
+          .forEach((s) => params.append("style", s));
       } else {
         params.append("style", style);
       }
       params.delete("page");
       router.push(`/shop?${params.toString()}`);
     },
-    [router, searchParams]
+    [router, searchParams],
   );
 
   const activeType = searchParams.get("type") ?? "";
@@ -66,10 +68,18 @@ export function FilterSidebar({ availableStyles }: FilterSidebarProps) {
   const activeStatus = searchParams.get("status") ?? "";
 
   return (
-    <aside aria-label="Product filters" className="w-56 flex-shrink-0 flex flex-col gap-6">
+    <aside
+      aria-label="Product filters"
+      className="w-56 flex-shrink-0 flex flex-col gap-6"
+    >
       {/* Sort */}
       <div role="group" aria-labelledby="filter-sort-label">
-        <p id="filter-sort-label" className="text-[10px] tracking-[0.25em] text-[var(--gold)] uppercase mb-3">Sort</p>
+        <p
+          id="filter-sort-label"
+          className="text-[10px] tracking-[0.25em] text-[var(--gold)] uppercase mb-3"
+        >
+          Sort
+        </p>
         <div className="flex flex-col gap-1">
           {SORT_OPTIONS.map((opt) => (
             <button
@@ -77,7 +87,7 @@ export function FilterSidebar({ availableStyles }: FilterSidebarProps) {
               onClick={() => setParam("sort", opt.value)}
               aria-pressed={activeSort === opt.value}
               className={[
-                "text-left text-sm px-3 py-2 rounded-sm transition-colors",
+                "hover:cursor-pointer text-left text-sm px-3 py-2 rounded-sm transition-colors",
                 activeSort === opt.value
                   ? "bg-[var(--gold)]/10 text-[var(--gold)]"
                   : "text-[var(--white-dim)] hover:text-[var(--white)] hover:bg-white/5",
@@ -91,7 +101,10 @@ export function FilterSidebar({ availableStyles }: FilterSidebarProps) {
 
       {/* Status */}
       <div role="group" aria-labelledby="filter-availability-label">
-        <p id="filter-availability-label" className="text-[10px] tracking-[0.25em] text-[var(--gold)] uppercase mb-3">
+        <p
+          id="filter-availability-label"
+          className="text-[10px] tracking-[0.25em] text-[var(--gold)] uppercase mb-3"
+        >
           Availability
         </p>
         <div className="flex flex-col gap-1">
@@ -105,7 +118,7 @@ export function FilterSidebar({ availableStyles }: FilterSidebarProps) {
               onClick={() => setParam("status", opt.value)}
               aria-pressed={activeStatus === opt.value}
               className={[
-                "text-left text-sm px-3 py-2 rounded-sm transition-colors",
+                "hover:cursor-pointer text-left text-sm px-3 py-2 rounded-sm transition-colors",
                 activeStatus === opt.value
                   ? "bg-[var(--gold)]/10 text-[var(--gold)]"
                   : "text-[var(--white-dim)] hover:text-[var(--white)] hover:bg-white/5",
@@ -119,7 +132,10 @@ export function FilterSidebar({ availableStyles }: FilterSidebarProps) {
 
       {/* Jewelry Type */}
       <div role="group" aria-labelledby="filter-category-label">
-        <p id="filter-category-label" className="text-[10px] tracking-[0.25em] text-[var(--gold)] uppercase mb-3">
+        <p
+          id="filter-category-label"
+          className="text-[10px] tracking-[0.25em] text-[var(--gold)] uppercase mb-3"
+        >
           Category
         </p>
         <div className="flex flex-col gap-1">
@@ -129,7 +145,7 @@ export function FilterSidebar({ availableStyles }: FilterSidebarProps) {
               onClick={() => setParam("type", type.value)}
               aria-pressed={activeType === type.value}
               className={[
-                "text-left text-sm px-3 py-2 rounded-sm transition-colors",
+                "hover:cursor-pointer text-left text-sm px-3 py-2 rounded-sm transition-colors",
                 activeType === type.value
                   ? "bg-[var(--gold)]/10 text-[var(--gold)]"
                   : "text-[var(--white-dim)] hover:text-[var(--white)] hover:bg-white/5",
@@ -144,7 +160,10 @@ export function FilterSidebar({ availableStyles }: FilterSidebarProps) {
       {/* Style Tags */}
       {availableStyles.length > 0 && (
         <div role="group" aria-labelledby="filter-style-label">
-          <p id="filter-style-label" className="text-[10px] tracking-[0.25em] text-[var(--gold)] uppercase mb-3">
+          <p
+            id="filter-style-label"
+            className="text-[10px] tracking-[0.25em] text-[var(--gold)] uppercase mb-3"
+          >
             Style
           </p>
           <div className="flex flex-wrap gap-2">
@@ -154,7 +173,7 @@ export function FilterSidebar({ availableStyles }: FilterSidebarProps) {
                 onClick={() => toggleStyle(style)}
                 aria-pressed={activeStyles.includes(style)}
                 className={[
-                  "text-xs px-2.5 py-1 rounded-sm border transition-colors",
+                  "hover:cursor-pointer text-xs px-2.5 py-1 rounded-sm border transition-colors",
                   activeStyles.includes(style)
                     ? "border-[var(--gold)] bg-[var(--gold)]/10 text-[var(--gold)]"
                     : "border-[var(--black-border)] text-[var(--white-dim)] hover:border-[var(--gold)]/40",
@@ -172,7 +191,7 @@ export function FilterSidebar({ availableStyles }: FilterSidebarProps) {
         <button
           onClick={() => router.push("/shop")}
           aria-label="Clear all filters"
-          className="text-xs text-[var(--white-dim)]/50 hover:text-[var(--white-dim)] transition-colors text-left"
+          className="hover:cursor-pointer text-xs text-[var(--white-dim)]/50 hover:text-[var(--white-dim)] transition-colors text-left"
         >
           Clear all filters ×
         </button>

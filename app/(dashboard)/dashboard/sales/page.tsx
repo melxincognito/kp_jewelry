@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { RecordSaleButton } from "@/components/dashboard/RecordSaleButton";
 import { SalesFilters } from "@/components/dashboard/SalesFilters";
+import { SalesExport } from "@/components/dashboard/SalesExport";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Sales" };
@@ -135,6 +136,19 @@ export default async function SalesPage({
 
   const activeLabel = formatPresetLabel(preset, from, to);
 
+  const exportRows = sales.map((s) => ({
+    item: s.product.name,
+    buyer: s.buyer?.name ?? s.buyer?.email ?? "In-person",
+    salePrice: s.salePrice,
+    profit: s.salePrice - s.product.wholesalePrice,
+    date: new Date(s.soldAt).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    }),
+    notes: s.notes ?? "",
+  }));
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between flex-wrap gap-3">
@@ -150,7 +164,15 @@ export default async function SalesPage({
         <RecordSaleButton availableProducts={availableProducts} />
       </div>
 
-      <SalesFilters />
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <SalesFilters />
+        <SalesExport
+          rows={exportRows}
+          totalRevenue={totalRevenue}
+          totalProfit={totalProfit}
+          label={activeLabel ?? "All Time"}
+        />
+      </div>
 
       {sales.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-24 gap-3 text-center">

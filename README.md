@@ -19,6 +19,7 @@ A full-stack jewelry storefront and inventory management system. Customers can b
 - Split-pane iMessage-style inbox for both customers (`/messages`) and the seller (`/dashboard/messages`) — conversation list on the left, thread on the right
 - Conversations sorted by most recent message; new messages bubble the thread to the top automatically
 - Unread message badge on the nav bar for both customers and the admin dashboard — shows count, clears when inbox is opened
+- Conversations can be deleted and pushed to a deleted folder. All conversations will be permanently deleted after being in the deleted folder for more than 30 days.
 - Full keyboard and screen reader accessibility: selecting a conversation shifts focus into the thread, each message is individually focusable, new messages are announced via a live region
 - No payment processing — seller and buyer coordinate payment directly
 

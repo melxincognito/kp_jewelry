@@ -16,7 +16,7 @@ const PRESETS = [
   { value: "last_quarter", label: "Last Quarter" },
   { value: "this_year", label: "This Year" },
   { value: "last_year", label: "Last Year" },
-  { value: "custom", label: "Custom Range…" },
+  { value: "custom", label: "Custom Dates…" },
 ];
 
 export function SalesFilters() {
@@ -36,7 +36,7 @@ export function SalesFilters() {
       if (value !== "all") params.set("preset", value);
       router.push(`${pathname}?${params.toString()}`);
     },
-    [router, pathname]
+    [router, pathname],
   );
 
   const applyCustom = useCallback(() => {

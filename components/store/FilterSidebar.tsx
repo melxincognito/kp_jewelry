@@ -67,30 +67,61 @@ export function FilterSidebar({ availableStyles }: FilterSidebarProps) {
   const activeSort = searchParams.get("sort") ?? "newest";
   const activeStatus = searchParams.get("status") ?? "";
 
+  // Styles Variables
+
+  const asideProductFiltersStyles = "w-56 flex-shrink-0 flex flex-col gap-6";
+
+  // Filter group label (Sort / Availability / Category / Style headings)
+
+  const sortByFiltersStyles =
+    "text-[10px] tracking-[0.25em] text-[var(--gold)] uppercase mb-3";
+
+  // Filter option list container
+
+  const filterOptionListStyles = "flex flex-col gap-1";
+
+  // Filter option buttons (Sort / Availability / Category)
+
+  const sortByButtonOptionsStyles =
+    "hover:cursor-pointer text-left text-sm px-3 py-2 rounded-sm transition-colors";
+
+  const filterButtonActiveStyles = "bg-[var(--gold)]/10 text-[var(--gold)]";
+  const filterButtonInactiveStyles =
+    "text-[var(--white-dim)] hover:text-[var(--white)] hover:bg-white/5";
+
+  // Style tag chips
+
+  const styleTagListStyles = "flex flex-wrap gap-2";
+  const styleTagBaseStyles =
+    "hover:cursor-pointer text-xs px-2.5 py-1 rounded-sm border transition-colors";
+  const styleTagActiveStyles =
+    "border-[var(--gold)] bg-[var(--gold)]/10 text-[var(--gold)]";
+  const styleTagInactiveStyles =
+    "border-[var(--black-border)] text-[var(--white-dim)] hover:border-[var(--gold)]/40";
+
+  // Reset Filters
+
+  const resetFiltersStyles =
+    "hover:cursor-pointer text-xs text-[var(--white-dim)]/50 hover:text-[var(--white-dim)] transition-colors text-left";
+
   return (
-    <aside
-      aria-label="Product filters"
-      className="w-56 flex-shrink-0 flex flex-col gap-6"
-    >
+    <aside aria-label="Product filters" className={asideProductFiltersStyles}>
       {/* Sort */}
       <div role="group" aria-labelledby="filter-sort-label">
-        <p
-          id="filter-sort-label"
-          className="text-[10px] tracking-[0.25em] text-[var(--gold)] uppercase mb-3"
-        >
+        <p id="filter-sort-label" className={sortByFiltersStyles}>
           Sort
         </p>
-        <div className="flex flex-col gap-1">
+        <div className={filterOptionListStyles}>
           {SORT_OPTIONS.map((opt) => (
             <button
               key={opt.value}
               onClick={() => setParam("sort", opt.value)}
               aria-pressed={activeSort === opt.value}
               className={[
-                "hover:cursor-pointer text-left text-sm px-3 py-2 rounded-sm transition-colors",
+                sortByButtonOptionsStyles,
                 activeSort === opt.value
-                  ? "bg-[var(--gold)]/10 text-[var(--gold)]"
-                  : "text-[var(--white-dim)] hover:text-[var(--white)] hover:bg-white/5",
+                  ? filterButtonActiveStyles
+                  : filterButtonInactiveStyles,
               ].join(" ")}
             >
               {opt.label}
@@ -99,15 +130,12 @@ export function FilterSidebar({ availableStyles }: FilterSidebarProps) {
         </div>
       </div>
 
-      {/* Status */}
+      {/* Availability */}
       <div role="group" aria-labelledby="filter-availability-label">
-        <p
-          id="filter-availability-label"
-          className="text-[10px] tracking-[0.25em] text-[var(--gold)] uppercase mb-3"
-        >
+        <p id="filter-availability-label" className={sortByFiltersStyles}>
           Availability
         </p>
-        <div className="flex flex-col gap-1">
+        <div className={filterOptionListStyles}>
           {[
             { value: "", label: "All" },
             { value: "AVAILABLE", label: "Available" },
@@ -118,10 +146,10 @@ export function FilterSidebar({ availableStyles }: FilterSidebarProps) {
               onClick={() => setParam("status", opt.value)}
               aria-pressed={activeStatus === opt.value}
               className={[
-                "hover:cursor-pointer text-left text-sm px-3 py-2 rounded-sm transition-colors",
+                sortByButtonOptionsStyles,
                 activeStatus === opt.value
-                  ? "bg-[var(--gold)]/10 text-[var(--gold)]"
-                  : "text-[var(--white-dim)] hover:text-[var(--white)] hover:bg-white/5",
+                  ? filterButtonActiveStyles
+                  : filterButtonInactiveStyles,
               ].join(" ")}
             >
               {opt.label}
@@ -130,25 +158,22 @@ export function FilterSidebar({ availableStyles }: FilterSidebarProps) {
         </div>
       </div>
 
-      {/* Jewelry Type */}
+      {/* Category */}
       <div role="group" aria-labelledby="filter-category-label">
-        <p
-          id="filter-category-label"
-          className="text-[10px] tracking-[0.25em] text-[var(--gold)] uppercase mb-3"
-        >
+        <p id="filter-category-label" className={sortByFiltersStyles}>
           Category
         </p>
-        <div className="flex flex-col gap-1">
+        <div className={filterOptionListStyles}>
           {JEWELRY_TYPES.map((type) => (
             <button
               key={type.value}
               onClick={() => setParam("type", type.value)}
               aria-pressed={activeType === type.value}
               className={[
-                "hover:cursor-pointer text-left text-sm px-3 py-2 rounded-sm transition-colors",
+                sortByButtonOptionsStyles,
                 activeType === type.value
-                  ? "bg-[var(--gold)]/10 text-[var(--gold)]"
-                  : "text-[var(--white-dim)] hover:text-[var(--white)] hover:bg-white/5",
+                  ? filterButtonActiveStyles
+                  : filterButtonInactiveStyles,
               ].join(" ")}
             >
               {type.label}
@@ -160,23 +185,20 @@ export function FilterSidebar({ availableStyles }: FilterSidebarProps) {
       {/* Style Tags */}
       {availableStyles.length > 0 && (
         <div role="group" aria-labelledby="filter-style-label">
-          <p
-            id="filter-style-label"
-            className="text-[10px] tracking-[0.25em] text-[var(--gold)] uppercase mb-3"
-          >
+          <p id="filter-style-label" className={sortByFiltersStyles}>
             Style
           </p>
-          <div className="flex flex-wrap gap-2">
+          <div className={styleTagListStyles}>
             {availableStyles.map((style) => (
               <button
                 key={style}
                 onClick={() => toggleStyle(style)}
                 aria-pressed={activeStyles.includes(style)}
                 className={[
-                  "hover:cursor-pointer text-xs px-2.5 py-1 rounded-sm border transition-colors",
+                  styleTagBaseStyles,
                   activeStyles.includes(style)
-                    ? "border-[var(--gold)] bg-[var(--gold)]/10 text-[var(--gold)]"
-                    : "border-[var(--black-border)] text-[var(--white-dim)] hover:border-[var(--gold)]/40",
+                    ? styleTagActiveStyles
+                    : styleTagInactiveStyles,
                 ].join(" ")}
               >
                 {style}
@@ -186,12 +208,12 @@ export function FilterSidebar({ availableStyles }: FilterSidebarProps) {
         </div>
       )}
 
-      {/* Clear */}
+      {/* Clear hello */}
       {(activeType || activeStyles.length > 0 || activeStatus) && (
         <button
           onClick={() => router.push("/shop")}
           aria-label="Clear all filters"
-          className="hover:cursor-pointer text-xs text-[var(--white-dim)]/50 hover:text-[var(--white-dim)] transition-colors text-left"
+          className={resetFiltersStyles}
         >
           Clear all filters ×
         </button>

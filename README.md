@@ -109,6 +109,7 @@ Fill in your values in `.env`:
 | `AUTH_SECRET`                               | Run `openssl rand -base64 32`                                |
 | `AZURE_STORAGE_CONNECTION_STRING`           | Azure Portal → Storage Account → Access Keys                 |
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Google Cloud Console (optional — for "Continue with Google") |
+| `HEALTH_API_KEY`                            |                                                              |
 
 ### 3. Push the database schema
 
@@ -194,6 +195,11 @@ GOOGLE_CLIENT_SECRET=""
 
 # Azure Blob Storage
 AZURE_STORAGE_CONNECTION_STRING=""
+
+# Health Endpoint API Key
+HEALTH_API_KEY=""
+*When set, get to endpoint with /api/health?key=EnteredKey*
+
 ```
 
 ---

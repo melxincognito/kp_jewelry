@@ -11,7 +11,10 @@ export default async function EditInventoryItemPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const product = await db.product.findUnique({ where: { id } });
+  const product = await db.product.findUnique({
+    where: { id },
+    include: { sizes: { orderBy: { size: "asc" } } },
+  });
   if (!product) notFound();
 
   const images: string[] = JSON.parse(product.images || "[]");
@@ -30,6 +33,7 @@ export default async function EditInventoryItemPage({
           name: product.name,
           sku: product.sku ?? "",
           description: product.description ?? "",
+          material: product.material ?? "",
           images,
           costMXN: product.costMXN,
           costUSD: product.costUSD,
@@ -41,6 +45,7 @@ export default async function EditInventoryItemPage({
           jewelryType: product.jewelryType,
           styles,
           quantity: product.quantity,
+          sizes: product.sizes.map((s) => ({ size: s.size, quantity: s.quantity })),
           status: product.status,
           showOnStorefront: product.showOnStorefront,
         }}

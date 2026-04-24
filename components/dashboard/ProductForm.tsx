@@ -19,6 +19,18 @@ const JEWELRY_TYPE_OPTIONS = [
   { value: "OTHER", label: "Other" },
 ];
 
+const MATERIAL_OPTIONS = [
+  { value: "", label: "— None —" },
+  { value: "Gold", label: "Gold" },
+  { value: "White Gold", label: "White Gold" },
+  { value: "Rose Gold", label: "Rose Gold" },
+  { value: "Silver", label: "Silver" },
+  { value: "Sterling Silver", label: "Sterling Silver" },
+  { value: "Stainless Steel", label: "Stainless Steel" },
+  { value: "Plated", label: "Plated" },
+  { value: "Other", label: "Other" },
+];
+
 const COMMON_STYLES = [
   "Cubano",
   "Torso",
@@ -36,12 +48,18 @@ function fmt2(v: number | undefined, fallback = "") {
   return v !== undefined ? v.toFixed(2) : fallback;
 }
 
+interface SizeRow {
+  size: string;
+  quantity: string;
+}
+
 interface ProductFormProps {
   defaultValues?: {
     id?: string;
     name?: string;
     sku?: string;
     description?: string;
+    material?: string;
     images?: string[];
     costMXN?: number;
     costUSD?: number;
@@ -53,6 +71,7 @@ interface ProductFormProps {
     jewelryType?: string;
     styles?: string[];
     quantity?: number;
+    sizes?: { size: string; quantity: number }[];
     status?: string;
     showOnStorefront?: boolean;
   };
@@ -68,6 +87,7 @@ export function ProductForm({ defaultValues, mode }: ProductFormProps) {
   const [name, setName] = useState(defaultValues?.name ?? "");
   const [sku, setSku] = useState(defaultValues?.sku ?? "");
   const [description, setDescription] = useState(defaultValues?.description ?? "");
+  const [material, setMaterial] = useState(defaultValues?.material ?? "");
   const [jewelryType, setJewelryType] = useState(defaultValues?.jewelryType ?? "NECKLACE");
   const [selectedStyles, setSelectedStyles] = useState<string[]>(defaultValues?.styles ?? []);
   const [customStyle, setCustomStyle] = useState("");
@@ -86,12 +106,23 @@ export function ProductForm({ defaultValues, mode }: ProductFormProps) {
   const [status, setStatus] = useState(defaultValues?.status ?? "AVAILABLE");
   const [showOnStorefront, setShowOnStorefront] = useState(defaultValues?.showOnStorefront ?? true);
 
+  // Size tracking
+  const initialSizes: SizeRow[] = (defaultValues?.sizes ?? []).map((s) => ({
+    size: s.size,
+    quantity: String(s.quantity),
+  }));
+  const [sizes, setSizes] = useState<SizeRow[]>(initialSizes);
+  const hasSizes = sizes.length > 0;
+
+  // When sizes are defined, total quantity is derived from their sum
+  const derivedQuantity = sizes.reduce((sum, s) => sum + (parseInt(s.quantity) || 0), 0);
+
   // Images
   const [existingImages, setExistingImages] = useState<string[]>(defaultValues?.images ?? []);
   const [newImageFiles, setNewImageFiles] = useState<File[]>([]);
   const [fetchingRate, setFetchingRate] = useState(false);
 
-  // Fetch historical exchange rate
+  // ── Fetch historical exchange rate ────────────────────────────────────────
   async function fetchRate() {
     if (!purchaseDate) return;
     setFetchingRate(true);
@@ -111,13 +142,11 @@ export function ProductForm({ defaultValues, mode }: ProductFormProps) {
     }
   }
 
-  // Round a money string to 2 decimal places on blur
   const roundMoney = (val: string, setter: (v: string) => void) => {
     const n = parseFloat(val);
     if (!isNaN(n)) setter(n.toFixed(2));
   };
 
-  // Recalculate USD when MXN or rate changes
   const recalcUSD = (mxn: string, rate: string) => {
     const mxnVal = parseFloat(mxn);
     const rateVal = parseFloat(rate);
@@ -126,6 +155,7 @@ export function ProductForm({ defaultValues, mode }: ProductFormProps) {
     }
   };
 
+  // ── Style helpers ─────────────────────────────────────────────────────────
   const toggleStyle = (style: string) => {
     setSelectedStyles((prev) =>
       prev.includes(style) ? prev.filter((s) => s !== style) : [...prev, style]
@@ -140,26 +170,39 @@ export function ProductForm({ defaultValues, mode }: ProductFormProps) {
     setCustomStyle("");
   };
 
+  // ── Size helpers ──────────────────────────────────────────────────────────
+  const addSizeRow = () =>
+    setSizes((prev) => [...prev, { size: "", quantity: "1" }]);
+
+  const removeSizeRow = (index: number) =>
+    setSizes((prev) => prev.filter((_, i) => i !== index));
+
+  const updateSizeRow = (index: number, field: keyof SizeRow, value: string) =>
+    setSizes((prev) =>
+      prev.map((row, i) => (i === index ? { ...row, [field]: value } : row))
+    );
+
+  const clearSizes = () => setSizes([]);
+
+  // ── Image helpers ─────────────────────────────────────────────────────────
   const handleImagePick = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []);
     setNewImageFiles((prev) => [...prev, ...files]);
   };
 
-  const removeExistingImage = (url: string) => {
+  const removeExistingImage = (url: string) =>
     setExistingImages((prev) => prev.filter((u) => u !== url));
-  };
 
-  const removeNewImage = (index: number) => {
+  const removeNewImage = (index: number) =>
     setNewImageFiles((prev) => prev.filter((_, i) => i !== index));
-  };
 
+  // ── Submit ────────────────────────────────────────────────────────────────
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
     setSaving(true);
 
     try {
-      // Upload new images first
       const uploadedUrls: string[] = [];
       for (const file of newImageFiles) {
         const formData = new FormData();
@@ -172,10 +215,27 @@ export function ProductForm({ defaultValues, mode }: ProductFormProps) {
 
       const allImages = [...existingImages, ...uploadedUrls];
 
+      // Parse sizes; validate no duplicate size labels
+      const parsedSizes = sizes.map((s) => ({
+        size: s.size.trim(),
+        quantity: parseInt(s.quantity) || 0,
+      }));
+      const sizeLabels = parsedSizes.map((s) => s.size);
+      const uniqueLabels = new Set(sizeLabels);
+      if (parsedSizes.length > 0 && uniqueLabels.size !== sizeLabels.length) {
+        throw new Error("Each size must have a unique label");
+      }
+      if (parsedSizes.some((s) => !s.size)) {
+        throw new Error("All size rows must have a label");
+      }
+
+      const finalQuantity = hasSizes ? derivedQuantity : parseInt(quantity, 10);
+
       const payload = {
         name,
         sku: sku.trim() || undefined,
         description,
+        material: material || undefined,
         showOnStorefront,
         images: allImages,
         costMXN: parseFloat(costMXN),
@@ -187,7 +247,8 @@ export function ProductForm({ defaultValues, mode }: ProductFormProps) {
         sellingPrice: parseFloat(sellingPrice),
         jewelryType,
         styles: selectedStyles,
-        quantity: parseInt(quantity, 10),
+        quantity: finalQuantity,
+        sizes: parsedSizes,
         status,
       };
 
@@ -228,6 +289,7 @@ export function ProductForm({ defaultValues, mode }: ProductFormProps) {
       {/* Basic Info */}
       <section className="bg-[var(--black-card)] border border-[var(--black-border)] rounded-sm p-5 flex flex-col gap-4">
         <p className="text-xs tracking-[0.25em] text-[var(--gold)] uppercase">Basic Info</p>
+
         <div className="grid grid-cols-2 gap-4">
           <Input label="Item Name" value={name} onChange={(e) => setName(e.target.value)} required />
           <Input
@@ -237,7 +299,7 @@ export function ProductForm({ defaultValues, mode }: ProductFormProps) {
             onChange={(e) => setSku(e.target.value)}
           />
         </div>
-        <Textarea label="Description (optional)" value={description} onChange={(e) => setDescription(e.target.value)} />
+
         <div className="grid grid-cols-2 gap-4">
           <Select
             label="Jewelry Type"
@@ -245,30 +307,126 @@ export function ProductForm({ defaultValues, mode }: ProductFormProps) {
             value={jewelryType}
             onChange={(e) => setJewelryType(e.target.value)}
           />
-          <Input
-            label="Quantity"
-            type="number"
-            min="1"
-            value={quantity}
-            onChange={(e) => setQuantity(e.target.value)}
-            required
+          <Select
+            label="Material (optional)"
+            options={MATERIAL_OPTIONS}
+            value={material}
+            onChange={(e) => setMaterial(e.target.value)}
           />
         </div>
-        {mode === "edit" && (
-          <Select
-            label="Status"
-            options={[
-              { value: "AVAILABLE", label: "Available" },
-              { value: "RESERVED", label: "Reserved" },
-              { value: "SOLD", label: "Sold" },
-            ]}
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-          />
-        )}
+
+        <Textarea label="Description (optional)" value={description} onChange={(e) => setDescription(e.target.value)} />
+
+        {/* Quantity — editable only when no sizes are set */}
+        <div className="grid grid-cols-2 gap-4 items-end">
+          {hasSizes ? (
+            <div>
+              <p className="text-sm font-medium text-[var(--white-dim)] tracking-wide mb-1.5">
+                Total Quantity
+              </p>
+              <p className="px-3 py-2 text-sm bg-[var(--black-soft)] border border-[var(--black-border)] rounded-sm text-[var(--white)]">
+                {derivedQuantity}{" "}
+                <span className="text-xs text-[var(--white-dim)]/40">
+                  (sum of sizes)
+                </span>
+              </p>
+            </div>
+          ) : (
+            <Input
+              label="Quantity"
+              type="number"
+              min="1"
+              value={quantity}
+              onChange={(e) => setQuantity(e.target.value)}
+              required
+            />
+          )}
+          {mode === "edit" && (
+            <Select
+              label="Status"
+              options={[
+                { value: "AVAILABLE", label: "Available" },
+                { value: "RESERVED", label: "Reserved" },
+                { value: "SOLD", label: "Sold" },
+              ]}
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+            />
+          )}
+        </div>
+
+        {/* Size Breakdown */}
+        <div className="flex flex-col gap-3 pt-1">
+          <div className="flex items-center justify-between">
+            <p className="text-xs text-[var(--white-dim)]/50">
+              {hasSizes
+                ? "Size breakdown — deductions will track per size"
+                : "This item has no sizes (e.g. necklace, nose ring)"}
+            </p>
+            {hasSizes ? (
+              <button
+                type="button"
+                onClick={clearSizes}
+                className="text-xs text-red-400/60 hover:text-red-400 transition-colors"
+              >
+                Remove sizing ×
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={addSizeRow}
+                className="text-xs text-[var(--gold)]/70 hover:text-[var(--gold)] transition-colors"
+              >
+                + Add sizing
+              </button>
+            )}
+          </div>
+
+          {hasSizes && (
+            <div className="flex flex-col gap-2">
+              <div className="grid grid-cols-[1fr_100px_32px] gap-2 text-[10px] text-[var(--white-dim)]/40 uppercase tracking-widest px-1">
+                <span>Size</span>
+                <span>Qty</span>
+                <span />
+              </div>
+              {sizes.map((row, i) => (
+                <div key={i} className="grid grid-cols-[1fr_100px_32px] gap-2 items-center">
+                  <Input
+                    placeholder='e.g. "6" or "M" or "18 inch"'
+                    value={row.size}
+                    onChange={(e) => updateSizeRow(i, "size", e.target.value)}
+                    aria-label={`Size label for row ${i + 1}`}
+                  />
+                  <Input
+                    type="number"
+                    min="0"
+                    value={row.quantity}
+                    onChange={(e) => updateSizeRow(i, "quantity", e.target.value)}
+                    aria-label={`Quantity for size ${row.size || i + 1}`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeSizeRow(i)}
+                    aria-label={`Remove size row ${i + 1}`}
+                    className="h-9 w-8 flex items-center justify-center text-[var(--white-dim)]/30 hover:text-red-400 transition-colors rounded-sm hover:bg-red-500/10"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={addSizeRow}
+                className="text-xs text-[var(--gold)]/70 hover:text-[var(--gold)] transition-colors text-left mt-1"
+              >
+                + Add another size
+              </button>
+            </div>
+          )}
+        </div>
 
         {/* Storefront visibility */}
-        <div className="flex items-start justify-between gap-4 pt-1">
+        <div className="flex items-start justify-between gap-4 pt-1 border-t border-[var(--black-border)]">
           <div>
             <p className="text-sm font-medium text-[var(--white-dim)] tracking-wide">
               Show on storefront
@@ -442,7 +600,6 @@ export function ProductForm({ defaultValues, mode }: ProductFormProps) {
           />
         </div>
 
-        {/* Cost summary */}
         {costUSD && wholesalePrice && sellingPrice && (
           <div className="grid grid-cols-3 gap-3 pt-2 border-t border-[var(--black-border)]">
             <div className="text-center">
@@ -476,7 +633,6 @@ export function ProductForm({ defaultValues, mode }: ProductFormProps) {
       {/* Images */}
       <section className="bg-[var(--black-card)] border border-[var(--black-border)] rounded-sm p-5 flex flex-col gap-4">
         <p className="text-xs tracking-[0.25em] text-[var(--gold)] uppercase">Photos</p>
-
         <div className="flex flex-wrap gap-3">
           {existingImages.map((url) => (
             <div key={url} className="relative group w-20 h-20">
@@ -492,13 +648,7 @@ export function ProductForm({ defaultValues, mode }: ProductFormProps) {
           ))}
           {newImageFiles.map((file, i) => (
             <div key={i} className="relative group w-20 h-20 bg-[var(--black-soft)] rounded-sm overflow-hidden">
-              <Image
-                src={URL.createObjectURL(file)}
-                alt="New"
-                fill
-                className="object-cover"
-                sizes="80px"
-              />
+              <Image src={URL.createObjectURL(file)} alt="New" fill className="object-cover" sizes="80px" />
               <button
                 type="button"
                 onClick={() => removeNewImage(i)}
@@ -509,18 +659,11 @@ export function ProductForm({ defaultValues, mode }: ProductFormProps) {
             </div>
           ))}
         </div>
-
         <label className="flex items-center gap-2 cursor-pointer w-fit">
           <span className="px-4 py-2 text-xs border border-dashed border-[var(--black-border)] rounded-sm text-[var(--white-dim)] hover:border-[var(--gold)]/40 transition-colors">
             + Add Photos
           </span>
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            className="sr-only"
-            onChange={handleImagePick}
-          />
+          <input type="file" accept="image/*" multiple className="sr-only" onChange={handleImagePick} />
         </label>
       </section>
 
@@ -529,11 +672,7 @@ export function ProductForm({ defaultValues, mode }: ProductFormProps) {
         <Button type="submit" loading={saving}>
           {mode === "edit" ? "Save Changes" : "Add to Inventory"}
         </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          onClick={() => router.push("/dashboard/inventory")}
-        >
+        <Button type="button" variant="ghost" onClick={() => router.push("/dashboard/inventory")}>
           Cancel
         </Button>
       </div>

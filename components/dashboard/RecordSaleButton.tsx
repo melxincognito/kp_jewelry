@@ -8,11 +8,17 @@ import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
 
+interface ProductSize {
+  size: string;
+  quantity: number;
+}
+
 interface AvailableProduct {
   id: string;
   name: string;
   sellingPrice: number;
   quantity: number;
+  sizes: ProductSize[];
 }
 
 export function RecordSaleButton({ availableProducts }: { availableProducts: AvailableProduct[] }) {
@@ -21,15 +27,19 @@ export function RecordSaleButton({ availableProducts }: { availableProducts: Ava
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [selectedProductId, setSelectedProductId] = useState(availableProducts[0]?.id ?? "");
-  const [salePrice, setSalePrice] = useState(
-    String(availableProducts[0]?.sellingPrice ?? "")
-  );
+  const [salePrice, setSalePrice] = useState(String(availableProducts[0]?.sellingPrice ?? ""));
+  const [selectedSize, setSelectedSize] = useState("");
   const [buyerEmail, setBuyerEmail] = useState("");
   const [notes, setNotes] = useState("");
   const [soldAt, setSoldAt] = useState(new Date().toISOString().split("T")[0]);
 
+  const selectedProduct = availableProducts.find((p) => p.id === selectedProductId) ?? null;
+  const availableSizes = selectedProduct?.sizes.filter((s) => s.quantity > 0) ?? [];
+  const hasSizes = availableSizes.length > 0;
+
   const handleProductChange = (id: string) => {
     setSelectedProductId(id);
+    setSelectedSize("");
     const product = availableProducts.find((p) => p.id === id);
     if (product) setSalePrice(String(product.sellingPrice));
   };
@@ -37,6 +47,12 @@ export function RecordSaleButton({ availableProducts }: { availableProducts: Ava
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
+
+    if (hasSizes && !selectedSize) {
+      setError("Please select a size for this item");
+      return;
+    }
+
     setLoading(true);
     try {
       const res = await fetch("/api/sales", {
@@ -44,6 +60,7 @@ export function RecordSaleButton({ availableProducts }: { availableProducts: Ava
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           productId: selectedProductId,
+          size: selectedSize || undefined,
           salePrice: parseFloat(salePrice),
           buyerEmail: buyerEmail || undefined,
           notes,
@@ -55,6 +72,7 @@ export function RecordSaleButton({ availableProducts }: { availableProducts: Ava
         throw new Error(data.error ?? "Failed to record sale");
       }
       setOpen(false);
+      setSelectedSize("");
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
@@ -80,11 +98,28 @@ export function RecordSaleButton({ availableProducts }: { availableProducts: Ava
             label="Item Sold"
             options={availableProducts.map((p) => ({
               value: p.id,
-              label: `${p.name} — $${p.sellingPrice} (${p.quantity} left)`,
+              label: `${p.name} — $${p.sellingPrice.toFixed(2)} (${p.quantity} left)`,
             }))}
             value={selectedProductId}
             onChange={(e) => handleProductChange(e.target.value)}
           />
+
+          {/* Size selector — only shown for sized products */}
+          {hasSizes && (
+            <Select
+              label="Size"
+              options={[
+                { value: "", label: "Select a size…" },
+                ...availableSizes.map((s) => ({
+                  value: s.size,
+                  label: `Size ${s.size} — ${s.quantity} left`,
+                })),
+              ]}
+              value={selectedSize}
+              onChange={(e) => setSelectedSize(e.target.value)}
+            />
+          )}
+
           <div className="grid grid-cols-2 gap-3">
             <Input
               label="Sale Price (USD)"

@@ -20,6 +20,7 @@ export async function PUT(
   }
 
   const data = result.data;
+
   if (data.sku) {
     const existing = await db.product.findFirst({ where: { sku: data.sku, NOT: { id } } });
     if (existing) {
@@ -27,26 +28,42 @@ export async function PUT(
     }
   }
 
-  const product = await db.product.update({
-    where: { id },
-    data: {
-      name: data.name,
-      sku: data.sku || null,
-      description: data.description,
-      images: JSON.stringify(body.images ?? []),
-      costMXN: data.costMXN,
-      costUSD: body.costUSD,
-      exchangeRate: body.exchangeRate,
-      purchaseDate: new Date(data.purchaseDate),
-      shippingFees: data.shippingFees,
-      wholesalePrice: data.wholesalePrice,
-      sellingPrice: data.sellingPrice,
-      jewelryType: data.jewelryType,
-      styles: JSON.stringify(data.styles),
-      quantity: data.quantity,
-      status: body.status,
-      showOnStorefront: data.showOnStorefront,
-    },
+  const finalQuantity =
+    data.sizes.length > 0
+      ? data.sizes.reduce((sum, s) => sum + s.quantity, 0)
+      : data.quantity;
+
+  // Replace sizes: delete all existing, recreate from submitted list
+  const product = await db.$transaction(async (tx) => {
+    await tx.productSize.deleteMany({ where: { productId: id } });
+
+    return tx.product.update({
+      where: { id },
+      data: {
+        name: data.name,
+        sku: data.sku || null,
+        description: data.description,
+        material: data.material || null,
+        images: JSON.stringify(body.images ?? []),
+        costMXN: data.costMXN,
+        costUSD: body.costUSD,
+        exchangeRate: body.exchangeRate,
+        purchaseDate: new Date(data.purchaseDate),
+        shippingFees: data.shippingFees,
+        wholesalePrice: data.wholesalePrice,
+        sellingPrice: data.sellingPrice,
+        jewelryType: data.jewelryType,
+        styles: JSON.stringify(data.styles),
+        quantity: finalQuantity,
+        status: body.status,
+        showOnStorefront: data.showOnStorefront,
+        ...(data.sizes.length > 0 && {
+          sizes: {
+            create: data.sizes.map((s) => ({ size: s.size, quantity: s.quantity })),
+          },
+        }),
+      },
+    });
   });
 
   return NextResponse.json(product);

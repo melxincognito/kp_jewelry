@@ -18,18 +18,14 @@ export async function POST(req: NextRequest) {
 
   const data = result.data;
 
-  // If costUSD was not provided (or is 0), calculate from MXN + rate
-  let costUSD = data.costMXN; // fallback
+  let costUSD = data.costMXN;
   let exchangeRate = 1;
 
   try {
-    const { usdPerMxn, mxnPerUsd } = await getHistoricalRate(
-      toApiDate(data.purchaseDate)
-    );
+    const { usdPerMxn, mxnPerUsd } = await getHistoricalRate(toApiDate(data.purchaseDate));
     exchangeRate = mxnPerUsd;
     costUSD = mxnToUsd(data.costMXN, usdPerMxn);
   } catch {
-    // If rate fetch fails, use what the client sent
     if (body.costUSD) costUSD = body.costUSD;
     if (body.exchangeRate) exchangeRate = body.exchangeRate;
   }
@@ -41,11 +37,18 @@ export async function POST(req: NextRequest) {
     }
   }
 
+  // If sizes are provided, quantity is their sum; otherwise use the submitted quantity
+  const finalQuantity =
+    data.sizes.length > 0
+      ? data.sizes.reduce((sum, s) => sum + s.quantity, 0)
+      : data.quantity;
+
   const product = await db.product.create({
     data: {
       name: data.name,
       sku: data.sku || null,
       description: data.description,
+      material: data.material || null,
       images: JSON.stringify(body.images ?? []),
       costMXN: data.costMXN,
       costUSD: body.costUSD ?? costUSD,
@@ -56,8 +59,13 @@ export async function POST(req: NextRequest) {
       sellingPrice: data.sellingPrice,
       jewelryType: data.jewelryType,
       styles: JSON.stringify(data.styles),
-      quantity: data.quantity,
+      quantity: finalQuantity,
       showOnStorefront: data.showOnStorefront,
+      ...(data.sizes.length > 0 && {
+        sizes: {
+          create: data.sizes.map((s) => ({ size: s.size, quantity: s.quantity })),
+        },
+      }),
     },
   });
 

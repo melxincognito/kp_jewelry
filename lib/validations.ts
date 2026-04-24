@@ -11,10 +11,16 @@ export const loginSchema = z.object({
   password: z.string().min(1, "Password is required"),
 });
 
+export const productSizeSchema = z.object({
+  size: z.string().min(1, "Size label is required"),
+  quantity: z.coerce.number().int().min(0, "Quantity cannot be negative"),
+});
+
 export const productSchema = z.object({
   name: z.string().min(1, "Name is required"),
   sku: z.string().optional(),
   description: z.string().optional(),
+  material: z.string().optional(),
   costMXN: z.coerce.number().positive("Cost in pesos must be positive"),
   purchaseDate: z.string().min(1, "Purchase date is required"),
   shippingFees: z.coerce.number().min(0).default(0),
@@ -31,7 +37,8 @@ export const productSchema = z.object({
     "OTHER",
   ]),
   styles: z.array(z.string()).default([]),
-  quantity: z.coerce.number().int().positive().default(1),
+  quantity: z.coerce.number().int().min(0).default(1),
+  sizes: z.array(productSizeSchema).default([]),
   showOnStorefront: z.boolean().default(true),
 });
 

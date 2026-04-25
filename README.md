@@ -64,7 +64,7 @@ A full-stack jewelry storefront and inventory management system. Customers can b
 | -------------- | --------------------------------------- |
 | Framework      | Next.js 16 (App Router)                 |
 | Language       | TypeScript                              |
-| Styling        | Tailwind CSS v4                         |
+| Styling        | Material UI.                            |
 | Database       | Azure SQL (SQL Server)                  |
 | ORM            | Prisma 7                                |
 | Authentication | Auth.js v5 (credentials + Google OAuth) |
@@ -169,6 +169,15 @@ npx prisma generate
 npm run dev
 ```
 
+_If it throws an error saying it can't connect to the database while running locally, do the following_
+
+- Go to Microsoft Azure
+- Select the resource group
+  - Select the SQL database in your resource group
+- On 'Overview' check on the right hand panel for 'Getting Started'
+- Click 'Configure access' to get to the Networking settings
+- The settings should be configured so only specified networks can access the DB. Scroll down and click 'Add your IPv4 address'. You need to do this every time you access a new internet network since your IP address changes per network
+
 ---
 
 ## Database Setup (Azure SQL)
@@ -259,9 +268,9 @@ When adding an item, enter the purchase date and cost in Mexican Pesos. Click th
 
 Two endpoints are designed to be called on a schedule by an external cron (GitHub Actions, Azure Scheduler, etc.):
 
-| Endpoint                  | Recommended cadence | What it does                                                  |
-| ------------------------- | ------------------- | ------------------------------------------------------------- |
-| `GET /api/messages/cleanup` | Daily             | Permanently deletes messages both parties soft-deleted 30+ days ago |
-| `GET /api/health`           | As needed         | Verifies all services are reachable                           |
+| Endpoint                    | Recommended cadence | What it does                                                        |
+| --------------------------- | ------------------- | ------------------------------------------------------------------- |
+| `GET /api/messages/cleanup` | Daily               | Permanently deletes messages both parties soft-deleted 30+ days ago |
+| `GET /api/health`           | As needed           | Verifies all services are reachable                                 |
 
 Both require `Authorization: Bearer <HEALTH_API_KEY>` or `?key=<HEALTH_API_KEY>`.

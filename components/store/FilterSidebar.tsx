@@ -1,10 +1,11 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
+import Collapse from "@mui/material/Collapse";
 import MuiLink from "@mui/material/Link";
 
 const JEWELRY_TYPES = [
@@ -88,6 +89,7 @@ function FilterButton({
 export function FilterSidebar({ availableStyles }: FilterSidebarProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const setParam = useCallback(
     (key: string, value: string) => {
@@ -109,7 +111,9 @@ export function FilterSidebar({ availableStyles }: FilterSidebarProps) {
       const current = params.getAll("style");
       if (current.includes(style)) {
         params.delete("style");
-        current.filter((s) => s !== style).forEach((s) => params.append("style", s));
+        current
+          .filter((s) => s !== style)
+          .forEach((s) => params.append("style", s));
       } else {
         params.append("style", style);
       }
@@ -124,12 +128,8 @@ export function FilterSidebar({ availableStyles }: FilterSidebarProps) {
   const activeSort = searchParams.get("sort") ?? "newest";
   const activeStatus = searchParams.get("status") ?? "";
 
-  return (
-    <Box
-      component="aside"
-      aria-label="Product filters"
-      sx={{ width: 224, flexShrink: 0, display: "flex", flexDirection: "column", gap: 3 }}
-    >
+  const filterContent = (
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
       {/* Sort */}
       <Box role="group" aria-labelledby="filter-sort-label">
         <FilterGroup label="Sort" labelId="filter-sort-label" />
@@ -209,7 +209,9 @@ export function FilterSidebar({ availableStyles }: FilterSidebarProps) {
                     color: active ? "primary.main" : "text.secondary",
                     bgcolor: active ? "rgba(122,92,16,0.08)" : "transparent",
                     "&:hover": {
-                      borderColor: active ? "primary.main" : "rgba(122,92,16,0.4)",
+                      borderColor: active
+                        ? "primary.main"
+                        : "rgba(122,92,16,0.4)",
                     },
                   }}
                 >
@@ -242,6 +244,50 @@ export function FilterSidebar({ availableStyles }: FilterSidebarProps) {
           Clear all filters ×
         </MuiLink>
       )}
+    </Box>
+  );
+
+  return (
+    <Box
+      component="aside"
+      aria-label="Product filters"
+      sx={{ flexShrink: 0, width: { xs: "100%", sm: 224 } }}
+    >
+      {/* Mobile toggle button */}
+      <Button
+        onClick={() => setMobileOpen((o) => !o)}
+        aria-expanded={mobileOpen}
+        aria-controls="filter-panel"
+        variant="outlined"
+        size="small"
+        sx={{
+          display: { xs: "flex", sm: "none" },
+          width: "100%",
+          mb: 1,
+          textTransform: "none",
+          fontSize: "0.875rem",
+          borderColor: "divider",
+          color: "text.secondary",
+          gap: 1,
+          "&:hover": { borderColor: "primary.main", color: "primary.main" },
+        }}
+      >
+        Filters & Sort {mobileOpen ? "▲" : "▼"}
+      </Button>
+
+      {/* Desktop: always visible; Mobile: collapsible */}
+      <Box id="filter-panel" sx={{ display: { xs: "block", sm: "block" } }}>
+        <Collapse in={mobileOpen} sx={{ display: { xs: "block", sm: "none" } }}>
+          {filterContent}
+        </Collapse>
+        <Box
+          sx={{
+            display: { xs: "none", sm: "block" },
+          }}
+        >
+          {filterContent}
+        </Box>
+      </Box>
     </Box>
   );
 }

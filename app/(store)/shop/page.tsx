@@ -94,7 +94,7 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
         </Typography>
       </Box>
 
-      <Box sx={{ display: "flex", gap: 4 }}>
+      <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, gap: { xs: 2, sm: 4 } }}>
         <Suspense fallback={null}>
           <FilterSidebar availableStyles={availableStyles} />
         </Suspense>

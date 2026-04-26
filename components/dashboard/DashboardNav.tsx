@@ -48,15 +48,27 @@ export function DashboardNav({ unreadCount = 0 }: DashboardNavProps) {
       }}
     >
       {/* Logo */}
-      <Box sx={{ px: 2.5, py: 2.5, borderBottom: "1px solid", borderColor: "divider" }}>
+      <Box
+        sx={{
+          px: 2.5,
+          py: 2.5,
+          borderBottom: "1px solid",
+          borderColor: "divider",
+        }}
+      >
         <MuiLink
           component={NextLink}
           href="/"
           underline="none"
           className="text-gold-gradient"
-          sx={{ fontSize: "0.875rem", fontWeight: 600, letterSpacing: "0.15em", display: "block" }}
+          sx={{
+            fontSize: "0.875rem",
+            fontWeight: 600,
+            letterSpacing: "0.15em",
+            display: "block",
+          }}
         >
-          KP JEWELRS
+          KP JEWELRY
         </MuiLink>
         <Typography
           sx={{
@@ -73,7 +85,11 @@ export function DashboardNav({ unreadCount = 0 }: DashboardNavProps) {
       </Box>
 
       {/* Nav links */}
-      <List sx={{ flex: 1, py: 1, px: 1 }} component="nav" aria-label="Dashboard navigation">
+      <List
+        sx={{ flex: 1, py: 1, px: 1 }}
+        component="nav"
+        aria-label="Dashboard navigation"
+      >
         {NAV_ITEMS.map((item) => {
           const isActive =
             item.href === "/dashboard"
@@ -90,13 +106,14 @@ export function DashboardNav({ unreadCount = 0 }: DashboardNavProps) {
                 selected={isActive}
                 aria-current={isActive ? "page" : undefined}
                 aria-label={
-                  showBadge
-                    ? `Messages, ${unreadCount} unread`
-                    : undefined
+                  showBadge ? `Messages, ${unreadCount} unread` : undefined
                 }
                 sx={{ py: 1, px: 1.5 }}
               >
-                <Box component="span" sx={{ mr: 1.5, fontSize: "0.75rem", opacity: 0.7 }}>
+                <Box
+                  component="span"
+                  sx={{ mr: 1.5, fontSize: "0.75rem", opacity: 0.7 }}
+                >
                   {item.icon}
                 </Box>
                 <ListItemText
@@ -105,7 +122,13 @@ export function DashboardNav({ unreadCount = 0 }: DashboardNavProps) {
                       <Badge
                         badgeContent={showBadge ? displayCount : 0}
                         color="error"
-                        sx={{ "& .MuiBadge-badge": { fontSize: "0.6rem", right: -14, top: 2 } }}
+                        sx={{
+                          "& .MuiBadge-badge": {
+                            fontSize: "0.6rem",
+                            right: -14,
+                            top: 2,
+                          },
+                        }}
                       >
                         {item.label}
                       </Badge>
@@ -130,7 +153,9 @@ export function DashboardNav({ unreadCount = 0 }: DashboardNavProps) {
       </List>
 
       {/* Bottom: sign out */}
-      <Box sx={{ px: 2, py: 2, borderTop: "1px solid", borderColor: "divider" }}>
+      <Box
+        sx={{ px: 2, py: 2, borderTop: "1px solid", borderColor: "divider" }}
+      >
         <Divider sx={{ mb: 1.5, borderColor: "transparent" }} />
         <Typography
           component="button"

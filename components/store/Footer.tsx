@@ -27,15 +27,26 @@ export function Footer() {
           <Typography
             component="span"
             className="text-gold-gradient"
-            sx={{ fontSize: "1.125rem", fontWeight: 600, letterSpacing: "0.15em" }}
+            sx={{
+              fontSize: "1.125rem",
+              fontWeight: 600,
+              letterSpacing: "0.15em",
+            }}
           >
-            KP JEWELRS
+            KP JEWELRY
           </Typography>
-          <Typography variant="caption" sx={{ color: "text.secondary", opacity: 0.5, textAlign: "center" }}>
-            All items are unisex. Prices listed in USD. Contact seller to coordinate payment.
+          <Typography
+            variant="caption"
+            sx={{ color: "text.secondary", opacity: 0.5, textAlign: "center" }}
+          >
+            All items are unisex. Prices listed in USD. Contact seller to
+            coordinate payment.
           </Typography>
-          <Typography variant="caption" sx={{ color: "text.secondary", opacity: 0.4 }}>
-            © {new Date().getFullYear()} KP Jewelrs
+          <Typography
+            variant="caption"
+            sx={{ color: "text.secondary", opacity: 0.4 }}
+          >
+            © {new Date().getFullYear()} KP Jewelry
           </Typography>
         </Box>
       </Container>

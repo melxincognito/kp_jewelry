@@ -20,7 +20,7 @@ const cormorant = Cormorant_Garamond({
 });
 
 export const metadata: Metadata = {
-  title: { default: "KP Jewelrs", template: "%s | KP Jewelrs" },
+  title: { default: "KP Jewelry", template: "%s | KP Jewelry" },
   description:
     "Handpicked jewelry — necklaces, bracelets, rings, earrings and more. Browse our curated collection.",
 };
@@ -34,7 +34,9 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${cormorant.variable}`}
       style={{ height: "100%" }}
     >
-      <body style={{ minHeight: "100%", display: "flex", flexDirection: "column" }}>
+      <body
+        style={{ minHeight: "100%", display: "flex", flexDirection: "column" }}
+      >
         <a href="#main-content" className="skip-link">
           Skip to main content
         </a>

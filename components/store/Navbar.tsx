@@ -69,7 +69,7 @@ export function Navbar({ session, unreadCount = 0 }: NavbarProps) {
             >
               KP{" "}
               <Box component="span" className="text-gold">
-                Jewelrs
+                Jewelry
               </Box>
             </Typography>
           </MuiLink>
@@ -78,9 +78,17 @@ export function Navbar({ session, unreadCount = 0 }: NavbarProps) {
           <Box
             component="nav"
             aria-label="Main navigation"
-            sx={{ display: { xs: "none", md: "flex" }, alignItems: "center", gap: 3 }}
+            sx={{
+              display: { xs: "none", md: "flex" },
+              alignItems: "center",
+              gap: 3,
+            }}
           >
-            <MuiLink component={NextLink} href="/shop" sx={navLinkSx(pathname.startsWith("/shop"))}>
+            <MuiLink
+              component={NextLink}
+              href="/shop"
+              sx={navLinkSx(pathname.startsWith("/shop"))}
+            >
               Shop
             </MuiLink>
 
@@ -117,7 +125,14 @@ export function Navbar({ session, unreadCount = 0 }: NavbarProps) {
           </Box>
 
           {/* Auth Actions (desktop) */}
-          <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center", gap: 1.5, ml: 3 }}>
+          <Box
+            sx={{
+              display: { xs: "none", md: "flex" },
+              alignItems: "center",
+              gap: 1.5,
+              ml: 3,
+            }}
+          >
             {session ? (
               <>
                 <Typography variant="caption" sx={{ color: "text.secondary" }}>
@@ -142,7 +157,12 @@ export function Navbar({ session, unreadCount = 0 }: NavbarProps) {
                 <MuiLink
                   component={NextLink}
                   href="/login"
-                  sx={{ fontSize: "0.875rem", color: "text.secondary", textDecoration: "none", "&:hover": { color: "text.primary" } }}
+                  sx={{
+                    fontSize: "0.875rem",
+                    color: "text.secondary",
+                    textDecoration: "none",
+                    "&:hover": { color: "text.primary" },
+                  }}
                 >
                   Sign in
                 </MuiLink>
@@ -219,7 +239,11 @@ export function Navbar({ session, unreadCount = 0 }: NavbarProps) {
           <MuiLink
             component={NextLink}
             href="/shop"
-            sx={{ fontSize: "0.875rem", color: "text.secondary", textDecoration: "none" }}
+            sx={{
+              fontSize: "0.875rem",
+              color: "text.secondary",
+              textDecoration: "none",
+            }}
             onClick={() => setMobileOpen(false)}
           >
             Shop
@@ -229,7 +253,14 @@ export function Navbar({ session, unreadCount = 0 }: NavbarProps) {
             <MuiLink
               component={NextLink}
               href="/messages"
-              sx={{ fontSize: "0.875rem", color: "text.secondary", textDecoration: "none", display: "flex", alignItems: "center", gap: 1 }}
+              sx={{
+                fontSize: "0.875rem",
+                color: "text.secondary",
+                textDecoration: "none",
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+              }}
               onClick={() => setMobileOpen(false)}
             >
               Messages
@@ -260,7 +291,11 @@ export function Navbar({ session, unreadCount = 0 }: NavbarProps) {
             <MuiLink
               component={NextLink}
               href="/dashboard"
-              sx={{ fontSize: "0.875rem", color: "text.secondary", textDecoration: "none" }}
+              sx={{
+                fontSize: "0.875rem",
+                color: "text.secondary",
+                textDecoration: "none",
+              }}
               onClick={() => setMobileOpen(false)}
             >
               Dashboard
@@ -288,7 +323,11 @@ export function Navbar({ session, unreadCount = 0 }: NavbarProps) {
               <MuiLink
                 component={NextLink}
                 href="/login"
-                sx={{ fontSize: "0.875rem", color: "text.secondary", textDecoration: "none" }}
+                sx={{
+                  fontSize: "0.875rem",
+                  color: "text.secondary",
+                  textDecoration: "none",
+                }}
                 onClick={() => setMobileOpen(false)}
               >
                 Sign in
@@ -296,7 +335,11 @@ export function Navbar({ session, unreadCount = 0 }: NavbarProps) {
               <MuiLink
                 component={NextLink}
                 href="/register"
-                sx={{ fontSize: "0.875rem", color: "primary.main", textDecoration: "none" }}
+                sx={{
+                  fontSize: "0.875rem",
+                  color: "primary.main",
+                  textDecoration: "none",
+                }}
                 onClick={() => setMobileOpen(false)}
               >
                 Create account

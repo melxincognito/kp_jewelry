@@ -31,57 +31,108 @@ export function SalesExport({ rows, totalRevenue, totalProfit, label }: Props) {
   function downloadExcel() {
     const sheetRows = [
       ["Item", "Buyer", "Sale Price (USD)", "Profit (USD)", "Date", "Notes"],
-      ...rows.map((r) => [r.item, r.buyer, r.salePrice, r.profit, r.date, r.notes]),
+      ...rows.map((r) => [
+        r.item,
+        r.buyer,
+        r.salePrice,
+        r.profit,
+        r.date,
+        r.notes,
+      ]),
       [],
       ["", "Total", totalRevenue, totalProfit, "", ""],
     ];
     const ws = utils.aoa_to_sheet(sheetRows);
-    ws["!cols"] = [{ wch: 28 }, { wch: 24 }, { wch: 16 }, { wch: 14 }, { wch: 14 }, { wch: 30 }];
+    ws["!cols"] = [
+      { wch: 28 },
+      { wch: 24 },
+      { wch: 16 },
+      { wch: 14 },
+      { wch: 14 },
+      { wch: 30 },
+    ];
     const wb = utils.book_new();
     utils.book_append_sheet(wb, ws, "Sales");
     writeFile(wb, filename(label, "xlsx"));
   }
 
   function downloadPDF() {
-    const doc = new jsPDF({ orientation: "landscape", unit: "pt", format: "letter" });
+    const doc = new jsPDF({
+      orientation: "landscape",
+      unit: "pt",
+      format: "letter",
+    });
     const pageW = doc.internal.pageSize.getWidth();
     doc.setFontSize(16);
     doc.setFont("helvetica", "bold");
-    doc.text("KP Jewelers — Sales Report", 40, 40);
+    doc.text("KP Jewelry — Sales Report", 40, 40);
     doc.setFontSize(10);
     doc.setFont("helvetica", "normal");
     doc.setTextColor(120);
     doc.text(
       `${label} · ${rows.length} sales · $${totalRevenue.toFixed(2)} revenue · $${totalProfit.toFixed(2)} profit`,
-      40, 58
+      40,
+      58,
     );
     doc.setTextColor(0);
     const tableRows = rows.map((r) => [
-      r.item, r.buyer, `$${r.salePrice.toFixed(2)}`, `$${r.profit.toFixed(2)}`, r.date, r.notes,
+      r.item,
+      r.buyer,
+      `$${r.salePrice.toFixed(2)}`,
+      `$${r.profit.toFixed(2)}`,
+      r.date,
+      r.notes,
     ]);
     tableRows.push([
-      { content: `Total (${rows.length} sales)`, colSpan: 2, styles: { fontStyle: "bold" } } as never,
-      { content: `$${totalRevenue.toFixed(2)}`, styles: { fontStyle: "bold", textColor: [180, 140, 60] } } as never,
-      { content: `$${totalProfit.toFixed(2)}`, styles: { fontStyle: "bold", textColor: [52, 211, 153] } } as never,
-      "", "",
+      {
+        content: `Total (${rows.length} sales)`,
+        colSpan: 2,
+        styles: { fontStyle: "bold" },
+      } as never,
+      {
+        content: `$${totalRevenue.toFixed(2)}`,
+        styles: { fontStyle: "bold", textColor: [180, 140, 60] },
+      } as never,
+      {
+        content: `$${totalProfit.toFixed(2)}`,
+        styles: { fontStyle: "bold", textColor: [52, 211, 153] },
+      } as never,
+      "",
+      "",
     ]);
     autoTable(doc, {
       startY: 72,
       head: [["Item", "Buyer", "Sale Price", "Profit", "Date", "Notes"]],
       body: tableRows,
       styles: { fontSize: 9, cellPadding: 5 },
-      headStyles: { fillColor: [30, 30, 30], textColor: 220, fontStyle: "bold" },
+      headStyles: {
+        fillColor: [30, 30, 30],
+        textColor: 220,
+        fontStyle: "bold",
+      },
       alternateRowStyles: { fillColor: [248, 248, 248] },
-      columnStyles: { 0: { cellWidth: "auto" }, 2: { halign: "right" }, 3: { halign: "right" }, 4: { halign: "right" } },
+      columnStyles: {
+        0: { cellWidth: "auto" },
+        2: { halign: "right" },
+        3: { halign: "right" },
+        4: { halign: "right" },
+      },
       margin: { left: 40, right: 40 },
       tableWidth: pageW - 80,
     });
-    const pageCount = (doc as jsPDF & { internal: { getNumberOfPages(): number } }).internal.getNumberOfPages();
+    const pageCount = (
+      doc as jsPDF & { internal: { getNumberOfPages(): number } }
+    ).internal.getNumberOfPages();
     for (let i = 1; i <= pageCount; i++) {
       doc.setPage(i);
       doc.setFontSize(8);
       doc.setTextColor(160);
-      doc.text(`Page ${i} of ${pageCount}`, pageW / 2, doc.internal.pageSize.getHeight() - 20, { align: "center" });
+      doc.text(
+        `Page ${i} of ${pageCount}`,
+        pageW / 2,
+        doc.internal.pageSize.getHeight() - 20,
+        { align: "center" },
+      );
     }
     doc.save(filename(label, "pdf"));
   }
@@ -97,7 +148,11 @@ export function SalesExport({ rows, totalRevenue, totalProfit, label }: Props) {
   };
 
   return (
-    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }} role="group" aria-label="Export sales data">
+    <Box
+      sx={{ display: "flex", alignItems: "center", gap: 1 }}
+      role="group"
+      aria-label="Export sales data"
+    >
       <MuiButton
         variant="text"
         size="small"

@@ -3,7 +3,11 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
+import Box from "@mui/material/Box";
+import Paper from "@mui/material/Paper";
+import Typography from "@mui/material/Typography";
+import MuiLink from "@mui/material/Link";
+import Alert from "@mui/material/Alert";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 
@@ -34,86 +38,52 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-[var(--black)]">
-      <div className="w-full max-w-sm">
+    <Box sx={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", px: 2, bgcolor: "background.default" }}>
+      <Box sx={{ width: "100%", maxWidth: 384 }}>
         {/* Logo */}
-        <div className="text-center mb-8">
-          <Link
-            href="/"
-            className="text-xl font-semibold tracking-[0.15em] text-gold-gradient"
-          >
+        <Box sx={{ textAlign: "center", mb: 4 }}>
+          <MuiLink href="/" className="text-gold-gradient" sx={{ fontSize: "1.25rem", fontWeight: 600, letterSpacing: "0.15em", textDecoration: "none" }}>
             KP JEWELRS
-          </Link>
-          <p
-            className="text-sm text-[var(--white-dim)] mt-2"
-            aria-label="Sign in to your account"
-          >
+          </MuiLink>
+          <Typography variant="body2" sx={{ color: "text.secondary", mt: 1 }} aria-label="Sign in to your account">
             Sign in to your account
-          </p>
-        </div>
+          </Typography>
+        </Box>
 
-        <div className="bg-[var(--black-card)] border border-[var(--black-border)] rounded-sm p-6">
+        <Paper sx={{ p: 3 }}>
           {error && (
-            <div
-              role="alert"
-              aria-live="assertive"
-              className="mb-4 px-3 py-2 bg-red-500/10 border border-red-500/30 rounded-sm text-xs text-red-400"
-            >
+            <Alert severity="error" role="alert" aria-live="assertive" sx={{ mb: 2, fontSize: "0.75rem" }}>
               {error}
-            </div>
+            </Alert>
           )}
-
-          <form
-            onSubmit={handleSubmit}
-            aria-label="Sign in"
-            className="flex flex-col gap-4"
-          >
-            <Input
-              name="email"
-              label="Email"
-              type="email"
-              autoComplete="email"
-              required
-            />
-            <Input
-              name="password"
-              label="Password"
-              type="password"
-              autoComplete="current-password"
-              required
-            />
-            <Button type="submit" loading={loading} className="w-full mt-2">
+          <Box component="form" onSubmit={handleSubmit} aria-label="Sign in" sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            <Input name="email" label="Email" type="email" autoComplete="email" required />
+            <Input name="password" label="Password" type="password" autoComplete="current-password" required />
+            <Button type="submit" loading={loading} fullWidth>
               Sign in
             </Button>
-          </form>
+          </Box>
 
-          <div className="mt-4 flex items-center gap-3">
-            <hr className="flex-1 border-[var(--black-border)]" />
-            <span className="text-xs text-[var(--white-dim)]/40">or</span>
-            <hr className="flex-1 border-[var(--black-border)]" />
-          </div>
+          <Box sx={{ mt: 2, display: "flex", alignItems: "center", gap: 1.5 }}>
+            <Box component="hr" sx={{ flex: 1, border: "none", borderTop: "1px solid", borderColor: "divider" }} />
+            <Typography variant="caption" sx={{ color: "text.secondary", opacity: 0.4 }}>or</Typography>
+            <Box component="hr" sx={{ flex: 1, border: "none", borderTop: "1px solid", borderColor: "divider" }} />
+          </Box>
 
-          <Button
-            type="button"
-            variant="secondary"
-            className="w-full mt-4"
-            onClick={() => signIn("google", { callbackUrl: "/" })}
-          >
-            Continue with Google
-          </Button>
-        </div>
+          <Box sx={{ mt: 2 }}>
+            <Button type="button" variant="secondary" fullWidth onClick={() => signIn("google", { callbackUrl: "/" })}>
+              Continue with Google
+            </Button>
+          </Box>
+        </Paper>
 
-        <p className="text-center text-xs text-[var(--white-dim)]/50 mt-4">
+        <Typography variant="caption" sx={{ display: "block", textAlign: "center", color: "text.secondary", opacity: 0.5, mt: 2 }}>
           Don&apos;t have an account?{" "}
-          <Link
-            href="/register"
-            className="text-[var(--gold)] hover:underline"
-            aria-label="Don't have an account? Create one."
-          >
+          <MuiLink href="/register" sx={{ color: "primary.main" }} aria-label="Don't have an account? Create one.">
             Create one
-          </Link>
-        </p>
-      </div>
-    </div>
+          </MuiLink>
+        </Typography>
+      </Box>
+    </Box>
   );
 }

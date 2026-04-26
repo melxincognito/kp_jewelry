@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import MuiButton from "@mui/material/Button";
 import type { Role } from "@/types/enums";
 
 export function UserRoleToggle({
@@ -27,17 +28,30 @@ export function UserRoleToggle({
   }
 
   return (
-    <button
+    <MuiButton
       onClick={toggle}
       disabled={loading}
-      className={[
-        "text-xs px-2.5 py-1 rounded-sm border transition-colors disabled:opacity-40",
-        currentRole === "ADMIN"
-          ? "border-red-500/30 text-red-400/70 hover:bg-red-500/10"
-          : "border-[var(--gold)]/30 text-[var(--gold)]/70 hover:bg-[var(--gold)]/10",
-      ].join(" ")}
+      variant="outlined"
+      size="small"
+      sx={{
+        fontSize: "0.7rem",
+        textTransform: "none",
+        letterSpacing: "normal",
+        px: 1.25,
+        py: 0.5,
+        borderColor: currentRole === "ADMIN" ? "rgba(185,28,28,0.3)" : "rgba(122,92,16,0.3)",
+        color: currentRole === "ADMIN" ? "rgba(185,28,28,0.7)" : "rgba(122,92,16,0.7)",
+        "&:hover": {
+          bgcolor:
+            currentRole === "ADMIN"
+              ? "rgba(185,28,28,0.06)"
+              : "rgba(122,92,16,0.06)",
+          borderColor: currentRole === "ADMIN" ? "error.main" : "primary.main",
+        },
+        "&.Mui-disabled": { opacity: 0.4 },
+      }}
     >
-      {loading ? "..." : currentRole === "ADMIN" ? "Remove admin" : "Make admin"}
-    </button>
+      {loading ? "…" : currentRole === "ADMIN" ? "Remove admin" : "Make admin"}
+    </MuiButton>
   );
 }

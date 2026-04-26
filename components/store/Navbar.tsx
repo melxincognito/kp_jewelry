@@ -1,10 +1,20 @@
 "use client";
 
-import Link from "next/link";
+import NextLink from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { signOut } from "next-auth/react";
 import type { Session } from "next-auth";
+import AppBar from "@mui/material/AppBar";
+import Toolbar from "@mui/material/Toolbar";
+import Box from "@mui/material/Box";
+import Drawer from "@mui/material/Drawer";
+import IconButton from "@mui/material/IconButton";
+import Typography from "@mui/material/Typography";
+import MuiLink from "@mui/material/Link";
+import Divider from "@mui/material/Divider";
+import Badge from "@mui/material/Badge";
+import Button from "@mui/material/Button";
 
 interface NavbarProps {
   session: Session | null;
@@ -13,222 +23,288 @@ interface NavbarProps {
 
 export function Navbar({ session, unreadCount = 0 }: NavbarProps) {
   const pathname = usePathname();
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const isAdmin = session?.user?.role === "ADMIN";
   const isCustomer = session?.user?.role === "CUSTOMER";
   const displayCount = unreadCount > 99 ? "99+" : unreadCount;
 
+  const navLinkSx = (active: boolean) => ({
+    fontSize: "0.875rem",
+    letterSpacing: "0.04em",
+    textDecoration: "none",
+    color: active ? "primary.main" : "text.secondary",
+    "&:hover": { color: "text.primary" },
+    transition: "color 0.15s",
+  });
+
   return (
-    <header className="sticky top-0 z-50 bg-[var(--black)]/95 backdrop-blur-md border-b border-[var(--black-border)]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+    <>
+      <AppBar position="sticky" component="header">
+        <Toolbar
+          sx={{
+            maxWidth: "80rem",
+            width: "100%",
+            mx: "auto",
+            px: { xs: 2, sm: 3, lg: 4 },
+            minHeight: "64px !important",
+          }}
+        >
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
-            <span className="font-serif text-lg font-light tracking-[0.25em] text-[var(--white)] uppercase">
-              KP <span className="text-gold">Jewelrs</span>
-            </span>
-          </Link>
+          <MuiLink
+            component={NextLink}
+            href="/"
+            underline="none"
+            sx={{ display: "flex", alignItems: "center", mr: "auto" }}
+          >
+            <Typography
+              sx={{
+                fontFamily: "var(--font-cormorant), serif",
+                fontSize: "1.125rem",
+                fontWeight: 300,
+                letterSpacing: "0.25em",
+                color: "text.primary",
+                textTransform: "uppercase",
+              }}
+            >
+              KP{" "}
+              <Box component="span" className="text-gold">
+                Jewelrs
+              </Box>
+            </Typography>
+          </MuiLink>
 
           {/* Desktop Nav */}
-          <nav
+          <Box
+            component="nav"
             aria-label="Main navigation"
-            className="hidden md:flex items-center gap-6"
-            role="navigation"
+            sx={{ display: { xs: "none", md: "flex" }, alignItems: "center", gap: 3 }}
           >
-            <NavLink href="/shop" active={pathname.startsWith("/shop")}>
+            <MuiLink component={NextLink} href="/shop" sx={navLinkSx(pathname.startsWith("/shop"))}>
               Shop
-            </NavLink>
+            </MuiLink>
 
-            {/* Want to keep it so only customers see this messages tab on the navigation bar since it looks cleaner on the admin dashboard to keep the location of their messages thread within the dashboard and not having two different messages views/links */}
             {isCustomer && (
-              <NavLink
+              <MuiLink
+                component={NextLink}
                 href="/messages"
-                active={pathname.startsWith("/messages")}
                 aria-label={
                   unreadCount > 0
                     ? `Messages, ${unreadCount} unread message${unreadCount !== 1 ? "s" : ""}`
                     : undefined
                 }
+                sx={navLinkSx(pathname.startsWith("/messages"))}
               >
-                <span className="relative inline-flex items-center gap-1">
+                <Badge
+                  badgeContent={unreadCount > 0 ? displayCount : 0}
+                  color="error"
+                  sx={{ "& .MuiBadge-badge": { fontSize: "0.625rem" } }}
+                >
                   Messages
-                  {unreadCount > 0 && (
-                    <span
-                      aria-hidden="true"
-                      className="inline-flex items-center justify-center min-w-[1.1rem] h-[1.1rem] px-1 rounded-full bg-red-500 text-white text-[10px] font-semibold leading-none"
-                    >
-                      {displayCount}
-                    </span>
-                  )}
-                </span>
-              </NavLink>
+                </Badge>
+              </MuiLink>
             )}
+
             {isAdmin && (
-              <NavLink
+              <MuiLink
+                component={NextLink}
                 href="/dashboard"
-                active={pathname.startsWith("/dashboard")}
+                sx={navLinkSx(pathname.startsWith("/dashboard"))}
               >
                 Dashboard
-              </NavLink>
+              </MuiLink>
             )}
-          </nav>
+          </Box>
 
-          {/* Auth Actions */}
-          <div className="hidden md:flex items-center gap-3">
+          {/* Auth Actions (desktop) */}
+          <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center", gap: 1.5, ml: 3 }}>
             {session ? (
               <>
-                <span className="text-xs text-[var(--white-dim)]">
+                <Typography variant="caption" sx={{ color: "text.secondary" }}>
                   {session.user?.name ?? session.user?.email}
-                </span>
-                <button
+                </Typography>
+                <Button
+                  variant="text"
+                  size="small"
                   onClick={() => signOut({ callbackUrl: "/" })}
-                  className="text-xs text-[var(--white-dim)] hover:text-[var(--gold)] transition-colors"
+                  sx={{
+                    color: "text.secondary",
+                    textTransform: "none",
+                    fontSize: "0.75rem",
+                    "&:hover": { color: "primary.main" },
+                  }}
                 >
                   Sign out
-                </button>
+                </Button>
               </>
             ) : (
               <>
-                <Link
+                <MuiLink
+                  component={NextLink}
                   href="/login"
-                  className="text-sm text-[var(--white-dim)] hover:text-[var(--white)] transition-colors"
+                  sx={{ fontSize: "0.875rem", color: "text.secondary", textDecoration: "none", "&:hover": { color: "text.primary" } }}
                 >
                   Sign in
-                </Link>
-                <Link
+                </MuiLink>
+                <Button
+                  component={NextLink}
                   href="/register"
-                  className="text-xs px-4 py-2 tracking-[0.15em] uppercase border border-[var(--white)] text-[var(--white)] hover:bg-[var(--gold-light)] hover:border-[var(--gold-light)] hover:text-[var(--black-card)] transition-colors"
+                  variant="outlined"
+                  size="small"
+                  sx={{
+                    fontSize: "0.7rem",
+                    letterSpacing: "0.15em",
+                    textTransform: "uppercase",
+                    borderColor: "text.primary",
+                    color: "text.primary",
+                    "&:hover": {
+                      bgcolor: "primary.light",
+                      borderColor: "primary.light",
+                      color: "text.primary",
+                    },
+                  }}
                 >
                   Create account
-                </Link>
+                </Button>
               </>
             )}
-          </div>
+          </Box>
 
           {/* Mobile hamburger */}
-          <button
-            className="md:hidden p-2 text-[var(--white-dim)] hover:text-[var(--white)]"
-            onClick={() => setMenuOpen((v) => !v)}
-            aria-label={menuOpen ? "Close menu" : "Open menu"}
-            aria-expanded={menuOpen}
+          <IconButton
+            sx={{ display: { md: "none" }, color: "text.secondary" }}
+            onClick={() => setMobileOpen((v) => !v)}
+            aria-label={mobileOpen ? "Close menu" : "Open menu"}
+            aria-expanded={mobileOpen}
             aria-controls="mobile-menu"
           >
-            <span
-              aria-hidden="true"
-              className="block w-5 h-0.5 bg-current mb-1"
-            />
-            <span
-              aria-hidden="true"
-              className="block w-5 h-0.5 bg-current mb-1"
-            />
-            <span aria-hidden="true" className="block w-5 h-0.5 bg-current" />
-          </button>
-        </div>
-      </div>
+            <Box sx={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+              <Box sx={{ width: 20, height: 1.5, bgcolor: "currentColor" }} />
+              <Box sx={{ width: 20, height: 1.5, bgcolor: "currentColor" }} />
+              <Box sx={{ width: 20, height: 1.5, bgcolor: "currentColor" }} />
+            </Box>
+          </IconButton>
+        </Toolbar>
+      </AppBar>
 
-      {/* Mobile menu */}
-      {menuOpen && (
-        <div
-          id="mobile-menu"
+      {/* Mobile Drawer */}
+      <Drawer
+        id="mobile-menu"
+        anchor="top"
+        open={mobileOpen}
+        onClose={() => setMobileOpen(false)}
+        sx={{ display: { md: "none" } }}
+        slotProps={{
+          paper: {
+            sx: {
+              top: 64,
+              bgcolor: "#ede9e3",
+              border: "none",
+              borderBottom: "1px solid",
+              borderColor: "divider",
+              px: 2,
+              py: 2,
+            },
+          },
+        }}
+        hideBackdrop
+        disableScrollLock
+      >
+        <Box
+          component="nav"
           role="navigation"
           aria-label="Mobile navigation"
-          className="md:hidden border-t border-[var(--black-border)] bg-[var(--black-soft)] px-4 py-4 flex flex-col gap-4"
+          sx={{ display: "flex", flexDirection: "column", gap: 2 }}
         >
-          <Link
+          <MuiLink
+            component={NextLink}
             href="/shop"
-            className="text-sm text-[var(--white-dim)]"
-            onClick={() => setMenuOpen(false)}
+            sx={{ fontSize: "0.875rem", color: "text.secondary", textDecoration: "none" }}
+            onClick={() => setMobileOpen(false)}
           >
             Shop
-          </Link>
+          </MuiLink>
+
           {session && (
-            <Link
+            <MuiLink
+              component={NextLink}
               href="/messages"
-              className="text-sm text-[var(--white-dim)] flex items-center gap-2"
-              aria-label={
-                unreadCount > 0
-                  ? `Messages, ${unreadCount} unread message${unreadCount !== 1 ? "s" : ""}`
-                  : undefined
-              }
-              onClick={() => setMenuOpen(false)}
+              sx={{ fontSize: "0.875rem", color: "text.secondary", textDecoration: "none", display: "flex", alignItems: "center", gap: 1 }}
+              onClick={() => setMobileOpen(false)}
             >
               Messages
               {unreadCount > 0 && (
-                <span
-                  aria-hidden="true"
-                  className="inline-flex items-center justify-center min-w-[1.1rem] h-[1.1rem] px-1 rounded-full bg-red-500 text-white text-[10px] font-semibold leading-none"
+                <Box
+                  component="span"
+                  sx={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    minWidth: "1.1rem",
+                    height: "1.1rem",
+                    px: "3px",
+                    borderRadius: "50%",
+                    bgcolor: "error.main",
+                    color: "#fff",
+                    fontSize: "0.625rem",
+                    fontWeight: 600,
+                  }}
                 >
                   {displayCount}
-                </span>
+                </Box>
               )}
-            </Link>
+            </MuiLink>
           )}
+
           {isAdmin && (
-            <Link
+            <MuiLink
+              component={NextLink}
               href="/dashboard"
-              className="text-sm text-[var(--white-dim)]"
-              onClick={() => setMenuOpen(false)}
+              sx={{ fontSize: "0.875rem", color: "text.secondary", textDecoration: "none" }}
+              onClick={() => setMobileOpen(false)}
             >
               Dashboard
-            </Link>
+            </MuiLink>
           )}
-          <hr className="divider-gold" />
+
+          <Divider sx={{ borderColor: "divider" }} />
+
           {session ? (
-            <button
+            <Button
+              variant="text"
               onClick={() => signOut({ callbackUrl: "/" })}
-              className="text-sm text-left text-[var(--white-dim)]"
+              sx={{
+                alignSelf: "flex-start",
+                color: "text.secondary",
+                textTransform: "none",
+                p: 0,
+                fontSize: "0.875rem",
+              }}
             >
               Sign out
-            </button>
+            </Button>
           ) : (
             <>
-              <Link
+              <MuiLink
+                component={NextLink}
                 href="/login"
-                className="text-sm text-[var(--white-dim)]"
-                onClick={() => setMenuOpen(false)}
+                sx={{ fontSize: "0.875rem", color: "text.secondary", textDecoration: "none" }}
+                onClick={() => setMobileOpen(false)}
               >
                 Sign in
-              </Link>
-              <Link
+              </MuiLink>
+              <MuiLink
+                component={NextLink}
                 href="/register"
-                className="text-sm text-[var(--gold)]"
-                onClick={() => setMenuOpen(false)}
+                sx={{ fontSize: "0.875rem", color: "primary.main", textDecoration: "none" }}
+                onClick={() => setMobileOpen(false)}
               >
                 Create account
-              </Link>
+              </MuiLink>
             </>
           )}
-        </div>
-      )}
-    </header>
-  );
-}
-
-function NavLink({
-  href,
-  active,
-  "aria-label": ariaLabel,
-  children,
-}: {
-  href: string;
-  active: boolean;
-  "aria-label"?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <Link
-      href={href}
-      aria-current={active ? "page" : undefined}
-      aria-label={ariaLabel}
-      className={[
-        "text-sm tracking-wide transition-colors duration-150",
-        active
-          ? "text-[var(--gold)]"
-          : "text-[var(--white-dim)] hover:text-[var(--white)]",
-      ].join(" ")}
-    >
-      {children}
-    </Link>
+        </Box>
+      </Drawer>
+    </>
   );
 }

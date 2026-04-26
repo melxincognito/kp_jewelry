@@ -1,5 +1,3 @@
-@import "tailwindcss";
-
 /* ─── KP Jewlrs Design Tokens ─────────────────────────────────── */
 :root {
   color-scheme: light;
@@ -26,22 +24,6 @@
   --accent: var(--gold);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-gold: var(--gold);
-  --color-gold-light: var(--gold-light);
-  --color-gold-dark: var(--gold-dark);
-  --color-black: var(--black);
-  --color-black-soft: var(--black-soft);
-  --color-black-card: var(--black-card);
-  --color-black-border: var(--black-border);
-  --color-white-warm: var(--white);
-  --color-white-dim: var(--white-dim);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-serif: var(--font-cormorant);
-}
 
 /* ─── Base ──────────────────────────────────────────────────────── */
 *,
@@ -78,8 +60,9 @@ body {
 }
 
 /* ─── Gold text gradient utility ───────────────────────────────── */
-.text-gold {
-  background: rgb(170, 148, 22);
+.text-gold,
+.text-gold-gradient {
+  background: linear-gradient(135deg, #c9a84c, #7a5c10);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

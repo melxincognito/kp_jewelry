@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { DashboardNav } from "@/components/dashboard/DashboardNav";
+import Box from "@mui/material/Box";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
@@ -11,11 +12,11 @@ export default async function DashboardLayout({ children }: { children: React.Re
     : 0;
 
   return (
-    <div className="flex min-h-screen">
+    <Box sx={{ display: "flex", minHeight: "100vh" }}>
       <DashboardNav unreadCount={unreadCount} />
-      <main className="flex-1 bg-[var(--black)] overflow-auto">
-        <div className="max-w-6xl mx-auto px-6 py-8">{children}</div>
-      </main>
-    </div>
+      <Box component="main" sx={{ flex: 1, bgcolor: "background.default", overflow: "auto" }}>
+        <Box sx={{ maxWidth: 1152, mx: "auto", px: 3, py: 4 }}>{children}</Box>
+      </Box>
+    </Box>
   );
 }

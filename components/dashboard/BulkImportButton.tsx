@@ -2,6 +2,16 @@
 
 import { useRef, useState, useId } from "react";
 import { useRouter } from "next/navigation";
+import MuiButton from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Alert from "@mui/material/Alert";
+import IconButton from "@mui/material/IconButton";
+import Paper from "@mui/material/Paper";
 
 interface ImportResult {
   row: number;
@@ -16,58 +26,11 @@ interface ImportResponse {
   results: ImportResult[];
 }
 
-// Generates and downloads a filled-out template so the user knows exactly what columns to use
 function downloadTemplate() {
-  const headers = [
-    "name",
-    "sku",
-    "description",
-    "jewelryType",
-    "quantity",
-    "costMXN",
-    "exchangeRate",
-    "costUSD",
-    "shippingFees",
-    "wholesalePrice",
-    "sellingPrice",
-    "purchaseDate",
-    "styles",
-  ];
-
-  const example = [
-    "Cuban Link Necklace",
-    "NKL-001",
-    "14k gold plated 5mm cuban link",
-    "NECKLACE",
-    "1",
-    "850",
-    "17.25",
-    "49.28",
-    "5.00",
-    "55.00",
-    "120.00",
-    "2026-04-01",
-    "Cubano, Gold",
-  ];
-
-  const note = [
-    "// jewelryType options:",
-    "",
-    "NECKLACE | BRACELET | RING | EARRING | CHARM | NOSE_RING | CLIP | OTHER",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "// comma-separated",
-  ];
-
-  const csvRows = [headers, example, note];
-  const csv = csvRows.map((row) => row.map((cell) => `"${cell}"`).join(",")).join("\n");
+  const headers = ["name","sku","description","jewelryType","quantity","costMXN","exchangeRate","costUSD","shippingFees","wholesalePrice","sellingPrice","purchaseDate","styles"];
+  const example = ["Cuban Link Necklace","NKL-001","14k gold plated 5mm cuban link","NECKLACE","1","850","17.25","49.28","5.00","55.00","120.00","2026-04-01","Cubano, Gold"];
+  const note = ["// jewelryType options:","","NECKLACE | BRACELET | RING | EARRING | CHARM | NOSE_RING | CLIP | OTHER","","","","","","","","","","// comma-separated"];
+  const csv = [headers, example, note].map((row) => row.map((cell) => `"${cell}"`).join(",")).join("\n");
   const blob = new Blob([csv], { type: "text/csv" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
@@ -85,7 +48,6 @@ export function BulkImportButton() {
   const [response, setResponse] = useState<ImportResponse | null>(null);
   const [fileError, setFileError] = useState("");
   const fileInputId = useId();
-  const dialogId = useId();
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -97,10 +59,8 @@ export function BulkImportButton() {
     setFileError("");
     setResponse(null);
     setUploading(true);
-
     const formData = new FormData();
     formData.append("file", file);
-
     try {
       const res = await fetch("/api/products/import", { method: "POST", body: formData });
       const data = await res.json();
@@ -114,7 +74,6 @@ export function BulkImportButton() {
       setFileError("Network error — please try again");
     } finally {
       setUploading(false);
-      // Reset so the same file can be re-uploaded after fixing errors
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
   }
@@ -127,178 +86,186 @@ export function BulkImportButton() {
 
   return (
     <>
-      <button
-        type="button"
+      <MuiButton
+        variant="outlined"
+        size="small"
         onClick={() => setOpen(true)}
-        className="text-xs px-3 py-2 border border-[var(--black-border)] text-[var(--white-dim)] hover:border-[var(--gold)]/40 hover:text-[var(--white)] rounded-sm transition-colors"
+        sx={{
+          fontSize: "0.75rem",
+          textTransform: "none",
+          letterSpacing: "normal",
+          borderColor: "divider",
+          color: "text.secondary",
+          "&:hover": { borderColor: "rgba(122,92,16,0.4)", color: "text.primary" },
+        }}
       >
         Import spreadsheet
-      </button>
+      </MuiButton>
 
-      {open && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby={`${dialogId}-title`}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
-        >
-          {/* Backdrop */}
-          <div
-            className="absolute inset-0 bg-black/70"
-            aria-hidden="true"
+      <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth aria-labelledby="import-dialog-title">
+        <DialogTitle id="import-dialog-title" sx={{ pr: 6 }}>
+          Import Inventory from Spreadsheet
+          <IconButton
+            aria-label="Close import dialog"
             onClick={handleClose}
-          />
+            size="small"
+            sx={{ position: "absolute", right: 16, top: 12, color: "text.secondary" }}
+          >
+            ×
+          </IconButton>
+        </DialogTitle>
 
-          {/* Panel */}
-          <div className="relative z-10 w-full max-w-lg bg-[var(--black-card)] border border-[var(--black-border)] rounded-sm flex flex-col gap-0 overflow-hidden">
+        <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+          {/* Step 1 */}
+          <Box>
+            <Typography sx={{ fontSize: "0.625rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "primary.main", mb: 1 }}>
+              Step 1 — Download the template
+            </Typography>
+            <Typography variant="body2" sx={{ color: "text.secondary", opacity: 0.6, lineHeight: 1.6, mb: 1.5 }}>
+              Fill in your items using the exact column headers. Required columns are:{" "}
+              <Box component="span" sx={{ fontFamily: "var(--font-geist-mono)", color: "text.secondary" }}>
+                name, jewelryType, costMXN, purchaseDate, wholesalePrice, sellingPrice
+              </Box>
+              . All other columns are optional.
+            </Typography>
+            <MuiButton
+              variant="outlined"
+              size="small"
+              onClick={downloadTemplate}
+              sx={{
+                fontSize: "0.75rem",
+                textTransform: "none",
+                letterSpacing: "normal",
+                borderColor: "divider",
+                color: "text.secondary",
+                "&:hover": { borderColor: "rgba(122,92,16,0.4)", color: "primary.main" },
+              }}
+            >
+              ↓ Download CSV template
+            </MuiButton>
+          </Box>
 
-            {/* Header */}
-            <div className="px-5 py-4 border-b border-[var(--black-border)] flex items-center justify-between">
-              <h2 id={`${dialogId}-title`} className="text-sm font-medium text-[var(--white)]">
-                Import Inventory from Spreadsheet
-              </h2>
-              <button
-                type="button"
-                onClick={handleClose}
-                aria-label="Close import dialog"
-                className="text-[var(--white-dim)]/40 hover:text-[var(--white)] transition-colors text-lg leading-none"
-              >
-                ×
-              </button>
-            </div>
+          {/* Reference */}
+          <Paper sx={{ px: 2, py: 1.5, bgcolor: "#ede9e3", border: "1px solid", borderColor: "divider" }}>
+            <Typography variant="caption" sx={{ color: "text.secondary", opacity: 0.7, fontWeight: 500, display: "block", mb: 0.5 }}>
+              jewelryType accepted values
+            </Typography>
+            <Typography variant="caption" sx={{ fontFamily: "var(--font-geist-mono)", color: "text.secondary", opacity: 0.5, lineHeight: 1.8 }}>
+              NECKLACE · BRACELET · RING · EARRING · CHARM · NOSE_RING · CLIP · OTHER
+            </Typography>
+            <Typography variant="caption" sx={{ color: "text.secondary", opacity: 0.7, fontWeight: 500, display: "block", mt: 1, mb: 0.5 }}>
+              purchaseDate format
+            </Typography>
+            <Typography variant="caption" sx={{ fontFamily: "var(--font-geist-mono)", color: "text.secondary", opacity: 0.5 }}>
+              YYYY-MM-DD &nbsp; or &nbsp; MM/DD/YYYY
+            </Typography>
+          </Paper>
 
-            <div className="px-5 py-5 flex flex-col gap-5">
-              {/* Step 1 */}
-              <div className="flex flex-col gap-2">
-                <p className="text-[10px] tracking-widest uppercase text-[var(--gold)]">
-                  Step 1 — Download the template
-                </p>
-                <p className="text-xs text-[var(--white-dim)]/60 leading-relaxed">
-                  Fill in your items using the exact column headers. Required columns are:
-                  <span className="font-mono text-[var(--white-dim)]"> name, jewelryType, costMXN, purchaseDate, wholesalePrice, sellingPrice</span>.
-                  All other columns are optional.
-                </p>
-                <button
-                  type="button"
-                  onClick={downloadTemplate}
-                  className="self-start text-xs px-3 py-2 border border-[var(--black-border)] text-[var(--white-dim)] hover:border-[var(--gold)]/40 hover:text-[var(--gold)] rounded-sm transition-colors"
-                >
-                  ↓ Download CSV template
-                </button>
-              </div>
+          {/* Step 2 */}
+          <Box>
+            <Typography sx={{ fontSize: "0.625rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "primary.main", mb: 1 }}>
+              Step 2 — Upload your completed file
+            </Typography>
+            <Typography variant="body2" sx={{ color: "text.secondary", opacity: 0.6, mb: 1.5 }}>
+              Accepts .xlsx, .xls, or .csv files.
+            </Typography>
 
-              {/* Accepted values reference */}
-              <div className="bg-[var(--black-soft)] border border-[var(--black-border)] rounded-sm px-4 py-3 text-xs text-[var(--white-dim)]/50 flex flex-col gap-1">
-                <p className="text-[var(--white-dim)]/70 font-medium mb-1">jewelryType accepted values</p>
-                <p className="font-mono leading-relaxed">
-                  NECKLACE · BRACELET · RING · EARRING · CHARM · NOSE_RING · CLIP · OTHER
-                </p>
-                <p className="text-[var(--white-dim)]/70 font-medium mt-2 mb-1">purchaseDate format</p>
-                <p className="font-mono">YYYY-MM-DD &nbsp; or &nbsp; MM/DD/YYYY</p>
-                <p className="text-[var(--white-dim)]/70 font-medium mt-2 mb-1">styles</p>
-                <p className="font-mono">Comma-separated &nbsp; e.g. Cubano, Franco</p>
-              </div>
+            <Box
+              component="label"
+              htmlFor={fileInputId}
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 1,
+                border: "1px dashed",
+                borderColor: uploading ? "divider" : "divider",
+                borderRadius: 1,
+                py: 4,
+                cursor: uploading ? "not-allowed" : "pointer",
+                opacity: uploading ? 0.5 : 1,
+                pointerEvents: uploading ? "none" : "auto",
+                "&:hover": { borderColor: "rgba(122,92,16,0.4)", bgcolor: "rgba(122,92,16,0.03)" },
+                transition: "all 0.15s",
+              }}
+            >
+              <Typography sx={{ fontSize: "1.5rem", opacity: 0.3 }} aria-hidden="true">⬆</Typography>
+              <Typography variant="caption" sx={{ color: "text.secondary", opacity: 0.5 }}>
+                {uploading ? "Processing…" : "Click to choose file"}
+              </Typography>
+              <input
+                ref={fileInputRef}
+                id={fileInputId}
+                type="file"
+                accept=".xlsx,.xls,.csv"
+                style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0,0,0,0)" }}
+                disabled={uploading}
+                onChange={handleFileChange}
+                aria-describedby={fileError ? `${fileInputId}-error` : undefined}
+              />
+            </Box>
 
-              {/* Step 2 */}
-              <div className="flex flex-col gap-2">
-                <p className="text-[10px] tracking-widest uppercase text-[var(--gold)]">
-                  Step 2 — Upload your completed file
-                </p>
-                <p className="text-xs text-[var(--white-dim)]/60">
-                  Accepts .xlsx, .xls, or .csv files.
-                </p>
+            {fileError && (
+              <Alert id={`${fileInputId}-error`} severity="error" sx={{ mt: 1, fontSize: "0.75rem" }}>
+                {fileError}
+              </Alert>
+            )}
+          </Box>
 
-                <label
-                  htmlFor={fileInputId}
-                  className={[
-                    "flex flex-col items-center justify-center gap-2 border border-dashed rounded-sm py-8 cursor-pointer transition-colors",
-                    uploading
-                      ? "border-[var(--black-border)] opacity-50 pointer-events-none"
-                      : "border-[var(--black-border)] hover:border-[var(--gold)]/40 hover:bg-[var(--gold)]/5",
-                  ].join(" ")}
-                >
-                  <span className="text-2xl opacity-30" aria-hidden="true">⬆</span>
-                  <span className="text-xs text-[var(--white-dim)]/50">
-                    {uploading ? "Processing…" : "Click to choose file"}
-                  </span>
-                  <input
-                    ref={fileInputRef}
-                    id={fileInputId}
-                    type="file"
-                    accept=".xlsx,.xls,.csv"
-                    className="sr-only"
-                    disabled={uploading}
-                    onChange={handleFileChange}
-                    aria-describedby={fileError ? `${fileInputId}-error` : undefined}
-                  />
-                </label>
-
-                {fileError && (
-                  <p
-                    id={`${fileInputId}-error`}
-                    role="alert"
-                    className="text-xs text-red-400"
-                  >
-                    {fileError}
-                  </p>
+          {/* Results */}
+          {response && (
+            <Box role="status" aria-live="polite" sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
+              <Box sx={{ display: "flex", gap: 1.5 }}>
+                {response.created > 0 && (
+                  <Paper sx={{ flex: 1, p: 1.5, textAlign: "center", bgcolor: "rgba(5,150,105,0.08)", border: "1px solid rgba(5,150,105,0.2)" }}>
+                    <Typography sx={{ fontSize: "1.25rem", fontWeight: 500, color: "#059669" }}>{response.created}</Typography>
+                    <Typography sx={{ fontSize: "0.625rem", textTransform: "uppercase", letterSpacing: "0.15em", color: "rgba(5,150,105,0.7)" }}>Created</Typography>
+                  </Paper>
                 )}
-              </div>
-
-              {/* Results */}
-              {response && (
-                <div
-                  role="status"
-                  aria-live="polite"
-                  className="flex flex-col gap-3"
-                >
-                  {/* Summary */}
-                  <div className="flex gap-3">
-                    {response.created > 0 && (
-                      <div className="flex-1 bg-emerald-500/10 border border-emerald-500/20 rounded-sm px-3 py-2 text-center">
-                        <p className="text-lg font-medium text-emerald-400">{response.created}</p>
-                        <p className="text-[10px] text-emerald-400/70 uppercase tracking-widest">Created</p>
-                      </div>
-                    )}
-                    {response.errors > 0 && (
-                      <div className="flex-1 bg-red-500/10 border border-red-500/20 rounded-sm px-3 py-2 text-center">
-                        <p className="text-lg font-medium text-red-400">{response.errors}</p>
-                        <p className="text-[10px] text-red-400/70 uppercase tracking-widest">Errors</p>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Error detail */}
-                  {response.errors > 0 && (
-                    <div className="max-h-40 overflow-y-auto flex flex-col gap-1.5">
-                      <p className="text-[10px] text-[var(--white-dim)]/50 uppercase tracking-widest">Error detail</p>
-                      {response.results
-                        .filter((r) => r.status === "error")
-                        .map((r) => (
-                          <div key={r.row} className="flex gap-2 text-xs">
-                            <span className="text-[var(--white-dim)]/30 shrink-0">Row {r.row}</span>
-                            <span className="text-[var(--white-dim)]">{r.name}</span>
-                            <span className="text-red-400 ml-auto shrink-0">{r.error}</span>
-                          </div>
-                        ))}
-                    </div>
-                  )}
-                </div>
+                {response.errors > 0 && (
+                  <Paper sx={{ flex: 1, p: 1.5, textAlign: "center", bgcolor: "rgba(185,28,28,0.08)", border: "1px solid rgba(185,28,28,0.2)" }}>
+                    <Typography sx={{ fontSize: "1.25rem", fontWeight: 500, color: "#b91c1c" }}>{response.errors}</Typography>
+                    <Typography sx={{ fontSize: "0.625rem", textTransform: "uppercase", letterSpacing: "0.15em", color: "rgba(185,28,28,0.7)" }}>Errors</Typography>
+                  </Paper>
+                )}
+              </Box>
+              {response.errors > 0 && (
+                <Box sx={{ maxHeight: 160, overflowY: "auto", display: "flex", flexDirection: "column", gap: 0.75 }}>
+                  <Typography sx={{ fontSize: "0.625rem", textTransform: "uppercase", letterSpacing: "0.15em", color: "text.secondary", opacity: 0.5 }}>
+                    Error detail
+                  </Typography>
+                  {response.results.filter((r) => r.status === "error").map((r) => (
+                    <Box key={r.row} sx={{ display: "flex", gap: 1, fontSize: "0.75rem" }}>
+                      <Typography variant="caption" sx={{ color: "text.secondary", opacity: 0.3, flexShrink: 0 }}>Row {r.row}</Typography>
+                      <Typography variant="caption" sx={{ color: "text.primary" }}>{r.name}</Typography>
+                      <Typography variant="caption" sx={{ color: "error.main", ml: "auto", flexShrink: 0 }}>{r.error}</Typography>
+                    </Box>
+                  ))}
+                </Box>
               )}
-            </div>
+            </Box>
+          )}
+        </DialogContent>
 
-            {/* Footer */}
-            <div className="px-5 py-4 border-t border-[var(--black-border)] flex justify-end">
-              <button
-                type="button"
-                onClick={handleClose}
-                className="text-xs px-4 py-2 border border-[var(--black-border)] text-[var(--white-dim)] hover:text-[var(--white)] rounded-sm transition-colors"
-              >
-                {response?.created ? "Done" : "Cancel"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+        <DialogActions>
+          <MuiButton
+            variant="outlined"
+            size="small"
+            onClick={handleClose}
+            sx={{
+              fontSize: "0.75rem",
+              textTransform: "none",
+              letterSpacing: "normal",
+              borderColor: "divider",
+              color: "text.secondary",
+              "&:hover": { color: "text.primary" },
+            }}
+          >
+            {response?.created ? "Done" : "Cancel"}
+          </MuiButton>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }

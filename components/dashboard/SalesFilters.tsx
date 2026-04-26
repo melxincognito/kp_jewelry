@@ -2,9 +2,10 @@
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useCallback, useState } from "react";
-import { Select } from "@/components/ui/Select";
-import { Input } from "@/components/ui/Input";
-import { Button } from "@/components/ui/Button";
+import Box from "@mui/material/Box";
+import TextField from "@mui/material/TextField";
+import MenuItem from "@mui/material/MenuItem";
+import MuiButton from "@mui/material/Button";
 
 const PRESETS = [
   { value: "all", label: "All Time" },
@@ -19,6 +20,11 @@ const PRESETS = [
   { value: "custom", label: "Custom Dates…" },
 ];
 
+const inputSx = {
+  minWidth: 180,
+  "& .MuiOutlinedInput-input": { padding: "8px 12px", fontSize: "0.875rem" },
+};
+
 export function SalesFilters() {
   const router = useRouter();
   const pathname = usePathname();
@@ -31,7 +37,7 @@ export function SalesFilters() {
   const applyPreset = useCallback(
     (value: string) => {
       setPreset(value);
-      if (value === "custom") return; // wait for user to enter dates
+      if (value === "custom") return;
       const params = new URLSearchParams();
       if (value !== "all") params.set("preset", value);
       router.push(`${pathname}?${params.toString()}`);
@@ -57,55 +63,85 @@ export function SalesFilters() {
   const isFiltered = preset !== "all";
 
   return (
-    <div
-      className="flex flex-wrap items-end gap-3"
+    <Box
+      sx={{ display: "flex", flexWrap: "wrap", alignItems: "flex-end", gap: 1.5 }}
       role="search"
       aria-label="Filter sales by date"
     >
-      <div className="min-w-[180px]">
-        <Select
-          label="Date Range"
-          options={PRESETS}
-          value={preset}
-          onChange={(e) => applyPreset(e.target.value)}
-        />
-      </div>
+      <TextField
+        select
+        label="Date Range"
+        value={preset}
+        onChange={(e) => applyPreset(e.target.value)}
+        size="small"
+        sx={inputSx}
+      >
+        {PRESETS.map((p) => (
+          <MenuItem key={p.value} value={p.value}>
+            {p.label}
+          </MenuItem>
+        ))}
+      </TextField>
 
       {preset === "custom" && (
         <>
-          <div className="min-w-[140px]">
-            <Input
-              label="From"
-              type="date"
-              value={from}
-              onChange={(e) => setFrom(e.target.value)}
-              aria-label="Start date"
-            />
-          </div>
-          <div className="min-w-[140px]">
-            <Input
-              label="To"
-              type="date"
-              value={to}
-              onChange={(e) => setTo(e.target.value)}
-              aria-label="End date"
-            />
-          </div>
-          <div className="pb-[1px]">
-            <Button size="sm" onClick={applyCustom} disabled={!from && !to}>
-              Apply
-            </Button>
-          </div>
+          <TextField
+            label="From"
+            type="date"
+            value={from}
+            onChange={(e) => setFrom(e.target.value)}
+            size="small"
+            aria-label="Start date"
+            slotProps={{ inputLabel: { shrink: true } }}
+            sx={{ ...inputSx, minWidth: 150 }}
+          />
+          <TextField
+            label="To"
+            type="date"
+            value={to}
+            onChange={(e) => setTo(e.target.value)}
+            size="small"
+            aria-label="End date"
+            slotProps={{ inputLabel: { shrink: true } }}
+            sx={{ ...inputSx, minWidth: 150 }}
+          />
+          <MuiButton
+            variant="contained"
+            size="small"
+            onClick={applyCustom}
+            disabled={!from && !to}
+            sx={{
+              bgcolor: "#1a1714",
+              color: "#fdfbf8",
+              textTransform: "uppercase",
+              letterSpacing: "0.1em",
+              fontSize: "0.75rem",
+              "&:hover": { bgcolor: "#7a5c10" },
+              "&.Mui-disabled": { opacity: 0.5 },
+              mb: "1px",
+            }}
+          >
+            Apply
+          </MuiButton>
         </>
       )}
 
       {isFiltered && (
-        <div className="pb-[1px]">
-          <Button size="sm" variant="ghost" onClick={clearFilters}>
-            Clear
-          </Button>
-        </div>
+        <MuiButton
+          variant="text"
+          size="small"
+          onClick={clearFilters}
+          sx={{
+            color: "text.secondary",
+            textTransform: "none",
+            letterSpacing: "normal",
+            fontSize: "0.875rem",
+            mb: "1px",
+          }}
+        >
+          Clear
+        </MuiButton>
       )}
-    </div>
+    </Box>
   );
 }

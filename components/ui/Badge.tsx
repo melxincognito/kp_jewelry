@@ -1,3 +1,5 @@
+import Chip from "@mui/material/Chip";
+
 type BadgeVariant = "gold" | "outline" | "status-available" | "status-reserved" | "status-sold";
 
 interface BadgeProps {
@@ -6,24 +8,46 @@ interface BadgeProps {
   className?: string;
 }
 
-const variantClasses: Record<BadgeVariant, string> = {
-  gold: "bg-[var(--gold)]/10 text-[var(--gold)] border border-[var(--gold)]/25",
-  outline: "border border-[var(--black-border)] text-[var(--white-dim)]",
-  "status-available": "bg-emerald-50 text-emerald-700 border border-emerald-200",
-  "status-reserved": "bg-amber-50 text-amber-700 border border-amber-200",
-  "status-sold": "bg-[var(--black-soft)] text-[var(--white-dim)] border border-[var(--black-border)]",
+const variantSx: Record<BadgeVariant, object> = {
+  gold: {
+    bgcolor: "rgba(122,92,16,0.08)",
+    color: "#7a5c10",
+    border: "1px solid rgba(122,92,16,0.25)",
+  },
+  outline: {
+    bgcolor: "transparent",
+    color: "text.secondary",
+    border: "1px solid",
+    borderColor: "divider",
+  },
+  "status-available": {
+    bgcolor: "#ecfdf5",
+    color: "#065f46",
+    border: "1px solid #a7f3d0",
+  },
+  "status-reserved": {
+    bgcolor: "#fffbeb",
+    color: "#92400e",
+    border: "1px solid #fcd34d",
+  },
+  "status-sold": {
+    bgcolor: "#ede9e3",
+    color: "#7a7470",
+    border: "1px solid #ddd6cc",
+  },
 };
 
-export function Badge({ children, variant = "outline", className = "" }: BadgeProps) {
+export function Badge({ children, variant = "outline", className }: BadgeProps) {
   return (
-    <span
-      className={[
-        "inline-flex items-center px-2 py-0.5 rounded-sm text-xs font-medium tracking-wide",
-        variantClasses[variant],
-        className,
-      ].join(" ")}
-    >
-      {children}
-    </span>
+    <Chip
+      label={children}
+      size="small"
+      className={className}
+      sx={{
+        ...variantSx[variant],
+        fontWeight: 500,
+        letterSpacing: "0.04em",
+      }}
+    />
   );
 }

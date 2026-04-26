@@ -1,5 +1,12 @@
+"use client";
+
 import Image from "next/image";
-import Link from "next/link";
+import NextLink from "next/link";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import CardActionArea from "@mui/material/CardActionArea";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
 import { Badge } from "@/components/ui/Badge";
 import type { Product } from "@/app/generated/prisma";
 import type { ProductStatus } from "@/types/enums";
@@ -29,64 +36,93 @@ export function ProductCard({ product }: ProductCardProps) {
   const typeText = product.jewelryType.replace("_", " ").toLowerCase();
 
   return (
-    <Link
+    <Card
+      component={NextLink}
       href={`/shop/${product.id}`}
       aria-label={`${product.name} — $${product.sellingPrice.toFixed(2)} — ${statusText}`}
-      className="group flex flex-col bg-[var(--black-card)] border border-[var(--black-border)] rounded-sm overflow-hidden hover:border-[var(--gold)]/40 transition-colors"
+      sx={{
+        textDecoration: "none",
+        display: "flex",
+        flexDirection: "column",
+        "&:hover": { borderColor: "rgba(122,92,16,0.4)" },
+        transition: "border-color 0.15s",
+      }}
     >
-      {/* Image */}
-      <div className="relative aspect-square bg-[var(--black-border)] overflow-hidden">
-        {firstImage ? (
-          <Image
-            src={firstImage}
-            alt={`${product.name}, ${typeText}, ${statusText}`}
-            fill
-            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            className="object-cover group-hover:scale-105 transition-transform duration-300"
-          />
-        ) : (
-          <div aria-hidden="true" className="flex items-center justify-center h-full text-3xl opacity-20">
-            💎
-          </div>
-        )}
-        {/* Status overlay badge */}
-        {product.status !== "AVAILABLE" && (
-          <div className="absolute top-2 left-2">
-            <Badge variant={statusVariant[product.status]}>
-              {statusLabel[product.status]}
-            </Badge>
-          </div>
-        )}
-      </div>
+      <CardActionArea sx={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "stretch" }}>
+        {/* Image */}
+        <Box
+          sx={{
+            position: "relative",
+            aspectRatio: "1",
+            bgcolor: "#ddd6cc",
+            overflow: "hidden",
+          }}
+        >
+          {firstImage ? (
+            <Image
+              src={firstImage}
+              alt={`${product.name}, ${typeText}, ${statusText}`}
+              fill
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+              style={{ objectFit: "cover", transition: "transform 0.3s" }}
+            />
+          ) : (
+            <Box
+              aria-hidden="true"
+              sx={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", fontSize: "2rem", opacity: 0.2 }}
+            >
+              💎
+            </Box>
+          )}
+          {product.status !== "AVAILABLE" && (
+            <Box sx={{ position: "absolute", top: 8, left: 8 }}>
+              <Badge variant={statusVariant[product.status as ProductStatus]}>
+                {statusLabel[product.status as ProductStatus]}
+              </Badge>
+            </Box>
+          )}
+        </Box>
 
-      {/* Info */}
-      <div className="p-3 flex flex-col gap-2">
-        <p className="text-sm font-medium text-[var(--white)] line-clamp-1 group-hover:text-[var(--gold)] transition-colors">
-          {product.name}
-        </p>
-        <div className="flex items-center justify-between">
-          <p className="text-sm font-semibold text-[var(--gold)]">
-            ${product.sellingPrice.toFixed(2)}
-          </p>
-          <p className="text-xs text-[var(--white-dim)]/50 capitalize">
-            {product.jewelryType.replace("_", " ").toLowerCase()}
-          </p>
-        </div>
-        {styles.length > 0 && (
-          <div className="flex flex-wrap gap-1 mt-0.5">
-            {styles.slice(0, 2).map((style) => (
-              <Badge key={style} variant="gold" className="text-[10px]">
-                {style}
-              </Badge>
-            ))}
-            {styles.length > 2 && (
-              <Badge variant="outline" className="text-[10px]">
-                +{styles.length - 2}
-              </Badge>
-            )}
-          </div>
-        )}
-      </div>
-    </Link>
+        {/* Info */}
+        <CardContent sx={{ p: 1.5, display: "flex", flexDirection: "column", gap: 1, flex: 1 }}>
+          <Typography
+            variant="body2"
+            sx={{
+              fontWeight: 500,
+              color: "text.primary",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              "&:hover": { color: "primary.main" },
+              transition: "color 0.15s",
+            }}
+          >
+            {product.name}
+          </Typography>
+          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <Typography variant="body2" sx={{ fontWeight: 600, color: "primary.main" }}>
+              ${product.sellingPrice.toFixed(2)}
+            </Typography>
+            <Typography variant="caption" sx={{ color: "text.secondary", opacity: 0.5, textTransform: "capitalize" }}>
+              {typeText}
+            </Typography>
+          </Box>
+          {styles.length > 0 && (
+            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, mt: 0.25 }}>
+              {styles.slice(0, 2).map((style) => (
+                <Badge key={style} variant="gold">
+                  <Typography sx={{ fontSize: "0.6rem" }}>{style}</Typography>
+                </Badge>
+              ))}
+              {styles.length > 2 && (
+                <Badge variant="outline">
+                  <Typography sx={{ fontSize: "0.6rem" }}>+{styles.length - 2}</Typography>
+                </Badge>
+              )}
+            </Box>
+          )}
+        </CardContent>
+      </CardActionArea>
+    </Card>
   );
 }

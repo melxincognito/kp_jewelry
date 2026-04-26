@@ -1,8 +1,12 @@
 "use client";
 
 import { useState, useRef, useEffect, useId, forwardRef, useImperativeHandle } from "react";
-import { Textarea } from "@/components/ui/Textarea";
-import { Button } from "@/components/ui/Button";
+import Box from "@mui/material/Box";
+import TextField from "@mui/material/TextField";
+import MuiButton from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
+import CircularProgress from "@mui/material/CircularProgress";
+import IconButton from "@mui/material/IconButton";
 import type { Message, User, Product } from "@/app/generated/prisma";
 
 export type MessageWithRelations = Message & {
@@ -30,14 +34,7 @@ interface MessageThreadProps {
 type TabId = "reply" | "note";
 
 function getInitials(name: string | null, email: string): string {
-  if (name) {
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
-  }
+  if (name) return name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
   return email[0].toUpperCase();
 }
 
@@ -52,18 +49,7 @@ function relativeTime(date: Date | string): string {
 }
 
 export const MessageThread = forwardRef<MessageThreadHandle, MessageThreadProps>(
-  function MessageThread(
-    {
-      messages: initialMessages,
-      currentUserId,
-      productId,
-      recipientId,
-      productName,
-      onClose,
-      onMessageSent,
-    },
-    ref
-  ) {
+  function MessageThread({ messages: initialMessages, currentUserId, productId, recipientId, productName, onClose, onMessageSent }, ref) {
     const [messages, setMessages] = useState(initialMessages);
     const [body, setBody] = useState("");
     const [loading, setLoading] = useState(false);
@@ -73,47 +59,28 @@ export const MessageThread = forwardRef<MessageThreadHandle, MessageThreadProps>
     const bottomRef = useRef<HTMLDivElement>(null);
     const tabPanelId = useId();
 
-    // Expose focusThread() so MessagesLayout can move focus here on selection
-    useImperativeHandle(ref, () => ({
-      focusThread() {
-        headingRef.current?.focus();
-      },
-    }));
+    useImperativeHandle(ref, () => ({ focusThread() { headingRef.current?.focus(); } }));
 
-    useEffect(() => {
-      bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, [messages]);
+    useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
 
-    // Derive the other person's name from messages
-    const recipientMsg = messages.find(
-      (m) => m.senderId !== currentUserId || m.recipientId === currentUserId
-    );
-    const recipient = recipientMsg
-      ? recipientMsg.senderId !== currentUserId
-        ? recipientMsg.sender
-        : recipientMsg.recipient
-      : null;
-    const recipientName = recipient
-      ? (recipient.name ?? recipient.email)
-      : "Customer";
+    const recipientMsg = messages.find((m) => m.senderId !== currentUserId || m.recipientId === currentUserId);
+    const recipient = recipientMsg ? (recipientMsg.senderId !== currentUserId ? recipientMsg.sender : recipientMsg.recipient) : null;
+    const recipientName = recipient ? (recipient.name ?? recipient.email) : "Customer";
 
     async function sendMessage(andClose = false) {
       if (!body.trim()) return;
       setLoading(true);
-
       const res = await fetch("/api/messages", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ productId, recipientId, body }),
       });
-
       setLoading(false);
       if (res.ok) {
         const newMsg = await res.json();
         setMessages((prev) => [...prev, newMsg]);
         setBody("");
         onMessageSent?.(newMsg);
-        // Announce the sent message to screen readers
         setLiveAnnouncement(`Message sent: ${newMsg.body}`);
         if (andClose) onClose?.();
       }
@@ -124,228 +91,161 @@ export const MessageThread = forwardRef<MessageThreadHandle, MessageThreadProps>
       { id: "note", label: "Note" },
     ];
 
-    const threadSummary =
-      messages.length === 0
-        ? `Conversation with ${recipientName} about ${productName}. No messages yet.`
-        : `Conversation with ${recipientName} about ${productName}. ${messages.length} message${messages.length !== 1 ? "s" : ""}. Press Tab to read each message, or continue to the reply box.`;
+    const threadSummary = messages.length === 0
+      ? `Conversation with ${recipientName} about ${productName}. No messages yet.`
+      : `Conversation with ${recipientName} about ${productName}. ${messages.length} message${messages.length !== 1 ? "s" : ""}.`;
 
     return (
-      <div className="flex flex-col h-full">
-        {/*
-          Visually hidden heading — receives focus when a conversation is selected.
-          Screen reader reads the full thread summary immediately.
-        */}
-        <h2
-          ref={headingRef}
-          tabIndex={-1}
-          className="sr-only"
-        >
+      <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
+        {/* SR heading */}
+        <Box component="h2" ref={headingRef} tabIndex={-1} sx={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0,0,0,0)" }}>
           {threadSummary}
-        </h2>
-
-        {/*
-          Live region for announcing new incoming/outgoing messages.
-          Separate from the list so it doesn't interfere with list navigation.
-        */}
-        <div
-          role="status"
-          aria-live="polite"
-          aria-atomic="true"
-          className="sr-only"
-        >
+        </Box>
+        <Box role="status" aria-live="polite" aria-atomic="true" sx={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0,0,0,0)" }}>
           {liveAnnouncement}
-        </div>
+        </Box>
 
-        {/* Visible header */}
-        <div
-          aria-hidden="true"
-          className="px-4 py-3 border-b border-[var(--black-border)] flex items-start justify-between gap-4"
-        >
-          <div>
-            <p className="text-sm font-medium text-[var(--white)]">{recipientName}</p>
-            <p className="text-xs text-[var(--white-dim)]/50 mt-0.5">Re: {productName}</p>
-          </div>
+        {/* Header */}
+        <Box aria-hidden="true" sx={{ px: 2, py: 1.5, borderBottom: "1px solid", borderColor: "divider", display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 2 }}>
+          <Box>
+            <Typography variant="body2" sx={{ fontWeight: 500, color: "text.primary" }}>{recipientName}</Typography>
+            <Typography variant="caption" sx={{ color: "text.secondary", opacity: 0.5 }}>Re: {productName}</Typography>
+          </Box>
           {onClose && (
-            <button
-              type="button"
-              onClick={onClose}
-              aria-label="Close conversation"
-              className="text-xs text-[var(--white-dim)]/50 hover:text-[var(--white)] transition-colors shrink-0 mt-0.5"
-            >
+            <MuiButton variant="text" size="small" onClick={onClose}
+              sx={{ color: "text.secondary", opacity: 0.5, textTransform: "none", letterSpacing: "normal", fontSize: "0.75rem", p: 0, minWidth: 0, "&:hover": { opacity: 1 } }}>
               Close
-            </button>
+            </MuiButton>
           )}
-        </div>
+        </Box>
 
-        {/*
-          Message list — plain <ol> so screen readers expose list navigation.
-          Each <li> is focusable with tabIndex={0} and carries a complete aria-label
-          so tabbing through reads: "You at Apr 13, 2:34 PM: Got it, thank you!"
-        */}
-        <ol
+        {/* Message list */}
+        <Box
+          component="ol"
           aria-label={`Messages in conversation with ${recipientName}`}
-          className="flex-1 overflow-y-auto p-4 flex flex-col gap-4 list-none"
+          sx={{ flex: 1, overflowY: "auto", p: 2, display: "flex", flexDirection: "column", gap: 2, listStyle: "none", m: 0 }}
         >
           {messages.length === 0 && (
-            <li className="text-xs text-[var(--white-dim)]/40 text-center py-8">
-              No messages yet
-            </li>
+            <Box component="li">
+              <Typography variant="caption" sx={{ color: "text.secondary", opacity: 0.4, display: "block", textAlign: "center", py: 4 }}>
+                No messages yet
+              </Typography>
+            </Box>
           )}
-
           {messages.map((msg) => {
             const isMe = msg.senderId === currentUserId;
             const senderName = msg.sender.name ?? msg.sender.email;
             const initials = getInitials(msg.sender.name, msg.sender.email);
             const timestamp = relativeTime(msg.createdAt);
-            const fullTime = new Date(msg.createdAt).toLocaleString("en-US", {
-              month: "short",
-              day: "numeric",
-              hour: "numeric",
-              minute: "2-digit",
-            });
-
+            const fullTime = new Date(msg.createdAt).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
             return (
-              <li
+              <Box
+                component="li"
                 key={msg.id}
                 tabIndex={0}
                 aria-label={`${isMe ? "You" : senderName}, ${fullTime}: ${msg.body}`}
-                className={`flex gap-2.5 rounded-sm focus:outline-none focus-visible:ring-1 focus-visible:ring-[var(--gold)]/50 ${
-                  isMe ? "flex-row-reverse" : "flex-row"
-                }`}
+                sx={{ display: "flex", gap: 1.25, flexDirection: isMe ? "row-reverse" : "row", borderRadius: 1, "&:focus": { outline: "none" }, "&:focus-visible": { ring: 1 } }}
               >
-                {/* Avatar — only for received messages, hidden from screen reader since label covers it */}
                 {!isMe && (
-                  <div
-                    aria-hidden="true"
-                    className="w-8 h-8 rounded-full bg-[var(--gold)]/20 border border-[var(--gold)]/30 flex items-center justify-center shrink-0 mt-1"
-                  >
-                    <span className="text-[10px] font-semibold text-[var(--gold)]">
-                      {initials}
-                    </span>
-                  </div>
+                  <Box aria-hidden="true" sx={{ width: 32, height: 32, borderRadius: "50%", bgcolor: "rgba(122,92,16,0.15)", border: "1px solid rgba(122,92,16,0.25)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, mt: 0.5 }}>
+                    <Typography sx={{ fontSize: "0.625rem", fontWeight: 600, color: "primary.main" }}>{initials}</Typography>
+                  </Box>
                 )}
-
-                {/* Visual bubble — hidden from AT since aria-label on <li> covers all content */}
-                <div
-                  aria-hidden="true"
-                  className={`flex flex-col gap-1 max-w-[75%] ${isMe ? "items-end" : "items-start"}`}
-                >
-                  <div
-                    className={[
-                      "px-4 py-2.5 rounded-sm text-sm leading-relaxed",
-                      isMe
-                        ? "bg-[var(--gold)]/15 text-[var(--white)] border border-[var(--gold)]/20"
-                        : "bg-[var(--black-card)] text-[var(--white)] border border-[var(--black-border)]",
-                    ].join(" ")}
-                  >
+                <Box aria-hidden="true" sx={{ display: "flex", flexDirection: "column", gap: 0.5, maxWidth: "75%", alignItems: isMe ? "flex-end" : "flex-start" }}>
+                  <Box sx={{
+                    px: 2, py: 1.25, borderRadius: 1, fontSize: "0.875rem", lineHeight: 1.6,
+                    ...(isMe ? { bgcolor: "rgba(122,92,16,0.1)", border: "1px solid rgba(122,92,16,0.15)", color: "text.primary" }
+                      : { bgcolor: "background.paper", border: "1px solid", borderColor: "divider", color: "text.primary" }),
+                  }}>
                     {msg.body}
-                  </div>
-                  <p className="text-[10px] text-[var(--white-dim)]/30 px-1">
-                    <time dateTime={new Date(msg.createdAt).toISOString()}>
-                      {timestamp}
-                    </time>
-                  </p>
-                </div>
-              </li>
+                  </Box>
+                  <Typography component="time" dateTime={new Date(msg.createdAt).toISOString()} sx={{ fontSize: "0.625rem", color: "text.secondary", opacity: 0.3, px: 0.5 }}>
+                    {timestamp}
+                  </Typography>
+                </Box>
+              </Box>
             );
           })}
-
-          <div ref={bottomRef} aria-hidden="true" />
-        </ol>
+          <Box ref={bottomRef} aria-hidden="true" />
+        </Box>
 
         {/* Reply box */}
-        <div className="border-t border-[var(--black-border)]">
+        <Box sx={{ borderTop: "1px solid", borderColor: "divider" }}>
           {/* Tabs */}
-          <div
-            role="tablist"
-            aria-label="Compose options"
-            className="flex border-b border-[var(--black-border)]"
-          >
+          <Box role="tablist" aria-label="Compose options" sx={{ display: "flex", borderBottom: "1px solid", borderColor: "divider" }}>
             {tabs.map((tab) => (
-              <button
+              <Box
+                component="button"
                 key={tab.id}
                 role="tab"
                 id={`tab-${tab.id}`}
                 aria-selected={activeTab === tab.id}
                 aria-controls={`${tabPanelId}-panel`}
                 onClick={() => setActiveTab(tab.id)}
-                className={[
-                  "px-4 py-2.5 text-xs font-medium transition-colors border-b-2 -mb-px",
-                  activeTab === tab.id
-                    ? "border-[var(--gold)] text-[var(--gold)]"
-                    : "border-transparent text-[var(--white-dim)]/50 hover:text-[var(--white-dim)]",
-                ].join(" ")}
+                sx={{
+                  px: 2, py: 1.25, fontSize: "0.75rem", fontWeight: 500, cursor: "pointer",
+                  border: "none", background: "none", borderBottom: "2px solid",
+                  mb: "-1px",
+                  borderBottomColor: activeTab === tab.id ? "primary.main" : "transparent",
+                  color: activeTab === tab.id ? "primary.main" : "rgba(122,116,112,0.5)",
+                  transition: "all 0.15s",
+                  "&:hover": { color: activeTab === tab.id ? "primary.main" : "text.secondary" },
+                }}
               >
                 {tab.label}
-              </button>
+              </Box>
             ))}
-          </div>
+          </Box>
 
           {/* Tab panel */}
-          <form
+          <Box
+            component="form"
             id={`${tabPanelId}-panel`}
             role="tabpanel"
             aria-labelledby={`tab-${activeTab}`}
-            onSubmit={(e) => {
-              e.preventDefault();
-              sendMessage(false);
-            }}
-            className="p-4 flex flex-col gap-3"
+            onSubmit={(e) => { e.preventDefault(); sendMessage(false); }}
+            sx={{ p: 2, display: "flex", flexDirection: "column", gap: 1.5 }}
           >
-            <Textarea
-              placeholder={
-                activeTab === "note" ? "Add an internal note..." : "Type a reply..."
-              }
+            <TextField
+              multiline
+              rows={3}
+              placeholder={activeTab === "note" ? "Add an internal note..." : "Type a reply..."}
               value={body}
               onChange={(e) => setBody(e.target.value)}
-              rows={3}
+              fullWidth
+              size="small"
               aria-label={activeTab === "note" ? "Internal note" : "Reply message"}
-              className="flex-1 resize-none"
+              sx={{ "& .MuiOutlinedInput-input": { resize: "none" } }}
             />
-
-            <div className="flex items-center justify-between gap-2">
-              <button
-                type="button"
+            <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1 }}>
+              <IconButton
                 aria-label="Attach image"
-                className="p-1.5 rounded-sm text-[var(--white-dim)]/40 hover:text-[var(--white-dim)] hover:bg-[var(--black-soft)] transition-colors"
+                size="small"
+                sx={{ color: "text.secondary", opacity: 0.4, "&:hover": { opacity: 1, bgcolor: "#ede9e3" } }}
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
                   <circle cx="8.5" cy="8.5" r="1.5" />
                   <polyline points="21 15 16 10 5 21" />
                 </svg>
-              </button>
-
-              <div className="flex gap-2">
+              </IconButton>
+              <Box sx={{ display: "flex", gap: 1 }}>
                 {onClose && (
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    disabled={!body.trim() || loading}
-                    onClick={() => sendMessage(true)}
-                  >
+                  <MuiButton variant="outlined" size="small" disabled={!body.trim() || loading} onClick={() => sendMessage(true)}
+                    sx={{ textTransform: "uppercase", letterSpacing: "0.1em", fontSize: "0.7rem", borderColor: "#1a1714", color: "#1a1714", "&:hover": { bgcolor: "#7a5c10", borderColor: "#7a5c10" }, "&.Mui-disabled": { opacity: 0.5 } }}>
                     Send and close
-                  </Button>
+                  </MuiButton>
                 )}
-                <Button type="submit" loading={loading} disabled={!body.trim()}>
+                <MuiButton type="submit" variant="contained" size="small" disabled={!body.trim() || loading}
+                  startIcon={loading ? <CircularProgress size={12} sx={{ color: "inherit" }} /> : undefined}
+                  sx={{ bgcolor: "#1a1714", color: "#fdfbf8", textTransform: "uppercase", letterSpacing: "0.1em", fontSize: "0.7rem", "&:hover": { bgcolor: "#7a5c10" }, "&.Mui-disabled": { opacity: 0.5 } }}>
                   Send
-                </Button>
-              </div>
-            </div>
-          </form>
-        </div>
-      </div>
+                </MuiButton>
+              </Box>
+            </Box>
+          </Box>
+        </Box>
+      </Box>
     );
   }
 );

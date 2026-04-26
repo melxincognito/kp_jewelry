@@ -1,6 +1,7 @@
-import Link from "next/link";
 import { db } from "@/lib/db";
-import { Button } from "@/components/ui/Button";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import MuiButton from "@mui/material/Button";
 import { InventoryTable } from "@/components/dashboard/InventoryTable";
 import { BulkImportButton } from "@/components/dashboard/BulkImportButton";
 import type { Metadata } from "next";
@@ -8,42 +9,52 @@ import type { Metadata } from "next";
 export const metadata: Metadata = { title: "Inventory" };
 
 export default async function InventoryPage() {
-  const products = await db.product.findMany({
-    orderBy: { createdAt: "desc" },
-  });
+  const products = await db.product.findMany({ orderBy: { createdAt: "desc" } });
 
   const totalValue = products
     .filter((p) => p.status !== "SOLD")
     .reduce((sum, p) => sum + p.sellingPrice * p.quantity, 0);
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-light tracking-wide text-[var(--white)]">Inventory</h1>
-          <p className="text-xs text-[var(--white-dim)]/40 mt-1">
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+      <Box sx={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+        <Box>
+          <Typography variant="h6" sx={{ fontWeight: 300, letterSpacing: "0.05em", color: "text.primary" }}>
+            Inventory
+          </Typography>
+          <Typography variant="caption" sx={{ color: "text.secondary", opacity: 0.4, mt: 0.5, display: "block" }}>
             {products.length} items · ${totalValue.toFixed(2)} listed value
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
+          </Typography>
+        </Box>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           <BulkImportButton />
-          <Link href="/dashboard/inventory/new">
-            <Button size="sm">+ Add Item</Button>
-          </Link>
-        </div>
-      </div>
+          <MuiButton
+            href="/dashboard/inventory/new"
+            variant="contained"
+            size="small"
+            sx={{ bgcolor: "#1a1714", color: "#fdfbf8", textTransform: "uppercase", letterSpacing: "0.1em", fontSize: "0.7rem", "&:hover": { bgcolor: "#7a5c10" } }}
+          >
+            + Add Item
+          </MuiButton>
+        </Box>
+      </Box>
 
       {products.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-24 gap-4 text-center">
-          <p className="text-4xl opacity-10">💎</p>
-          <p className="text-[var(--white-dim)]">No items yet</p>
-          <Link href="/dashboard/inventory/new">
-            <Button variant="secondary" size="sm">Add your first item</Button>
-          </Link>
-        </div>
+        <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", py: 12, gap: 2, textAlign: "center" }}>
+          <Typography sx={{ fontSize: "2.5rem", opacity: 0.1 }} aria-hidden="true">💎</Typography>
+          <Typography variant="body2" sx={{ color: "text.secondary" }}>No items yet</Typography>
+          <MuiButton
+            href="/dashboard/inventory/new"
+            variant="outlined"
+            size="small"
+            sx={{ borderColor: "#1a1714", color: "#1a1714", textTransform: "uppercase", letterSpacing: "0.1em", fontSize: "0.7rem", "&:hover": { bgcolor: "#7a5c10", borderColor: "#7a5c10", color: "#fdfbf8" } }}
+          >
+            Add your first item
+          </MuiButton>
+        </Box>
       ) : (
         <InventoryTable products={products} />
       )}
-    </div>
+    </Box>
   );
 }

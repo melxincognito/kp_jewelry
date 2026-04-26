@@ -1,15 +1,13 @@
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
 import { ProductForm } from "@/components/dashboard/ProductForm";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Edit Item" };
 
-export default async function EditInventoryItemPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default async function EditInventoryItemPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const product = await db.product.findUnique({
     where: { id },
@@ -21,11 +19,15 @@ export default async function EditInventoryItemPage({
   const styles: string[] = JSON.parse(product.styles || "[]");
 
   return (
-    <div className="flex flex-col gap-6 max-w-2xl">
-      <div>
-        <h1 className="text-xl font-light tracking-wide text-[var(--white)]">Edit Item</h1>
-        <p className="text-xs text-[var(--white-dim)]/40 mt-1">{product.name}</p>
-      </div>
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 3, maxWidth: 672 }}>
+      <Box>
+        <Typography variant="h6" sx={{ fontWeight: 300, letterSpacing: "0.05em", color: "text.primary" }}>
+          Edit Item
+        </Typography>
+        <Typography variant="caption" sx={{ color: "text.secondary", opacity: 0.4, mt: 0.5, display: "block" }}>
+          {product.name}
+        </Typography>
+      </Box>
       <ProductForm
         mode="edit"
         defaultValues={{
@@ -50,6 +52,6 @@ export default async function EditInventoryItemPage({
           showOnStorefront: product.showOnStorefront,
         }}
       />
-    </div>
+    </Box>
   );
 }

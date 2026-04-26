@@ -2,6 +2,10 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import MuiLink from "@mui/material/Link";
 
 const JEWELRY_TYPES = [
   { value: "", label: "All Types" },
@@ -25,6 +29,62 @@ interface FilterSidebarProps {
   availableStyles: string[];
 }
 
+function FilterGroup({ label, labelId }: { label: string; labelId: string }) {
+  return (
+    <Typography
+      id={labelId}
+      sx={{
+        fontSize: "0.625rem",
+        letterSpacing: "0.25em",
+        color: "primary.main",
+        textTransform: "uppercase",
+        fontWeight: 500,
+        mb: 1,
+      }}
+    >
+      {label}
+    </Typography>
+  );
+}
+
+function FilterButton({
+  active,
+  onClick,
+  children,
+  "aria-pressed": ariaPressed,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+  "aria-pressed"?: boolean;
+}) {
+  return (
+    <Button
+      onClick={onClick}
+      aria-pressed={ariaPressed}
+      variant="text"
+      size="small"
+      sx={{
+        justifyContent: "flex-start",
+        textAlign: "left",
+        fontSize: "0.875rem",
+        textTransform: "none",
+        letterSpacing: "normal",
+        px: 1.5,
+        py: 0.75,
+        color: active ? "primary.main" : "text.secondary",
+        bgcolor: active ? "rgba(122,92,16,0.08)" : "transparent",
+        "&:hover": {
+          color: active ? "primary.main" : "text.primary",
+          bgcolor: active ? "rgba(122,92,16,0.12)" : "rgba(0,0,0,0.04)",
+        },
+      }}
+    >
+      {children}
+    </Button>
+  );
+}
+
 export function FilterSidebar({ availableStyles }: FilterSidebarProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -37,7 +97,6 @@ export function FilterSidebar({ availableStyles }: FilterSidebarProps) {
       } else {
         params.delete(key);
       }
-      // Reset page on filter change
       params.delete("page");
       router.push(`/shop?${params.toString()}`);
     },
@@ -50,9 +109,7 @@ export function FilterSidebar({ availableStyles }: FilterSidebarProps) {
       const current = params.getAll("style");
       if (current.includes(style)) {
         params.delete("style");
-        current
-          .filter((s) => s !== style)
-          .forEach((s) => params.append("style", s));
+        current.filter((s) => s !== style).forEach((s) => params.append("style", s));
       } else {
         params.append("style", style);
       }
@@ -67,157 +124,124 @@ export function FilterSidebar({ availableStyles }: FilterSidebarProps) {
   const activeSort = searchParams.get("sort") ?? "newest";
   const activeStatus = searchParams.get("status") ?? "";
 
-  // Styles Variables
-
-  const asideProductFiltersStyles = "w-56 flex-shrink-0 flex flex-col gap-6";
-
-  // Filter group label (Sort / Availability / Category / Style headings)
-
-  const sortByFiltersStyles =
-    "text-[10px] tracking-[0.25em] text-[var(--gold)] uppercase mb-3";
-
-  // Filter option list container
-
-  const filterOptionListStyles = "flex flex-col gap-1";
-
-  // Filter option buttons (Sort / Availability / Category)
-
-  const sortByButtonOptionsStyles =
-    "hover:cursor-pointer text-left text-sm px-3 py-2 rounded-sm transition-colors";
-
-  const filterButtonActiveStyles = "bg-[var(--gold)]/10 text-[var(--gold)]";
-  const filterButtonInactiveStyles =
-    "text-[var(--white-dim)] hover:text-[var(--white)] hover:bg-white/5";
-
-  // Style tag chips
-
-  const styleTagListStyles = "flex flex-wrap gap-2";
-  const styleTagBaseStyles =
-    "hover:cursor-pointer text-xs px-2.5 py-1 rounded-sm border transition-colors";
-  const styleTagActiveStyles =
-    "border-[var(--gold)] bg-[var(--gold)]/10 text-[var(--gold)]";
-  const styleTagInactiveStyles =
-    "border-[var(--black-border)] text-[var(--white-dim)] hover:border-[var(--gold)]/40";
-
-  // Reset Filters
-
-  const resetFiltersStyles =
-    "hover:cursor-pointer text-xs text-[var(--white-dim)]/50 hover:text-[var(--white-dim)] transition-colors text-left";
-
   return (
-    <aside aria-label="Product filters" className={asideProductFiltersStyles}>
+    <Box
+      component="aside"
+      aria-label="Product filters"
+      sx={{ width: 224, flexShrink: 0, display: "flex", flexDirection: "column", gap: 3 }}
+    >
       {/* Sort */}
-      <div role="group" aria-labelledby="filter-sort-label">
-        <p id="filter-sort-label" className={sortByFiltersStyles}>
-          Sort
-        </p>
-        <div className={filterOptionListStyles}>
+      <Box role="group" aria-labelledby="filter-sort-label">
+        <FilterGroup label="Sort" labelId="filter-sort-label" />
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 0.25 }}>
           {SORT_OPTIONS.map((opt) => (
-            <button
+            <FilterButton
               key={opt.value}
+              active={activeSort === opt.value}
               onClick={() => setParam("sort", opt.value)}
               aria-pressed={activeSort === opt.value}
-              className={[
-                sortByButtonOptionsStyles,
-                activeSort === opt.value
-                  ? filterButtonActiveStyles
-                  : filterButtonInactiveStyles,
-              ].join(" ")}
             >
               {opt.label}
-            </button>
+            </FilterButton>
           ))}
-        </div>
-      </div>
+        </Box>
+      </Box>
 
       {/* Availability */}
-      <div role="group" aria-labelledby="filter-availability-label">
-        <p id="filter-availability-label" className={sortByFiltersStyles}>
-          Availability
-        </p>
-        <div className={filterOptionListStyles}>
+      <Box role="group" aria-labelledby="filter-availability-label">
+        <FilterGroup label="Availability" labelId="filter-availability-label" />
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 0.25 }}>
           {[
             { value: "", label: "All" },
             { value: "AVAILABLE", label: "Available" },
             { value: "RESERVED", label: "Reserved" },
           ].map((opt) => (
-            <button
+            <FilterButton
               key={opt.value}
+              active={activeStatus === opt.value}
               onClick={() => setParam("status", opt.value)}
               aria-pressed={activeStatus === opt.value}
-              className={[
-                sortByButtonOptionsStyles,
-                activeStatus === opt.value
-                  ? filterButtonActiveStyles
-                  : filterButtonInactiveStyles,
-              ].join(" ")}
             >
               {opt.label}
-            </button>
+            </FilterButton>
           ))}
-        </div>
-      </div>
+        </Box>
+      </Box>
 
       {/* Category */}
-      <div role="group" aria-labelledby="filter-category-label">
-        <p id="filter-category-label" className={sortByFiltersStyles}>
-          Category
-        </p>
-        <div className={filterOptionListStyles}>
+      <Box role="group" aria-labelledby="filter-category-label">
+        <FilterGroup label="Category" labelId="filter-category-label" />
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 0.25 }}>
           {JEWELRY_TYPES.map((type) => (
-            <button
+            <FilterButton
               key={type.value}
+              active={activeType === type.value}
               onClick={() => setParam("type", type.value)}
               aria-pressed={activeType === type.value}
-              className={[
-                sortByButtonOptionsStyles,
-                activeType === type.value
-                  ? filterButtonActiveStyles
-                  : filterButtonInactiveStyles,
-              ].join(" ")}
             >
               {type.label}
-            </button>
+            </FilterButton>
           ))}
-        </div>
-      </div>
+        </Box>
+      </Box>
 
       {/* Style Tags */}
       {availableStyles.length > 0 && (
-        <div role="group" aria-labelledby="filter-style-label">
-          <p id="filter-style-label" className={sortByFiltersStyles}>
-            Style
-          </p>
-          <div className={styleTagListStyles}>
-            {availableStyles.map((style) => (
-              <button
-                key={style}
-                onClick={() => toggleStyle(style)}
-                aria-pressed={activeStyles.includes(style)}
-                className={[
-                  styleTagBaseStyles,
-                  activeStyles.includes(style)
-                    ? styleTagActiveStyles
-                    : styleTagInactiveStyles,
-                ].join(" ")}
-              >
-                {style}
-              </button>
-            ))}
-          </div>
-        </div>
+        <Box role="group" aria-labelledby="filter-style-label">
+          <FilterGroup label="Style" labelId="filter-style-label" />
+          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+            {availableStyles.map((style) => {
+              const active = activeStyles.includes(style);
+              return (
+                <Button
+                  key={style}
+                  onClick={() => toggleStyle(style)}
+                  aria-pressed={active}
+                  variant="outlined"
+                  size="small"
+                  sx={{
+                    fontSize: "0.75rem",
+                    textTransform: "none",
+                    letterSpacing: "normal",
+                    px: 1.25,
+                    py: 0.5,
+                    borderColor: active ? "primary.main" : "divider",
+                    color: active ? "primary.main" : "text.secondary",
+                    bgcolor: active ? "rgba(122,92,16,0.08)" : "transparent",
+                    "&:hover": {
+                      borderColor: active ? "primary.main" : "rgba(122,92,16,0.4)",
+                    },
+                  }}
+                >
+                  {style}
+                </Button>
+              );
+            })}
+          </Box>
+        </Box>
       )}
 
-      {/* Clear hello */}
+      {/* Clear filters */}
       {(activeType || activeStyles.length > 0 || activeStatus) && (
-        <button
+        <MuiLink
+          component="button"
           onClick={() => router.push("/shop")}
           aria-label="Clear all filters"
-          className={resetFiltersStyles}
+          sx={{
+            fontSize: "0.75rem",
+            color: "text.secondary",
+            opacity: 0.5,
+            cursor: "pointer",
+            textAlign: "left",
+            textDecoration: "none",
+            "&:hover": { opacity: 1 },
+            background: "none",
+            border: "none",
+          }}
         >
           Clear all filters ×
-        </button>
+        </MuiLink>
       )}
-    </aside>
+    </Box>
   );
 }

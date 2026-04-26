@@ -1,8 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { Textarea } from "@/components/ui/Textarea";
-import { Button } from "@/components/ui/Button";
+import Box from "@mui/material/Box";
+import TextField from "@mui/material/TextField";
+import MuiButton from "@mui/material/Button";
+import Alert from "@mui/material/Alert";
+import Typography from "@mui/material/Typography";
+import CircularProgress from "@mui/material/CircularProgress";
 
 interface SendMessageFormProps {
   productId: string;
@@ -39,37 +43,69 @@ export function SendMessageForm({ productId, recipientId }: SendMessageFormProps
 
   if (sent) {
     return (
-      <div
+      <Box
         role="status"
         aria-live="polite"
-        className="px-4 py-3 bg-emerald-500/10 border border-emerald-500/20 rounded-sm text-sm text-emerald-400"
+        sx={{
+          px: 2,
+          py: 1.5,
+          bgcolor: "rgba(5,150,105,0.08)",
+          border: "1px solid rgba(5,150,105,0.2)",
+          borderRadius: 1,
+          display: "flex",
+          alignItems: "center",
+          gap: 1,
+        }}
       >
-        Message sent! The seller will get back to you soon.
-        <button
-          className="ml-2 text-xs underline opacity-70 hover:opacity-100"
+        <Typography variant="body2" sx={{ color: "#059669" }}>
+          Message sent! The seller will get back to you soon.
+        </Typography>
+        <MuiButton
+          variant="text"
+          size="small"
           onClick={() => setSent(false)}
+          sx={{ color: "#059669", opacity: 0.7, textTransform: "none", letterSpacing: "normal", fontSize: "0.75rem", p: 0, minWidth: 0, ml: 0.5 }}
         >
           Send another
-        </button>
-      </div>
+        </MuiButton>
+      </Box>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+    <Box component="form" onSubmit={handleSubmit} sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
       {error && (
-        <p role="alert" aria-live="assertive" className="text-xs text-red-400">{error}</p>
+        <Alert severity="error" sx={{ fontSize: "0.75rem" }} role="alert">{error}</Alert>
       )}
-      <Textarea
+      <TextField
         label="Message to seller"
         placeholder="I'm interested in this item. Is it still available?"
         value={body}
         onChange={(e) => setBody(e.target.value)}
+        multiline
         rows={3}
+        fullWidth
+        size="small"
       />
-      <Button type="submit" loading={loading} size="sm" disabled={!body.trim()}>
+      <MuiButton
+        type="submit"
+        variant="contained"
+        size="small"
+        disabled={!body.trim() || loading}
+        startIcon={loading ? <CircularProgress size={12} sx={{ color: "inherit" }} /> : undefined}
+        sx={{
+          alignSelf: "flex-start",
+          bgcolor: "#1a1714",
+          color: "#fdfbf8",
+          textTransform: "uppercase",
+          letterSpacing: "0.1em",
+          fontSize: "0.7rem",
+          "&:hover": { bgcolor: "#7a5c10" },
+          "&.Mui-disabled": { opacity: 0.5 },
+        }}
+      >
         Send Message
-      </Button>
-    </form>
+      </MuiButton>
+    </Box>
   );
 }

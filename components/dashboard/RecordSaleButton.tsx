@@ -2,11 +2,17 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Modal } from "@/components/ui/Modal";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
-import { Select } from "@/components/ui/Select";
-import { Textarea } from "@/components/ui/Textarea";
+import MuiButton from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import TextField from "@mui/material/TextField";
+import MenuItem from "@mui/material/MenuItem";
+import Box from "@mui/material/Box";
+import Alert from "@mui/material/Alert";
+import CircularProgress from "@mui/material/CircularProgress";
+import IconButton from "@mui/material/IconButton";
 
 interface ProductSize {
   size: string;
@@ -20,6 +26,8 @@ interface AvailableProduct {
   quantity: number;
   sizes: ProductSize[];
 }
+
+const fieldSx = { "& .MuiOutlinedInput-input": { padding: "8px 12px", fontSize: "0.875rem" } };
 
 export function RecordSaleButton({ availableProducts }: { availableProducts: AvailableProduct[] }) {
   const router = useRouter();
@@ -47,12 +55,10 @@ export function RecordSaleButton({ availableProducts }: { availableProducts: Ava
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
-
     if (hasSizes && !selectedSize) {
       setError("Please select a size for this item");
       return;
     }
-
     setLoading(true);
     try {
       const res = await fetch("/api/sales", {
@@ -83,81 +89,153 @@ export function RecordSaleButton({ availableProducts }: { availableProducts: Ava
 
   return (
     <>
-      <Button size="sm" onClick={() => setOpen(true)} disabled={availableProducts.length === 0}>
+      <MuiButton
+        variant="contained"
+        size="small"
+        onClick={() => setOpen(true)}
+        disabled={availableProducts.length === 0}
+        sx={{
+          bgcolor: "#1a1714",
+          color: "#fdfbf8",
+          textTransform: "uppercase",
+          letterSpacing: "0.1em",
+          fontSize: "0.7rem",
+          "&:hover": { bgcolor: "#7a5c10" },
+          "&.Mui-disabled": { opacity: 0.5 },
+        }}
+      >
         Record Sale
-      </Button>
+      </MuiButton>
 
-      <Modal open={open} onClose={() => setOpen(false)} title="Record a Sale" maxWidth="sm">
-        {error && (
-          <div className="mb-4 px-3 py-2 bg-red-500/10 border border-red-500/30 rounded-sm text-xs text-red-400">
-            {error}
-          </div>
-        )}
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <Select
-            label="Item Sold"
-            options={availableProducts.map((p) => ({
-              value: p.id,
-              label: `${p.name} — $${p.sellingPrice.toFixed(2)} (${p.quantity} left)`,
-            }))}
-            value={selectedProductId}
-            onChange={(e) => handleProductChange(e.target.value)}
-          />
+      <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle sx={{ pr: 6 }}>
+          Record a Sale
+          <IconButton
+            aria-label="Close"
+            onClick={() => setOpen(false)}
+            size="small"
+            sx={{ position: "absolute", right: 16, top: 12, color: "text.secondary" }}
+          >
+            ×
+          </IconButton>
+        </DialogTitle>
 
-          {/* Size selector — only shown for sized products */}
-          {hasSizes && (
-            <Select
-              label="Size"
-              options={[
-                { value: "", label: "Select a size…" },
-                ...availableSizes.map((s) => ({
-                  value: s.size,
-                  label: `Size ${s.size} — ${s.quantity} left`,
-                })),
-              ]}
-              value={selectedSize}
-              onChange={(e) => setSelectedSize(e.target.value)}
-            />
+        <DialogContent>
+          {error && (
+            <Alert severity="error" sx={{ mb: 2, fontSize: "0.75rem" }}>{error}</Alert>
           )}
 
-          <div className="grid grid-cols-2 gap-3">
-            <Input
-              label="Sale Price (USD)"
-              type="number"
-              step="0.01"
-              min="0"
-              value={salePrice}
-              onChange={(e) => setSalePrice(e.target.value)}
-              required
+          <Box component="form" id="record-sale-form" onSubmit={handleSubmit} sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 1 }}>
+            <TextField
+              select
+              label="Item Sold"
+              value={selectedProductId}
+              onChange={(e) => handleProductChange(e.target.value)}
+              fullWidth
+              size="small"
+              sx={fieldSx}
+            >
+              {availableProducts.map((p) => (
+                <MenuItem key={p.id} value={p.id}>
+                  {p.name} — ${p.sellingPrice.toFixed(2)} ({p.quantity} left)
+                </MenuItem>
+              ))}
+            </TextField>
+
+            {hasSizes && (
+              <TextField
+                select
+                label="Size"
+                value={selectedSize}
+                onChange={(e) => setSelectedSize(e.target.value)}
+                fullWidth
+                size="small"
+                sx={fieldSx}
+              >
+                <MenuItem value="">Select a size…</MenuItem>
+                {availableSizes.map((s) => (
+                  <MenuItem key={s.size} value={s.size}>
+                    Size {s.size} — {s.quantity} left
+                  </MenuItem>
+                ))}
+              </TextField>
+            )}
+
+            <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 1.5 }}>
+              <TextField
+                label="Sale Price (USD)"
+                type="number"
+                slotProps={{ htmlInput: { step: "0.01", min: "0" } }}
+                value={salePrice}
+                onChange={(e) => setSalePrice(e.target.value)}
+                required
+                size="small"
+                sx={fieldSx}
+              />
+              <TextField
+                label="Date Sold"
+                type="date"
+                value={soldAt}
+                onChange={(e) => setSoldAt(e.target.value)}
+                required
+                size="small"
+                slotProps={{ inputLabel: { shrink: true } }}
+                sx={fieldSx}
+              />
+            </Box>
+
+            <TextField
+              label="Buyer Email (optional)"
+              type="email"
+              placeholder="Leave blank for in-person sales"
+              value={buyerEmail}
+              onChange={(e) => setBuyerEmail(e.target.value)}
+              fullWidth
+              size="small"
+              sx={fieldSx}
             />
-            <Input
-              label="Date Sold"
-              type="date"
-              value={soldAt}
-              onChange={(e) => setSoldAt(e.target.value)}
-              required
+
+            <TextField
+              label="Notes (optional)"
+              placeholder="Any notes about this sale..."
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              fullWidth
+              multiline
+              rows={2}
+              size="small"
             />
-          </div>
-          <Input
-            label="Buyer Email (optional)"
-            type="email"
-            placeholder="Leave blank for in-person sales"
-            value={buyerEmail}
-            onChange={(e) => setBuyerEmail(e.target.value)}
-          />
-          <Textarea
-            label="Notes (optional)"
-            placeholder="Any notes about this sale..."
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            rows={2}
-          />
-          <div className="flex gap-3 pt-2">
-            <Button type="submit" loading={loading}>Save Sale</Button>
-            <Button type="button" variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>
-          </div>
-        </form>
-      </Modal>
+          </Box>
+        </DialogContent>
+
+        <DialogActions>
+          <MuiButton
+            variant="text"
+            onClick={() => setOpen(false)}
+            sx={{ color: "text.secondary", textTransform: "none", letterSpacing: "normal" }}
+          >
+            Cancel
+          </MuiButton>
+          <MuiButton
+            type="submit"
+            form="record-sale-form"
+            variant="contained"
+            disabled={loading}
+            startIcon={loading ? <CircularProgress size={14} sx={{ color: "inherit" }} /> : undefined}
+            sx={{
+              bgcolor: "#1a1714",
+              color: "#fdfbf8",
+              textTransform: "uppercase",
+              letterSpacing: "0.1em",
+              fontSize: "0.75rem",
+              "&:hover": { bgcolor: "#7a5c10" },
+              "&.Mui-disabled": { opacity: 0.5 },
+            }}
+          >
+            Save Sale
+          </MuiButton>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }

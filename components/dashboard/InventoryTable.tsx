@@ -1,16 +1,26 @@
 "use client";
 
 import { useState, useMemo, useId } from "react";
-import Link from "next/link";
+import NextLink from "next/link";
 import Image from "next/image";
+import Box from "@mui/material/Box";
+import Paper from "@mui/material/Paper";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import TextField from "@mui/material/TextField";
+import MenuItem from "@mui/material/MenuItem";
+import Typography from "@mui/material/Typography";
+import MuiLink from "@mui/material/Link";
+import MuiButton from "@mui/material/Button";
 import { Badge } from "@/components/ui/Badge";
 import { DeleteProductButton } from "@/components/dashboard/DeleteProductButton";
 import type { ProductStatus } from "@/types/enums";
 
-const statusVariant: Record<
-  ProductStatus,
-  "status-available" | "status-reserved" | "status-sold"
-> = {
+const statusVariant: Record<ProductStatus, "status-available" | "status-reserved" | "status-sold"> = {
   AVAILABLE: "status-available",
   RESERVED: "status-reserved",
   SOLD: "status-sold",
@@ -51,11 +61,12 @@ export interface InventoryProduct {
   showOnStorefront: boolean;
 }
 
-interface InventoryTableProps {
-  products: InventoryProduct[];
-}
+const filterSx = {
+  minWidth: 140,
+  "& .MuiOutlinedInput-input": { padding: "8px 12px", fontSize: "0.875rem" },
+};
 
-export function InventoryTable({ products }: InventoryTableProps) {
+export function InventoryTable({ products }: { products: InventoryProduct[] }) {
   const [nameQuery, setNameQuery] = useState("");
   const [skuQuery, setSkuQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
@@ -63,8 +74,6 @@ export function InventoryTable({ products }: InventoryTableProps) {
 
   const nameId = useId();
   const skuId = useId();
-  const typeId = useId();
-  const statusId = useId();
 
   const filtered = useMemo(() => {
     const name = nameQuery.trim().toLowerCase();
@@ -88,215 +97,184 @@ export function InventoryTable({ products }: InventoryTableProps) {
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
       {/* Filter bar */}
-      <section
+      <Paper
+        component="section"
         aria-label="Filter inventory"
-        className="bg-[var(--black-card)] border border-[var(--black-border)] rounded-sm p-4 flex flex-wrap gap-3 items-end"
+        sx={{ p: 2, display: "flex", flexWrap: "wrap", gap: 1.5, alignItems: "flex-end" }}
       >
-        {/* Name */}
-        <div className="flex flex-col gap-1 min-w-[160px] flex-1">
-          <label
-            htmlFor={nameId}
-            className="text-[10px] tracking-widest uppercase text-[var(--white-dim)]/50"
-          >
-            Name
-          </label>
-          <input
-            id={nameId}
-            type="search"
-            value={nameQuery}
-            onChange={(e) => setNameQuery(e.target.value)}
-            placeholder="Search by name…"
-            className="bg-[var(--black-soft)] border border-[var(--black-border)] rounded-sm px-3 py-2 text-sm text-[var(--white)] placeholder:text-[var(--white-dim)]/30 focus:outline-none focus:border-[var(--gold)]/50 transition-colors"
-          />
-        </div>
-
-        {/* SKU */}
-        <div className="flex flex-col gap-1 min-w-[140px] flex-1">
-          <label
-            htmlFor={skuId}
-            className="text-[10px] tracking-widest uppercase text-[var(--white-dim)]/50"
-          >
-            SKU
-          </label>
-          <input
-            id={skuId}
-            type="search"
-            value={skuQuery}
-            onChange={(e) => setSkuQuery(e.target.value)}
-            placeholder="e.g. NKL-001"
-            className="bg-[var(--black-soft)] border border-[var(--black-border)] rounded-sm px-3 py-2 text-sm text-[var(--white)] placeholder:text-[var(--white-dim)]/30 focus:outline-none focus:border-[var(--gold)]/50 transition-colors"
-          />
-        </div>
-
-        {/* Type */}
-        <div className="flex flex-col gap-1 min-w-[140px]">
-          <label
-            htmlFor={typeId}
-            className="text-[10px] tracking-widest uppercase text-[var(--white-dim)]/50"
-          >
-            Type
-          </label>
-          <select
-            id={typeId}
-            value={typeFilter}
-            onChange={(e) => setTypeFilter(e.target.value)}
-            className="bg-[var(--black-soft)] border border-[var(--black-border)] rounded-sm px-3 py-2 text-sm text-[var(--white)] focus:outline-none focus:border-[var(--gold)]/50 transition-colors"
-          >
-            {TYPE_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>
-                {o.label}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Status */}
-        <div className="flex flex-col gap-1 min-w-[140px]">
-          <label
-            htmlFor={statusId}
-            className="text-[10px] tracking-widest uppercase text-[var(--white-dim)]/50"
-          >
-            Status
-          </label>
-          <select
-            id={statusId}
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="bg-[var(--black-soft)] border border-[var(--black-border)] rounded-sm px-3 py-2 text-sm text-[var(--white)] focus:outline-none focus:border-[var(--gold)]/50 transition-colors"
-          >
-            {STATUS_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>
-                {o.label}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Clear */}
+        <TextField
+          id={nameId}
+          label="Name"
+          type="search"
+          value={nameQuery}
+          onChange={(e) => setNameQuery(e.target.value)}
+          placeholder="Search by name…"
+          size="small"
+          sx={{ ...filterSx, flex: 1, minWidth: 160 }}
+        />
+        <TextField
+          id={skuId}
+          label="SKU"
+          type="search"
+          value={skuQuery}
+          onChange={(e) => setSkuQuery(e.target.value)}
+          placeholder="e.g. NKL-001"
+          size="small"
+          sx={{ ...filterSx, flex: 1 }}
+        />
+        <TextField
+          select
+          label="Type"
+          value={typeFilter}
+          onChange={(e) => setTypeFilter(e.target.value)}
+          size="small"
+          sx={filterSx}
+        >
+          {TYPE_OPTIONS.map((o) => (
+            <MenuItem key={o.value} value={o.value}>{o.label}</MenuItem>
+          ))}
+        </TextField>
+        <TextField
+          select
+          label="Status"
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          size="small"
+          sx={filterSx}
+        >
+          {STATUS_OPTIONS.map((o) => (
+            <MenuItem key={o.value} value={o.value}>{o.label}</MenuItem>
+          ))}
+        </TextField>
         {hasFilters && (
-          <button
-            type="button"
+          <MuiButton
+            variant="text"
+            size="small"
             onClick={clearFilters}
-            className="text-xs text-[var(--white-dim)]/50 hover:text-[var(--gold)] transition-colors pb-2 self-end whitespace-nowrap"
+            sx={{ color: "text.secondary", textTransform: "none", letterSpacing: "normal", fontSize: "0.75rem", alignSelf: "flex-end", mb: "1px" }}
           >
             Clear filters
-          </button>
+          </MuiButton>
         )}
-      </section>
+      </Paper>
 
       {/* Results count */}
-      <p
+      <Typography
         role="status"
         aria-live="polite"
-        className="text-xs text-[var(--white-dim)]/40"
+        variant="caption"
+        sx={{ color: "text.secondary", opacity: 0.4 }}
       >
         {hasFilters
           ? `${filtered.length} of ${products.length} item${products.length !== 1 ? "s" : ""} match`
           : `${products.length} item${products.length !== 1 ? "s" : ""}`}
-      </p>
+      </Typography>
 
       {/* Table */}
       {filtered.length === 0 ? (
-        <div className="py-16 text-center text-xs text-[var(--white-dim)]/40">
-          No items match your filters.
-        </div>
+        <Box sx={{ py: 8, textAlign: "center" }}>
+          <Typography variant="caption" sx={{ color: "text.secondary", opacity: 0.4 }}>
+            No items match your filters.
+          </Typography>
+        </Box>
       ) : (
-        <div className="bg-[var(--black-card)] border border-[var(--black-border)] rounded-sm overflow-hidden">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-[var(--black-border)]">
-                <th scope="col" className="text-left px-4 py-3 text-xs text-[var(--white-dim)]/50 font-normal tracking-widest uppercase w-10" />
-                <th scope="col" className="text-left px-4 py-3 text-xs text-[var(--white-dim)]/50 font-normal tracking-widest uppercase">Item</th>
-                <th scope="col" className="text-left px-4 py-3 text-xs text-[var(--white-dim)]/50 font-normal tracking-widest uppercase">SKU</th>
-                <th scope="col" className="text-left px-4 py-3 text-xs text-[var(--white-dim)]/50 font-normal tracking-widest uppercase">Type</th>
-                <th scope="col" className="text-left px-4 py-3 text-xs text-[var(--white-dim)]/50 font-normal tracking-widest uppercase">Status</th>
-                <th scope="col" className="text-left px-4 py-3 text-xs text-[var(--white-dim)]/50 font-normal tracking-widest uppercase">Storefront</th>
-                <th scope="col" className="text-right px-4 py-3 text-xs text-[var(--white-dim)]/50 font-normal tracking-widest uppercase">Cost USD</th>
-                <th scope="col" className="text-right px-4 py-3 text-xs text-[var(--white-dim)]/50 font-normal tracking-widest uppercase">List Price</th>
-                <th scope="col" className="text-right px-4 py-3 text-xs text-[var(--white-dim)]/50 font-normal tracking-widest uppercase">Margin</th>
-                <th scope="col" className="px-4 py-3"><span className="sr-only">Actions</span></th>
-              </tr>
-            </thead>
-            <tbody>
+        <TableContainer component={Paper}>
+          <Table size="small">
+            <TableHead>
+              <TableRow>
+                <TableCell sx={{ width: 40 }} />
+                <TableCell>Item</TableCell>
+                <TableCell>SKU</TableCell>
+                <TableCell>Type</TableCell>
+                <TableCell>Status</TableCell>
+                <TableCell>Storefront</TableCell>
+                <TableCell align="right">Cost USD</TableCell>
+                <TableCell align="right">List Price</TableCell>
+                <TableCell align="right">Margin</TableCell>
+                <TableCell><Box component="span" sx={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0,0,0,0)" }}>Actions</Box></TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
               {filtered.map((product) => {
                 const images: string[] = JSON.parse(product.images || "[]");
                 const totalCost = product.costUSD + product.shippingFees;
                 const margin = product.sellingPrice - product.wholesalePrice;
                 return (
-                  <tr
-                    key={product.id}
-                    className="border-b border-[var(--black-border)]/50 last:border-0 hover:bg-white/[0.02] transition-colors"
-                  >
-                    <td className="px-3 py-2">
-                      <div className="relative w-8 h-8 bg-[var(--black-soft)] rounded-sm overflow-hidden">
+                  <TableRow key={product.id}>
+                    <TableCell sx={{ p: 1 }}>
+                      <Box sx={{ position: "relative", width: 32, height: 32, bgcolor: "#ede9e3", borderRadius: "2px", overflow: "hidden" }}>
                         {images[0] && (
-                          <Image
-                            src={images[0]}
-                            alt=""
-                            fill
-                            sizes="32px"
-                            className="object-cover"
-                          />
+                          <Image src={images[0]} alt="" fill sizes="32px" style={{ objectFit: "cover" }} />
                         )}
-                      </div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <p className="text-[var(--white)] font-medium">{product.name}</p>
-                      <p className="text-xs text-[var(--white-dim)]/40">Qty: {product.quantity}</p>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className="text-xs text-[var(--white-dim)]/60 font-mono">
-                        {product.sku ?? <span className="text-[var(--white-dim)]/20">—</span>}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className="text-xs text-[var(--white-dim)] capitalize">
+                      </Box>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2" sx={{ fontWeight: 500, color: "text.primary" }}>{product.name}</Typography>
+                      <Typography variant="caption" sx={{ color: "text.secondary", opacity: 0.4 }}>Qty: {product.quantity}</Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="caption" sx={{ fontFamily: "var(--font-geist-mono)", color: "text.secondary", opacity: 0.6 }}>
+                        {product.sku ?? <Box component="span" sx={{ opacity: 0.2 }}>—</Box>}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="caption" sx={{ color: "text.secondary", textTransform: "capitalize" }}>
                         {product.jewelryType.replace("_", " ").toLowerCase()}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
                       <Badge variant={statusVariant[product.status as ProductStatus]}>
                         {product.status.charAt(0) + product.status.slice(1).toLowerCase()}
                       </Badge>
-                    </td>
-                    <td className="px-4 py-3">
+                    </TableCell>
+                    <TableCell>
                       {product.showOnStorefront ? (
-                        <span className="text-xs text-emerald-400">Visible</span>
+                        <Typography variant="caption" sx={{ color: "#059669" }}>Visible</Typography>
                       ) : (
-                        <span className="text-xs text-[var(--white-dim)]/30">Hidden</span>
+                        <Typography variant="caption" sx={{ color: "text.secondary", opacity: 0.3 }}>Hidden</Typography>
                       )}
-                    </td>
-                    <td className="px-4 py-3 text-right text-[var(--white-dim)]">
-                      <p>${totalCost.toFixed(2)}</p>
-                      <p className="text-[10px] text-[var(--white-dim)]/40">{product.costMXN.toFixed(0)} MXN</p>
-                    </td>
-                    <td className="px-4 py-3 text-right text-[var(--gold)] font-medium">
-                      ${product.sellingPrice.toFixed(2)}
-                    </td>
-                    <td className={`px-4 py-3 text-right text-xs font-medium ${margin >= 0 ? "text-emerald-400" : "text-red-400"}`}>
-                      ${margin.toFixed(2)}
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2 justify-end">
-                        <Link
+                    </TableCell>
+                    <TableCell align="right">
+                      <Typography variant="body2" sx={{ color: "text.secondary" }}>${totalCost.toFixed(2)}</Typography>
+                      <Typography variant="caption" sx={{ color: "text.secondary", opacity: 0.4 }}>{product.costMXN.toFixed(0)} MXN</Typography>
+                    </TableCell>
+                    <TableCell align="right">
+                      <Typography variant="body2" sx={{ fontWeight: 500, color: "primary.main" }}>${product.sellingPrice.toFixed(2)}</Typography>
+                    </TableCell>
+                    <TableCell align="right">
+                      <Typography variant="caption" sx={{ fontWeight: 500, color: margin >= 0 ? "#059669" : "#b91c1c" }}>
+                        ${margin.toFixed(2)}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 1, justifyContent: "flex-end" }}>
+                        <MuiLink
+                          component={NextLink}
                           href={`/dashboard/inventory/${product.id}/edit`}
-                          className="text-xs text-[var(--white-dim)]/50 hover:text-[var(--gold)] transition-colors"
                           aria-label={`Edit ${product.name}`}
+                          sx={{
+                            fontSize: "0.75rem",
+                            color: "text.secondary",
+                            opacity: 0.5,
+                            textDecoration: "none",
+                            "&:hover": { color: "primary.main", opacity: 1 },
+                            transition: "all 0.15s",
+                          }}
                         >
                           Edit
-                        </Link>
+                        </MuiLink>
                         <DeleteProductButton id={product.id} />
-                      </div>
-                    </td>
-                  </tr>
+                      </Box>
+                    </TableCell>
+                  </TableRow>
                 );
               })}
-            </tbody>
-          </table>
-        </div>
+            </TableBody>
+          </Table>
+        </TableContainer>
       )}
-    </div>
+    </Box>
   );
 }

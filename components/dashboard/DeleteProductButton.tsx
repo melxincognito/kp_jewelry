@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import MuiButton from "@mui/material/Button";
+import Box from "@mui/material/Box";
 
 export function DeleteProductButton({ id }: { id: string }) {
   const router = useRouter();
@@ -16,30 +18,64 @@ export function DeleteProductButton({ id }: { id: string }) {
 
   if (confirming) {
     return (
-      <span className="flex items-center gap-1">
-        <button
+      <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
+        <MuiButton
           onClick={handleDelete}
           disabled={loading}
-          className="text-xs text-red-400 hover:text-red-300 disabled:opacity-50"
+          variant="text"
+          size="small"
+          sx={{
+            fontSize: "0.75rem",
+            textTransform: "none",
+            letterSpacing: "normal",
+            color: "error.main",
+            p: 0,
+            minWidth: 0,
+            "&:hover": { color: "#dc2626", bgcolor: "transparent" },
+            "&.Mui-disabled": { opacity: 0.5 },
+          }}
         >
-          {loading ? "..." : "Confirm"}
-        </button>
-        <button
+          {loading ? "…" : "Confirm"}
+        </MuiButton>
+        <MuiButton
           onClick={() => setConfirming(false)}
-          className="text-xs text-[var(--white-dim)]/30 hover:text-[var(--white-dim)]"
+          variant="text"
+          size="small"
+          sx={{
+            fontSize: "0.75rem",
+            textTransform: "none",
+            letterSpacing: "normal",
+            color: "text.secondary",
+            opacity: 0.4,
+            p: 0,
+            minWidth: 0,
+            "&:hover": { opacity: 1, bgcolor: "transparent" },
+          }}
         >
           Cancel
-        </button>
-      </span>
+        </MuiButton>
+      </Box>
     );
   }
 
   return (
-    <button
+    <MuiButton
       onClick={() => setConfirming(true)}
-      className="text-xs text-[var(--white-dim)]/30 hover:text-red-400 transition-colors"
+      variant="text"
+      size="small"
+      sx={{
+        fontSize: "0.75rem",
+        textTransform: "none",
+        letterSpacing: "normal",
+        color: "text.secondary",
+        opacity: 0.3,
+        p: 0,
+        minWidth: 0,
+        "&:hover": { color: "error.main", opacity: 1, bgcolor: "transparent" },
+        transition: "all 0.15s",
+      }}
     >
       Delete
-    </button>
+    </MuiButton>
   );
 }

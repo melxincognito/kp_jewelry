@@ -1,6 +1,10 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import IconButton from "@mui/material/IconButton";
+import Box from "@mui/material/Box";
 
 interface ModalProps {
   open: boolean;
@@ -10,58 +14,38 @@ interface ModalProps {
   maxWidth?: "sm" | "md" | "lg";
 }
 
-const maxWidthClasses = {
-  sm: "max-w-sm",
-  md: "max-w-md",
-  lg: "max-w-lg",
-};
-
 export function Modal({ open, onClose, title, children, maxWidth = "md" }: ModalProps) {
-  const dialogRef = useRef<HTMLDialogElement>(null);
-  const titleId = title ? "modal-title" : undefined;
-
-  useEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog) return;
-    if (open) dialog.showModal();
-    else dialog.close();
-  }, [open]);
-
-  // Close on backdrop click
-  const handleBackdropClick = (e: React.MouseEvent<HTMLDialogElement>) => {
-    if (e.target === dialogRef.current) onClose();
-  };
-
   return (
-    <dialog
-      ref={dialogRef}
-      onClick={handleBackdropClick}
-      aria-labelledby={titleId}
-      aria-modal="true"
-      className={[
-        "w-full rounded-sm p-0",
-        "bg-[var(--black-card)] border border-[var(--black-border)]",
-        "text-[var(--white)]",
-        "backdrop:bg-black/70",
-        maxWidthClasses[maxWidth],
-      ].join(" ")}
+    <Dialog
+      open={open}
       onClose={onClose}
+      maxWidth={maxWidth}
+      fullWidth
+      aria-labelledby={title ? "modal-title" : undefined}
+      aria-modal="true"
     >
-      <div className="flex flex-col">
-        {title && (
-          <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--black-border)]">
-            <h2 id="modal-title" className="text-base font-semibold text-[var(--white)]">{title}</h2>
-            <button
-              onClick={onClose}
-              className="text-[var(--white-dim)] hover:text-[var(--white)] transition-colors text-xl leading-none"
-              aria-label="Close"
-            >
+      {title && (
+        <DialogTitle id="modal-title" sx={{ pr: 6 }}>
+          {title}
+          <IconButton
+            aria-label="Close"
+            onClick={onClose}
+            size="small"
+            sx={{
+              position: "absolute",
+              right: 16,
+              top: 12,
+              color: "text.secondary",
+              "&:hover": { color: "text.primary" },
+            }}
+          >
+            <Box component="span" sx={{ fontSize: "1.25rem", lineHeight: 1 }}>
               ×
-            </button>
-          </div>
-        )}
-        <div className="px-6 py-5">{children}</div>
-      </div>
-    </dialog>
+            </Box>
+          </IconButton>
+        </DialogTitle>
+      )}
+      <DialogContent>{children}</DialogContent>
+    </Dialog>
   );
 }

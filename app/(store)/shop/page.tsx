@@ -1,5 +1,8 @@
 import { Suspense } from "react";
 import { db } from "@/lib/db";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import MuiLink from "@mui/material/Link";
 import { ProductCard } from "@/components/store/ProductCard";
 import { FilterSidebar } from "@/components/store/FilterSidebar";
 import { PageLoader } from "@/components/ui/LoadingSpinner";
@@ -29,26 +32,16 @@ async function getProducts(params: ShopSearchParams) {
   const where = {
     showOnStorefront: true,
     ...(params.type ? { jewelryType: params.type as JewelryType } : {}),
-    ...(params.status
-      ? { status: params.status as ProductStatus }
-      : { status: { not: "SOLD" as ProductStatus } }),
+    ...(params.status ? { status: params.status as ProductStatus } : { status: { not: "SOLD" as ProductStatus } }),
   };
 
   const orderBy =
-    params.sort === "price_asc"
-      ? { sellingPrice: "asc" as const }
-      : params.sort === "price_desc"
-      ? { sellingPrice: "desc" as const }
-      : { createdAt: "desc" as const };
+    params.sort === "price_asc" ? { sellingPrice: "asc" as const }
+    : params.sort === "price_desc" ? { sellingPrice: "desc" as const }
+    : { createdAt: "desc" as const };
 
-  let products = await db.product.findMany({
-    where,
-    orderBy,
-    skip,
-    take: PAGE_SIZE + 1, // fetch one extra to check hasNextPage
-  });
+  let products = await db.product.findMany({ where, orderBy, skip, take: PAGE_SIZE + 1 });
 
-  // Filter by style in JS (styles stored as JSON array)
   if (styleFilters.length > 0) {
     products = products.filter((p) => {
       const pStyles: string[] = JSON.parse(p.styles || "[]");
@@ -66,20 +59,13 @@ async function getAvailableStyles(): Promise<string[]> {
     select: { styles: true },
   });
   const allStyles = products.flatMap((p) => {
-    try {
-      return JSON.parse(p.styles || "[]") as string[];
-    } catch {
-      return [];
-    }
+    try { return JSON.parse(p.styles || "[]") as string[]; }
+    catch { return []; }
   });
   return [...new Set(allStyles)].sort();
 }
 
-export default async function ShopPage({
-  searchParams,
-}: {
-  searchParams: Promise<ShopSearchParams>;
-}) {
+export default async function ShopPage({ searchParams }: { searchParams: Promise<ShopSearchParams> }) {
   const params = await searchParams;
   const [{ products, hasNextPage, page }, availableStyles] = await Promise.all([
     getProducts(params),
@@ -98,66 +84,58 @@ export default async function ShopPage({
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      <div className="mb-8">
-        <h1 className="text-2xl font-light tracking-wide text-[var(--white)]">
+    <Box sx={{ maxWidth: 1280, mx: "auto", px: { xs: 2, sm: 3, lg: 4 }, py: 5 }}>
+      <Box sx={{ mb: 4 }}>
+        <Typography variant="h5" sx={{ fontWeight: 300, letterSpacing: "0.05em", color: "text.primary" }}>
           Collection
-        </h1>
-        <p className="text-xs text-[var(--white-dim)]/50 mt-1">
+        </Typography>
+        <Typography variant="caption" sx={{ color: "text.secondary", opacity: 0.5, mt: 0.5, display: "block" }}>
           {products.length} item{products.length !== 1 ? "s" : ""} shown
-        </p>
-      </div>
+        </Typography>
+      </Box>
 
-      <div className="flex gap-8">
+      <Box sx={{ display: "flex", gap: 4 }}>
         <Suspense fallback={null}>
           <FilterSidebar availableStyles={availableStyles} />
         </Suspense>
 
-        <div className="flex-1 min-w-0">
+        <Box sx={{ flex: 1, minWidth: 0 }}>
           {products.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-24 text-center gap-4">
-              <p className="text-3xl opacity-20">💎</p>
-              <p className="text-[var(--white-dim)]">No items found</p>
-              <a href="/shop" className="text-xs text-[var(--gold)]">
+            <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", py: 12, gap: 2, textAlign: "center" }}>
+              <Typography sx={{ fontSize: "1.875rem", opacity: 0.2 }} aria-hidden="true">💎</Typography>
+              <Typography variant="body2" sx={{ color: "text.secondary" }}>No items found</Typography>
+              <MuiLink href="/shop" variant="caption" sx={{ color: "primary.main" }}>
                 Clear filters
-              </a>
-            </div>
+              </MuiLink>
+            </Box>
           ) : (
             <>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+              <Box sx={{ display: "grid", gridTemplateColumns: { xs: "repeat(2, 1fr)", sm: "repeat(3, 1fr)", lg: "repeat(4, 1fr)" }, gap: 2 }}>
                 {products.map((product) => (
                   <Suspense key={product.id} fallback={<PageLoader />}>
                     <ProductCard product={product} />
                   </Suspense>
                 ))}
-              </div>
+              </Box>
 
               {/* Pagination */}
-              <div className="flex items-center justify-center gap-4 mt-10">
+              <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 2, mt: 5 }}>
                 {page > 1 && (
-                  <a
-                    href={buildPageUrl(page - 1)}
-                    className="text-sm text-[var(--white-dim)] hover:text-[var(--gold)] transition-colors"
-                  >
+                  <MuiLink href={buildPageUrl(page - 1)} sx={{ fontSize: "0.875rem", color: "text.secondary", textDecoration: "none", "&:hover": { color: "primary.main" }, transition: "color 0.15s" }}>
                     ← Previous
-                  </a>
+                  </MuiLink>
                 )}
-                <span className="text-xs text-[var(--white-dim)]/40">
-                  Page {page}
-                </span>
+                <Typography variant="caption" sx={{ color: "text.secondary", opacity: 0.4 }}>Page {page}</Typography>
                 {hasNextPage && (
-                  <a
-                    href={buildPageUrl(page + 1)}
-                    className="text-sm text-[var(--white-dim)] hover:text-[var(--gold)] transition-colors"
-                  >
+                  <MuiLink href={buildPageUrl(page + 1)} sx={{ fontSize: "0.875rem", color: "text.secondary", textDecoration: "none", "&:hover": { color: "primary.main" }, transition: "color 0.15s" }}>
                     Next →
-                  </a>
+                  </MuiLink>
                 )}
-              </div>
+              </Box>
             </>
           )}
-        </div>
-      </div>
-    </div>
+        </Box>
+      </Box>
+    </Box>
   );
 }

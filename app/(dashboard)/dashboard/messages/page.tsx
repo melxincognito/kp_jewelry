@@ -1,6 +1,8 @@
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { redirect } from "next/navigation";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
 import { MessagesLayout } from "@/components/messages/MessagesLayout";
 import type { ThreadData } from "@/components/messages/MessagesLayout";
 import type { Metadata } from "next";
@@ -29,10 +31,7 @@ interface ThreadAccum {
   deletedAt: Date | null;
 }
 
-function groupIntoThreads(
-  messages: MsgRow[],
-  adminId: string
-): { inbox: ThreadData[]; deleted: ThreadData[] } {
+function groupIntoThreads(messages: MsgRow[], adminId: string): { inbox: ThreadData[]; deleted: ThreadData[] } {
   const map = new Map<string, ThreadAccum>();
 
   for (const msg of messages) {
@@ -53,9 +52,7 @@ function groupIntoThreads(
     const entry = map.get(key)!;
     entry.messages.push(msg);
 
-    // Track the deletion timestamp for this user's view (sender or recipient)
-    const adminDeletedAt =
-      msg.senderId === adminId ? msg.deletedBySenderAt : msg.deletedByRecipientAt;
+    const adminDeletedAt = msg.senderId === adminId ? msg.deletedBySenderAt : msg.deletedByRecipientAt;
     if (adminDeletedAt && !entry.deletedAt) {
       entry.deletedAt = adminDeletedAt;
     }
@@ -86,7 +83,6 @@ export default async function AdminMessagesPage() {
 
   const adminId = session.user.id;
 
-  // Only mark non-deleted inbox messages as read
   await db.message.updateMany({
     where: { recipientId: adminId, read: false, deletedByRecipientAt: null },
     data: { read: true },
@@ -96,20 +92,18 @@ export default async function AdminMessagesPage() {
   const { inbox, deleted } = groupIntoThreads(messages, adminId);
 
   return (
-    <div className="flex flex-col gap-4">
-      <h1 className="text-xl font-light tracking-wide text-[var(--white)]">Messages</h1>
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+      <Typography variant="h6" sx={{ fontWeight: 300, letterSpacing: "0.05em", color: "text.primary" }}>
+        Messages
+      </Typography>
       {inbox.length === 0 && deleted.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-24 gap-3 text-center">
-          <p className="text-4xl opacity-10">◇</p>
-          <p className="text-[var(--white-dim)]">No messages yet</p>
-        </div>
+        <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", py: 12, gap: 1.5, textAlign: "center" }}>
+          <Typography sx={{ fontSize: "2.5rem", opacity: 0.1 }} aria-hidden="true">◇</Typography>
+          <Typography variant="body2" sx={{ color: "text.secondary" }}>No messages yet</Typography>
+        </Box>
       ) : (
-        <MessagesLayout
-          initialInboxThreads={inbox}
-          initialDeletedThreads={deleted}
-          currentUserId={adminId}
-        />
+        <MessagesLayout initialInboxThreads={inbox} initialDeletedThreads={deleted} currentUserId={adminId} />
       )}
-    </div>
+    </Box>
   );
 }

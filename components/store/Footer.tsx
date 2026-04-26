@@ -1,23 +1,44 @@
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Container from "@mui/material/Container";
+
 export function Footer() {
   return (
-    <footer
+    <Box
+      component="footer"
       aria-label="Site footer"
-      className="mt-auto border-t border-[var(--black-border)] bg-[var(--black-soft)]"
+      sx={{
+        mt: "auto",
+        borderTop: "1px solid",
+        borderColor: "divider",
+        bgcolor: "#ede9e3",
+      }}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-          <span className="text-lg font-semibold tracking-[0.15em] text-gold-gradient">
+      <Container maxWidth="xl" sx={{ py: 4, px: { xs: 2, sm: 3, lg: 4 } }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", md: "row" },
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 2,
+          }}
+        >
+          <Typography
+            component="span"
+            className="text-gold-gradient"
+            sx={{ fontSize: "1.125rem", fontWeight: 600, letterSpacing: "0.15em" }}
+          >
             KP JEWELRS
-          </span>
-          <p className="text-xs text-[var(--white-dim)]/50">
-            All items are unisex. Prices listed in USD. Contact seller to
-            coordinate payment.
-          </p>
-          <p className="text-xs text-[var(--white-dim)]/40">
+          </Typography>
+          <Typography variant="caption" sx={{ color: "text.secondary", opacity: 0.5, textAlign: "center" }}>
+            All items are unisex. Prices listed in USD. Contact seller to coordinate payment.
+          </Typography>
+          <Typography variant="caption" sx={{ color: "text.secondary", opacity: 0.4 }}>
             © {new Date().getFullYear()} KP Jewelrs
-          </p>
-        </div>
-      </div>
-    </footer>
+          </Typography>
+        </Box>
+      </Container>
+    </Box>
   );
 }

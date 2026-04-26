@@ -1,14 +1,14 @@
-import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { Navbar } from "@/components/store/Navbar";
 import { Footer } from "@/components/store/Footer";
 import { ProductCard } from "@/components/store/ProductCard";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import MuiLink from "@mui/material/Link";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = {
-  title: "KP Jewelrs — Handpicked Jewelry",
-};
+export const metadata: Metadata = { title: "KP Jewelrs — Handpicked Jewelry" };
 
 async function getFeaturedProducts() {
   return db.product.findMany({
@@ -19,10 +19,7 @@ async function getFeaturedProducts() {
 }
 
 export default async function LandingPage() {
-  const [session, featured] = await Promise.all([
-    auth(),
-    getFeaturedProducts(),
-  ]);
+  const [session, featured] = await Promise.all([auth(), getFeaturedProducts()]);
 
   const noUserDetected = session?.user?.id == null;
   const userId = session?.user?.id;
@@ -32,126 +29,176 @@ export default async function LandingPage() {
     : 0;
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
       <Navbar session={session} unreadCount={unreadCount} />
-      <main id="main-content" className="flex-1" tabIndex={-1}>
+      <Box component="main" id="main-content" sx={{ flex: 1 }} tabIndex={-1}>
+
         {/* Hero */}
-        <section
+        <Box
+          component="section"
           aria-labelledby="hero-heading"
-          className="bg-[var(--black-soft)] border-b border-[var(--black-border)]"
+          sx={{ bgcolor: "#ede9e3", borderBottom: "1px solid", borderColor: "divider" }}
         >
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-32 text-center flex flex-col items-center gap-6">
-            <p
-              className="text-[10px] tracking-[0.5em] text-[var(--gold)] uppercase font-medium"
-              aria-hidden="true"
-            >
+          <Box sx={{ maxWidth: 896, mx: "auto", px: { xs: 2, sm: 3, lg: 4 }, py: 16, textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}>
+            <Typography aria-hidden="true" sx={{ fontSize: "0.625rem", letterSpacing: "0.5em", color: "primary.main", textTransform: "uppercase", fontWeight: 500 }}>
               Handpicked from Mexico
-            </p>
-            <h1
+            </Typography>
+            <Typography
               id="hero-heading"
-              className="font-serif text-6xl sm:text-7xl font-light tracking-wide text-[var(--white)]"
+              component="h1"
+              sx={{ fontFamily: "serif", fontSize: { xs: "3.75rem", sm: "4.5rem" }, fontWeight: 300, letterSpacing: "0.05em", color: "text.primary", lineHeight: 1.1 }}
             >
-              KP <span className="text-gold">Jewelrs</span>
-            </h1>
-            <p className="text-sm text-[var(--white-dim)] max-w-md leading-loose tracking-wide">
-              Curated jewelry for every style. Necklaces, bracelets, rings,
-              earrings and more — all unisex, all authentic.
-            </p>
-            <div className="flex items-center gap-6 pt-2">
-              <Link
+              KP <Box component="span" className="text-gold">Jewelrs</Box>
+            </Typography>
+            <Typography variant="body2" sx={{ color: "text.secondary", maxWidth: 448, lineHeight: 2, letterSpacing: "0.05em" }}>
+              Curated jewelry for every style. Necklaces, bracelets, rings, earrings and more — all unisex, all authentic.
+            </Typography>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 3, pt: 1 }}>
+              <MuiLink
                 href="/shop"
-                className="px-10 py-3 bg-[var(--white)] text-[var(--black-card)] text-xs tracking-[0.2em] uppercase font-medium hover:bg-[var(--gold)] hover:text-[var(--black-card)] transition-colors"
+                sx={{
+                  px: 5, py: 1.5,
+                  bgcolor: "text.primary",
+                  color: "background.paper",
+                  fontSize: "0.75rem",
+                  letterSpacing: "0.2em",
+                  textTransform: "uppercase",
+                  fontWeight: 500,
+                  textDecoration: "none",
+                  "&:hover": { bgcolor: "primary.main", color: "background.paper" },
+                  transition: "background-color 0.15s",
+                }}
               >
                 Browse Collection
-              </Link>
+              </MuiLink>
               {noUserDetected && (
-                <Link
+                <MuiLink
                   href="/register"
-                  className="text-xs tracking-[0.2em] uppercase text-[var(--white-dim)] border-b border-[var(--black-border)] pb-0.5 hover:border-[var(--gold)] hover:text-[var(--gold)] transition-colors"
+                  sx={{
+                    fontSize: "0.75rem",
+                    letterSpacing: "0.2em",
+                    textTransform: "uppercase",
+                    color: "text.secondary",
+                    borderBottom: "1px solid",
+                    borderColor: "divider",
+                    pb: 0.25,
+                    textDecoration: "none",
+                    "&:hover": { borderColor: "primary.main", color: "primary.main" },
+                    transition: "all 0.15s",
+                  }}
                 >
                   Create Account
-                </Link>
+                </MuiLink>
               )}
-            </div>
-          </div>
-        </section>
+            </Box>
+          </Box>
+        </Box>
 
         {/* Category Quick Links */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <h2
+        <Box component="section" sx={{ maxWidth: 1280, mx: "auto", px: { xs: 2, sm: 3, lg: 4 }, py: 8 }}>
+          <Typography
             id="category-heading"
-            className="text-[10px] tracking-[0.4em] text-[var(--white-dim)] uppercase mb-10"
+            variant="caption"
+            sx={{ display: "block", letterSpacing: "0.4em", color: "text.secondary", textTransform: "uppercase", mb: 5 }}
           >
             Shop by Category
-          </h2>
+          </Typography>
 
-          <ul
+          <Box
+            component="ul"
             role="list"
-            className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-[var(--black-border)] list-none p-0 m-0"
+            sx={{
+              display: "grid",
+              gridTemplateColumns: { xs: "repeat(2, 1fr)", sm: "repeat(4, 1fr)" },
+              gap: "1px",
+              bgcolor: "divider",
+              listStyle: "none",
+              p: 0,
+              m: 0,
+            }}
           >
             {CATEGORIES.map(({ label, type }) => (
-              <li key={type}>
-                <Link
+              <Box component="li" key={type}>
+                <MuiLink
                   href={`/shop?type=${type}`}
                   aria-label={`Shop by Category: ${label}`}
-                  className="group flex items-center justify-center py-7 bg-[var(--black-card)] hover:bg-[var(--black-soft)] transition-colors"
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    py: 3.5,
+                    bgcolor: "background.paper",
+                    textDecoration: "none",
+                    "&:hover": { bgcolor: "#ede9e3", "& .cat-label": { color: "primary.main" } },
+                    transition: "background-color 0.15s",
+                  }}
                 >
-                  <span
+                  <Typography
+                    className="cat-label"
                     aria-hidden="true"
-                    className="text-xs tracking-[0.25em] uppercase text-[var(--white-dim)] group-hover:text-[var(--gold)] transition-colors"
+                    sx={{ fontSize: "0.75rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "text.secondary", transition: "color 0.15s" }}
                   >
                     {label}
-                  </span>
-                </Link>
-              </li>
+                  </Typography>
+                </MuiLink>
+              </Box>
             ))}
-          </ul>
-        </section>
+          </Box>
+        </Box>
 
-        <hr className="divider-gold max-w-7xl mx-auto w-full" />
+        <Box component="hr" className="divider-gold" sx={{ maxWidth: 1280, mx: "auto", width: "100%", border: "none" }} />
 
         {/* New Arrivals */}
         {featured.length > 0 && (
-          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-            <div className="flex items-end justify-between mb-10">
-              <h2 className="font-serif text-2xl font-light tracking-wide text-[var(--white)]">
+          <Box component="section" sx={{ maxWidth: 1280, mx: "auto", px: { xs: 2, sm: 3, lg: 4 }, py: 8 }}>
+            <Box sx={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", mb: 5 }}>
+              <Typography component="h2" sx={{ fontFamily: "serif", fontSize: "1.5rem", fontWeight: 300, letterSpacing: "0.05em", color: "text.primary" }}>
                 New Arrivals
-              </h2>
-              <Link
+              </Typography>
+              <MuiLink
                 href="/shop"
                 aria-label="View all new arrivals"
-                className="text-[10px] tracking-[0.25em] uppercase text-[var(--white-dim)] border-b border-[var(--black-border)] pb-0.5 hover:border-[var(--gold)] hover:text-[var(--gold)] transition-colors"
+                sx={{
+                  fontSize: "0.625rem",
+                  letterSpacing: "0.25em",
+                  textTransform: "uppercase",
+                  color: "text.secondary",
+                  borderBottom: "1px solid",
+                  borderColor: "divider",
+                  pb: 0.25,
+                  textDecoration: "none",
+                  "&:hover": { borderColor: "primary.main", color: "primary.main" },
+                  transition: "all 0.15s",
+                }}
               >
                 View All
-              </Link>
-            </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+              </MuiLink>
+            </Box>
+            <Box sx={{ display: "grid", gridTemplateColumns: { xs: "repeat(2, 1fr)", sm: "repeat(3, 1fr)", lg: "repeat(4, 1fr)" }, gap: 2 }}>
               {featured.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
-            </div>
-          </section>
+            </Box>
+          </Box>
         )}
 
         {/* About strip */}
-        <section className="border-t border-[var(--black-border)] bg-[var(--black-soft)] py-20">
-          <div className="max-w-2xl mx-auto px-4 text-center flex flex-col gap-6">
-            <p className="text-[10px] tracking-[0.5em] text-[var(--gold)] uppercase">
+        <Box component="section" sx={{ borderTop: "1px solid", borderColor: "divider", bgcolor: "#ede9e3", py: 10 }}>
+          <Box sx={{ maxWidth: 672, mx: "auto", px: 2, textAlign: "center", display: "flex", flexDirection: "column", gap: 3 }}>
+            <Typography sx={{ fontSize: "0.625rem", letterSpacing: "0.5em", color: "primary.main", textTransform: "uppercase" }}>
               Our Story
-            </p>
-            <p className="font-serif text-xl font-light text-[var(--white)] leading-relaxed">
+            </Typography>
+            <Typography component="p" sx={{ fontFamily: "serif", fontSize: "1.25rem", fontWeight: 300, color: "text.primary", lineHeight: 1.7 }}>
               Every piece in our collection is personally sourced from Mexico.
-            </p>
-            <p className="text-xs text-[var(--white-dim)] leading-loose tracking-wide max-w-lg mx-auto">
-              We specialize in styles like Cubano, Torso, and Cartier chains, as
-              well as charms, rings, earrings and more. Interested in a piece?
-              Create an account and send us a message to coordinate.
-            </p>
-          </div>
-        </section>
-      </main>
+            </Typography>
+            <Typography variant="caption" sx={{ color: "text.secondary", lineHeight: 2, letterSpacing: "0.05em", maxWidth: 512, mx: "auto", display: "block" }}>
+              We specialize in styles like Cubano, Torso, and Cartier chains, as well as charms, rings, earrings and more. Interested in a piece? Create an account and send us a message to coordinate.
+            </Typography>
+          </Box>
+        </Box>
+      </Box>
       <Footer />
-    </div>
+    </Box>
   );
 }
 

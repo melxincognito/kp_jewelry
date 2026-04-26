@@ -1,18 +1,28 @@
-export function LoadingSpinner({ className = "" }: { className?: string }) {
+import CircularProgress from "@mui/material/CircularProgress";
+import Box from "@mui/material/Box";
+
+export function LoadingSpinner({ className }: { className?: string }) {
   return (
-    <div
-      className={[
-        "h-6 w-6 border-2 border-[var(--gold)]/30 border-t-[var(--gold)] rounded-full animate-spin",
-        className,
-      ].join(" ")}
+    <CircularProgress
+      size={24}
+      className={className}
+      sx={{ color: "primary.main" }}
     />
   );
 }
 
 export function PageLoader() {
   return (
-    <div className="flex-1 flex items-center justify-center min-h-[50vh]">
-      <LoadingSpinner className="h-8 w-8" />
-    </div>
+    <Box
+      sx={{
+        flex: 1,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        minHeight: "50vh",
+      }}
+    >
+      <LoadingSpinner />
+    </Box>
   );
 }

@@ -1,19 +1,22 @@
 import { db } from "@/lib/db";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import MuiLink from "@mui/material/Link";
+import Paper from "@mui/material/Paper";
+import Table from "@mui/material/Table";
+import TableHead from "@mui/material/TableHead";
+import TableBody from "@mui/material/TableBody";
+import TableRow from "@mui/material/TableRow";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableFooter from "@mui/material/TableFooter";
 import { StatCard } from "@/components/ui/StatCard";
-import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Dashboard" };
 
 async function getAnalytics() {
-  const [
-    totalProducts,
-    availableProducts,
-    soldProducts,
-    totalSales,
-    recentSales,
-    unreadMessages,
-  ] = await Promise.all([
+  const [totalProducts, availableProducts, soldProducts, totalSales, recentSales, unreadMessages] = await Promise.all([
     db.product.count(),
     db.product.count({ where: { status: "AVAILABLE" } }),
     db.product.count({ where: { status: "SOLD" } }),
@@ -29,7 +32,6 @@ async function getAnalytics() {
     db.message.count({ where: { read: false } }),
   ]);
 
-  // Revenue this month
   const startOfMonth = new Date();
   startOfMonth.setDate(1);
   startOfMonth.setHours(0, 0, 0, 0);
@@ -53,164 +55,148 @@ async function getAnalytics() {
 export default async function DashboardOverviewPage() {
   const data = await getAnalytics();
 
+  const quickLinks = [
+    { href: "/dashboard/inventory/new", label: "Add New Item", icon: "+" },
+    { href: "/dashboard/inventory", label: "Manage Inventory", icon: "◻" },
+    { href: "/dashboard/sales", label: "Record a Sale", icon: "◆" },
+  ];
+
   return (
-    <div className="flex flex-col gap-8">
-      <div>
-        <h1 className="text-xl font-light tracking-wide text-[var(--white)]">
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 4 }}>
+      <Box>
+        <Typography variant="h6" sx={{ fontWeight: 300, letterSpacing: "0.05em", color: "text.primary" }}>
           Overview
-        </h1>
-        <p className="text-xs text-[var(--white-dim)]/40 mt-1">
-          {new Date().toLocaleDateString("en-US", {
-            weekday: "long",
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          })}
-        </p>
-      </div>
+        </Typography>
+        <Typography variant="caption" sx={{ color: "text.secondary", opacity: 0.4, mt: 0.5, display: "block" }}>
+          {new Date().toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
+        </Typography>
+      </Box>
 
       {/* Stats grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          title="Total Revenue"
-          value={`$${data.totalRevenue.toFixed(2)}`}
-          subtitle="All time"
-          icon={<span>$</span>}
-        />
-        <StatCard
-          title="This Month"
-          value={`$${data.monthRevenue.toFixed(2)}`}
-          subtitle={new Date().toLocaleString("en-US", { month: "long" })}
-          icon={<span>📅</span>}
-        />
-        <StatCard
-          title="Items Sold"
-          value={data.soldProducts}
-          subtitle={`${data.totalSalesCount} transactions`}
-          icon={<span>✓</span>}
-        />
-        <StatCard
-          title="Available"
-          value={data.availableProducts}
-          subtitle={`of ${data.totalProducts} total items`}
-          icon={<span>◈</span>}
-        />
-      </div>
+      <Box sx={{ display: "grid", gridTemplateColumns: { xs: "repeat(2, 1fr)", lg: "repeat(4, 1fr)" }, gap: 2 }}>
+        <StatCard title="Total Revenue" value={`$${data.totalRevenue.toFixed(2)}`} subtitle="All time" icon={<span>$</span>} />
+        <StatCard title="This Month" value={`$${data.monthRevenue.toFixed(2)}`} subtitle={new Date().toLocaleString("en-US", { month: "long" })} icon={<span>📅</span>} />
+        <StatCard title="Items Sold" value={data.soldProducts} subtitle={`${data.totalSalesCount} transactions`} icon={<span>✓</span>} />
+        <StatCard title="Available" value={data.availableProducts} subtitle={`of ${data.totalProducts} total items`} icon={<span>◈</span>} />
+      </Box>
 
-      {/* Alerts row */}
+      {/* Unread messages alert */}
       {data.unreadMessages > 0 && (
-        <Link
+        <MuiLink
           href="/dashboard/messages"
-          className="flex items-center gap-3 px-4 py-3 bg-[var(--gold)]/8 border border-[var(--gold)]/20 rounded-sm hover:bg-[var(--gold)]/12 transition-colors"
+          underline="none"
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 1.5,
+            px: 2,
+            py: 1.5,
+            bgcolor: "rgba(122,92,16,0.06)",
+            border: "1px solid rgba(122,92,16,0.18)",
+            borderRadius: 0.5,
+            "&:hover": { bgcolor: "rgba(122,92,16,0.1)" },
+            transition: "background-color 0.15s",
+          }}
         >
-          <span className="text-[var(--gold)] text-sm">◇</span>
-          <p className="text-sm text-[var(--white-dim)]">
+          <Typography sx={{ color: "primary.main", fontSize: "0.875rem" }}>◇</Typography>
+          <Typography variant="body2" sx={{ color: "text.secondary" }}>
             You have{" "}
-            <span className="text-[var(--gold)] font-medium">
+            <Box component="span" sx={{ color: "primary.main", fontWeight: 500 }}>
               {data.unreadMessages}
-            </span>{" "}
+            </Box>{" "}
             unread message{data.unreadMessages !== 1 ? "s" : ""}
-          </p>
-          <span className="ml-auto text-xs text-[var(--gold)]">View →</span>
-        </Link>
+          </Typography>
+          <Typography variant="caption" sx={{ ml: "auto", color: "primary.main" }}>View →</Typography>
+        </MuiLink>
       )}
 
       {/* Recent Sales */}
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xs tracking-[0.25em] text-[var(--gold)] uppercase">
+      <Box>
+        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 2 }}>
+          <Typography sx={{ fontSize: "0.625rem", letterSpacing: "0.25em", color: "primary.main", textTransform: "uppercase" }}>
             Recent Sales
-          </h2>
-          <Link
+          </Typography>
+          <MuiLink
             href="/dashboard/sales"
-            className="text-xs text-[var(--white-dim)]/50 hover:text-[var(--gold)] transition-colors"
+            variant="caption"
+            sx={{ color: "text.secondary", opacity: 0.5, textDecoration: "none", "&:hover": { color: "primary.main", opacity: 1 } }}
           >
             View all →
-          </Link>
-        </div>
+          </MuiLink>
+        </Box>
 
         {data.recentSales.length === 0 ? (
-          <p className="text-sm text-[var(--white-dim)]/40 py-6 text-center">
+          <Typography variant="body2" sx={{ color: "text.secondary", opacity: 0.4, py: 3, textAlign: "center" }}>
             No sales yet
-          </p>
+          </Typography>
         ) : (
-          <div className="bg-[var(--black-card)] border border-[var(--black-border)] rounded-sm overflow-hidden">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-[var(--black-border)]">
-                  <th className="text-left px-4 py-3 text-xs text-[var(--white-dim)]/50 font-normal tracking-widest uppercase">
-                    Item
-                  </th>
-                  <th className="text-left px-4 py-3 text-xs text-[var(--white-dim)]/50 font-normal tracking-widest uppercase">
-                    Buyer
-                  </th>
-                  <th className="text-right px-4 py-3 text-xs text-[var(--white-dim)]/50 font-normal tracking-widest uppercase">
-                    Price
-                  </th>
-                  <th className="text-right px-4 py-3 text-xs text-[var(--white-dim)]/50 font-normal tracking-widest uppercase">
-                    Date
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
+          <TableContainer component={Paper}>
+            <Table size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell>Item</TableCell>
+                  <TableCell>Buyer</TableCell>
+                  <TableCell align="right">Price</TableCell>
+                  <TableCell align="right">Date</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
                 {data.recentSales.map((sale) => (
-                  <tr
-                    key={sale.id}
-                    className="border-b border-[var(--black-border)]/50 last:border-0 hover:bg-white/[0.02] transition-colors"
-                  >
-                    <td className="px-4 py-3 text-[var(--white)]">
-                      {sale.product.name}
-                    </td>
-                    <td className="px-4 py-3 text-[var(--white-dim)]">
-                      {sale.buyer?.name ?? sale.buyer?.email ?? (
-                        <span className="text-[var(--white-dim)]/30 italic">
-                          In-person
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3 text-right text-[var(--gold)] font-medium">
-                      ${sale.salePrice.toFixed(2)}
-                    </td>
-                    <td className="px-4 py-3 text-right text-[var(--white-dim)]/50 text-xs">
-                      {new Date(sale.soldAt).toLocaleDateString()}
-                    </td>
-                  </tr>
+                  <TableRow key={sale.id}>
+                    <TableCell>
+                      <Typography variant="body2" sx={{ color: "text.primary" }}>{sale.product.name}</Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                        {sale.buyer?.name ?? sale.buyer?.email ?? (
+                          <Box component="span" sx={{ color: "text.secondary", opacity: 0.3, fontStyle: "italic", fontSize: "0.75rem" }}>In-person</Box>
+                        )}
+                      </Typography>
+                    </TableCell>
+                    <TableCell align="right">
+                      <Typography variant="body2" sx={{ color: "primary.main", fontWeight: 500 }}>${sale.salePrice.toFixed(2)}</Typography>
+                    </TableCell>
+                    <TableCell align="right">
+                      <Typography variant="caption" sx={{ color: "text.secondary", opacity: 0.5 }}>
+                        {new Date(sale.soldAt).toLocaleDateString()}
+                      </Typography>
+                    </TableCell>
+                  </TableRow>
                 ))}
-              </tbody>
-            </table>
-          </div>
+              </TableBody>
+            </Table>
+          </TableContainer>
         )}
-      </div>
+      </Box>
 
       {/* Quick links */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-        {[
-          {
-            href: "/dashboard/inventory/new",
-            label: "Add New Item",
-            icon: "+",
-          },
-          {
-            href: "/dashboard/inventory",
-            label: "Manage Inventory",
-            icon: "◻",
-          },
-          { href: "/dashboard/sales", label: "Record a Sale", icon: "◆" },
-        ].map((link) => (
-          <Link
+      <Box sx={{ display: "grid", gridTemplateColumns: { xs: "repeat(2, 1fr)", sm: "repeat(3, 1fr)" }, gap: 1.5 }}>
+        {quickLinks.map((link) => (
+          <MuiLink
             key={link.href}
             href={link.href}
-            className="flex items-center gap-3 px-4 py-4 bg-[var(--black-card)] border border-[var(--black-border)] rounded-sm hover:border-[var(--gold)]/30 transition-colors group"
+            underline="none"
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 1.5,
+              px: 2,
+              py: 2,
+              bgcolor: "background.paper",
+              border: "1px solid",
+              borderColor: "divider",
+              borderRadius: 0.5,
+              "&:hover": { borderColor: "rgba(122,92,16,0.3)" },
+              transition: "border-color 0.15s",
+            }}
           >
-            <span className="text-[var(--gold)] text-lg font-light">
-              {link.icon}
-            </span>
-            <span className="text-sm text-[var(--white-dim)] group-hover:text-[var(--white)] transition-colors">
+            <Typography sx={{ color: "primary.main", fontSize: "1.125rem", fontWeight: 300 }}>{link.icon}</Typography>
+            <Typography variant="body2" sx={{ color: "text.secondary", "&:hover": { color: "text.primary" } }}>
               {link.label}
-            </span>
-          </Link>
+            </Typography>
+          </MuiLink>
         ))}
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 }

@@ -2,12 +2,9 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { Navbar } from "@/components/store/Navbar";
 import { Footer } from "@/components/store/Footer";
+import Box from "@mui/material/Box";
 
-export default async function StoreLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default async function StoreLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
   const userId = session?.user?.id;
 
@@ -16,10 +13,10 @@ export default async function StoreLayout({
     : 0;
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
       <Navbar session={session} unreadCount={unreadCount} />
-      <main className="flex-1">{children}</main>
+      <Box component="main" sx={{ flex: 1 }}>{children}</Box>
       <Footer />
-    </div>
+    </Box>
   );
 }

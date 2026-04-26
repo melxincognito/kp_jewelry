@@ -1,3 +1,8 @@
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+
 interface StatCardProps {
   title: string;
   value: string | number;
@@ -8,30 +13,51 @@ interface StatCardProps {
 
 export function StatCard({ title, value, subtitle, icon, trend }: StatCardProps) {
   return (
-    <div className="bg-[var(--black-card)] border border-[var(--black-border)] rounded-sm p-5 flex flex-col gap-3">
-      <div className="flex items-start justify-between">
-        <p className="text-xs font-medium text-[var(--white-dim)] uppercase tracking-widest">
-          {title}
-        </p>
-        {icon && (
-          <span className="text-[var(--gold)] opacity-70">{icon}</span>
+    <Card>
+      <CardContent sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
+        <Box sx={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+          <Typography
+            variant="caption"
+            sx={{
+              color: "text.secondary",
+              textTransform: "uppercase",
+              letterSpacing: "0.15em",
+              fontWeight: 500,
+              fontSize: "0.65rem",
+            }}
+          >
+            {title}
+          </Typography>
+          {icon && (
+            <Box sx={{ color: "primary.main", opacity: 0.7, fontSize: "1rem" }}>
+              {icon}
+            </Box>
+          )}
+        </Box>
+
+        <Box>
+          <Typography variant="h5" sx={{ fontWeight: 600, color: "text.primary", lineHeight: 1.2 }}>
+            {value}
+          </Typography>
+          {subtitle && (
+            <Typography variant="caption" sx={{ color: "text.secondary", opacity: 0.6, mt: 0.5, display: "block" }}>
+              {subtitle}
+            </Typography>
+          )}
+        </Box>
+
+        {trend && (
+          <Typography
+            variant="caption"
+            sx={{
+              fontWeight: 500,
+              color: trend.value >= 0 ? "#059669" : "#b91c1c",
+            }}
+          >
+            {trend.value >= 0 ? "▲" : "▼"} {Math.abs(trend.value)}% {trend.label}
+          </Typography>
         )}
-      </div>
-      <div>
-        <p className="text-2xl font-semibold text-[var(--white)]">{value}</p>
-        {subtitle && (
-          <p className="text-xs text-[var(--white-dim)]/60 mt-1">{subtitle}</p>
-        )}
-      </div>
-      {trend && (
-        <p
-          className={`text-xs font-medium ${
-            trend.value >= 0 ? "text-emerald-400" : "text-red-400"
-          }`}
-        >
-          {trend.value >= 0 ? "▲" : "▼"} {Math.abs(trend.value)}% {trend.label}
-        </p>
-      )}
-    </div>
+      </CardContent>
+    </Card>
   );
 }

@@ -1,6 +1,8 @@
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { redirect } from "next/navigation";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
 import { MessagesLayout } from "@/components/messages/MessagesLayout";
 import type { ThreadData } from "@/components/messages/MessagesLayout";
 import type { Metadata } from "next";
@@ -23,20 +25,13 @@ export default async function CustomerMessagesPage() {
         product: { select: { id: true, name: true } },
       },
     }),
-    db.user.findFirst({
-      where: { role: "ADMIN" },
-      select: { id: true, name: true, email: true },
-    }),
+    db.user.findFirst({ where: { role: "ADMIN" }, select: { id: true, name: true, email: true } }),
   ]);
 
   const adminId = admin?.id ?? "";
   const adminName = admin?.name ?? admin?.email ?? "KP Jewelers";
 
-  // Group by productId, split into inbox vs deleted
-  const map = new Map<
-    string,
-    { messages: typeof messages; deletedAt: Date | null }
-  >();
+  const map = new Map<string, { messages: typeof messages; deletedAt: Date | null }>();
 
   for (const msg of messages) {
     if (!map.has(msg.productId)) {
@@ -45,8 +40,7 @@ export default async function CustomerMessagesPage() {
     const entry = map.get(msg.productId)!;
     entry.messages.push(msg);
 
-    const userDeletedAt =
-      msg.senderId === userId ? msg.deletedBySenderAt : msg.deletedByRecipientAt;
+    const userDeletedAt = msg.senderId === userId ? msg.deletedBySenderAt : msg.deletedByRecipientAt;
     if (userDeletedAt && !entry.deletedAt) {
       entry.deletedAt = userDeletedAt;
     }
@@ -69,23 +63,21 @@ export default async function CustomerMessagesPage() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col gap-4">
-      <h1 className="text-xl font-light tracking-wide text-[var(--white)]">Messages</h1>
+    <Box sx={{ maxWidth: 960, mx: "auto", px: { xs: 2, sm: 3, lg: 4 }, py: 5, display: "flex", flexDirection: "column", gap: 2 }}>
+      <Typography variant="h6" sx={{ fontWeight: 300, letterSpacing: "0.05em", color: "text.primary" }}>
+        Messages
+      </Typography>
       {inbox.length === 0 && deleted.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-24 gap-3 text-center">
-          <p className="text-4xl opacity-10">◇</p>
-          <p className="text-[var(--white-dim)]">No messages yet</p>
-          <p className="text-xs text-[var(--white-dim)]/40">
+        <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", py: 12, gap: 1.5, textAlign: "center" }}>
+          <Typography sx={{ fontSize: "2.5rem", opacity: 0.1 }} aria-hidden="true">◇</Typography>
+          <Typography variant="body2" sx={{ color: "text.secondary" }}>No messages yet</Typography>
+          <Typography variant="caption" sx={{ color: "text.secondary", opacity: 0.4 }}>
             Browse the shop and message us about an item
-          </p>
-        </div>
+          </Typography>
+        </Box>
       ) : (
-        <MessagesLayout
-          initialInboxThreads={inbox}
-          initialDeletedThreads={deleted}
-          currentUserId={userId}
-        />
+        <MessagesLayout initialInboxThreads={inbox} initialDeletedThreads={deleted} currentUserId={userId} />
       )}
-    </div>
+    </Box>
   );
 }

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Sign in | KP Jewelers",
+  title: "Sign in | KP Jewelry",
 };
 
 export default function LoginLayout({

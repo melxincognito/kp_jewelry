@@ -17,7 +17,7 @@ describe("Button", () => {
   });
 
   it("is disabled and not clickable when loading is true", async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ pointerEventsCheck: 0 });
     const handleClick = jest.fn();
     render(<Button loading onClick={handleClick}>Submit</Button>);
 

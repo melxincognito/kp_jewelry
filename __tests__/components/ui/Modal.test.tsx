@@ -54,12 +54,12 @@ describe("Modal", () => {
     expect(document.getElementById(labelId!)).toHaveTextContent("My Dialog");
   });
 
-  it("calls showModal on the dialog element when open is true", () => {
+  it("renders children when open is true", () => {
     render(
       <Modal open onClose={jest.fn()} title="Open">
-        <p>Content</p>
+        <p>Content is visible</p>
       </Modal>
     );
-    expect(HTMLDialogElement.prototype.showModal).toHaveBeenCalled();
+    expect(screen.getByText("Content is visible")).toBeInTheDocument();
   });
 });

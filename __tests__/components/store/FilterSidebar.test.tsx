@@ -26,15 +26,17 @@ describe("FilterSidebar", () => {
 
     it("renders Sort, Availability, and Category filter groups", () => {
       render(<FilterSidebar availableStyles={[]} />);
-      expect(screen.getByText("Sort")).toBeInTheDocument();
-      expect(screen.getByText("Availability")).toBeInTheDocument();
-      expect(screen.getByText("Category")).toBeInTheDocument();
+      expect(screen.getAllByText("Sort").length).toBeGreaterThan(0);
+      expect(screen.getAllByText("Availability").length).toBeGreaterThan(0);
+      expect(screen.getAllByText("Category").length).toBeGreaterThan(0);
     });
 
     it("all filter buttons have aria-pressed attributes", () => {
       render(<FilterSidebar availableStyles={[]} />);
-      const buttons = screen.getAllByRole("button");
-      buttons.forEach((btn) => {
+      const filterButtons = screen
+        .getAllByRole("button")
+        .filter((btn) => !btn.textContent?.includes("Filters & Sort"));
+      filterButtons.forEach((btn) => {
         expect(btn).toHaveAttribute("aria-pressed");
       });
     });

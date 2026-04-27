@@ -249,7 +249,7 @@ export function Navbar({ session, unreadCount = 0 }: NavbarProps) {
             Shop
           </MuiLink>
 
-          {session && (
+          {isCustomer && (
             <MuiLink
               component={NextLink}
               href="/messages"

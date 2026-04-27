@@ -1,4 +1,7 @@
 import "@testing-library/jest-dom";
+import { toHaveNoViolations } from "jest-axe";
+
+expect.extend(toHaveNoViolations);
 
 // jsdom doesn't implement HTMLDialogElement methods — guard for node test environment.
 // The showModal mock sets the `open` attribute so the dialog is visible in the a11y tree.
@@ -22,6 +25,14 @@ jest.mock("next/navigation", () => ({
   }),
   useSearchParams: () => new URLSearchParams(),
   usePathname: () => "/",
+}));
+
+// Mock next-auth/react globally — many components import signIn/signOut/useSession
+jest.mock("next-auth/react", () => ({
+  signIn: jest.fn(),
+  signOut: jest.fn(),
+  useSession: jest.fn(() => ({ data: null, status: "unauthenticated" })),
+  SessionProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
 // Mock next/image globally — render as a plain img element to avoid canvas/loader issues

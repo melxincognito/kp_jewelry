@@ -8,7 +8,6 @@ import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import TextField from "@mui/material/TextField";
-import MenuItem from "@mui/material/MenuItem";
 import Box from "@mui/material/Box";
 import Alert from "@mui/material/Alert";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -134,11 +133,12 @@ export function RecordSaleButton({ availableProducts }: { availableProducts: Ava
               fullWidth
               size="small"
               sx={fieldSx}
+              slotProps={{ select: { native: true } }}
             >
               {availableProducts.map((p) => (
-                <MenuItem key={p.id} value={p.id}>
+                <option key={p.id} value={p.id}>
                   {p.name} — ${p.sellingPrice.toFixed(2)} ({p.quantity} left)
-                </MenuItem>
+                </option>
               ))}
             </TextField>
 
@@ -151,12 +151,13 @@ export function RecordSaleButton({ availableProducts }: { availableProducts: Ava
                 fullWidth
                 size="small"
                 sx={fieldSx}
+                slotProps={{ select: { native: true } }}
               >
-                <MenuItem value="">Select a size…</MenuItem>
+                <option value="">Select a size…</option>
                 {availableSizes.map((s) => (
-                  <MenuItem key={s.size} value={s.size}>
+                  <option key={s.size} value={s.size}>
                     Size {s.size} — {s.quantity} left
-                  </MenuItem>
+                  </option>
                 ))}
               </TextField>
             )}

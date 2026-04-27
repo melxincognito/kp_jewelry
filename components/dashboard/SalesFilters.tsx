@@ -4,7 +4,6 @@ import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useCallback, useState } from "react";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
-import MenuItem from "@mui/material/MenuItem";
 import MuiButton from "@mui/material/Button";
 
 const PRESETS = [
@@ -75,11 +74,12 @@ export function SalesFilters() {
         onChange={(e) => applyPreset(e.target.value)}
         size="small"
         sx={inputSx}
+        slotProps={{ select: { native: true } }}
       >
         {PRESETS.map((p) => (
-          <MenuItem key={p.value} value={p.value}>
+          <option key={p.value} value={p.value}>
             {p.label}
-          </MenuItem>
+          </option>
         ))}
       </TextField>
 
@@ -91,8 +91,7 @@ export function SalesFilters() {
             value={from}
             onChange={(e) => setFrom(e.target.value)}
             size="small"
-            aria-label="Start date"
-            slotProps={{ inputLabel: { shrink: true } }}
+            slotProps={{ inputLabel: { shrink: true }, htmlInput: { "aria-label": "Start date" } }}
             sx={{ ...inputSx, minWidth: 150 }}
           />
           <TextField
@@ -101,8 +100,7 @@ export function SalesFilters() {
             value={to}
             onChange={(e) => setTo(e.target.value)}
             size="small"
-            aria-label="End date"
-            slotProps={{ inputLabel: { shrink: true } }}
+            slotProps={{ inputLabel: { shrink: true }, htmlInput: { "aria-label": "End date" } }}
             sx={{ ...inputSx, minWidth: 150 }}
           />
           <MuiButton

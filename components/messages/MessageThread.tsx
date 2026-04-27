@@ -199,10 +199,12 @@ export const MessageThread = forwardRef<MessageThreadHandle, MessageThreadProps>
 
           {/* Tab panel */}
           <Box
-            component="form"
             id={`${tabPanelId}-panel`}
             role="tabpanel"
             aria-labelledby={`tab-${activeTab}`}
+          >
+          <Box
+            component="form"
             onSubmit={(e) => { e.preventDefault(); sendMessage(false); }}
             sx={{ p: 2, display: "flex", flexDirection: "column", gap: 1.5 }}
           >
@@ -243,6 +245,7 @@ export const MessageThread = forwardRef<MessageThreadHandle, MessageThreadProps>
                 </MuiButton>
               </Box>
             </Box>
+          </Box>
           </Box>
         </Box>
       </Box>

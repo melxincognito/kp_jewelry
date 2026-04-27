@@ -184,7 +184,9 @@ export function InventoryTable({ products }: { products: InventoryProduct[] }) {
           <Table size="small">
             <TableHead>
               <TableRow>
-                <TableCell sx={{ width: 40 }} />
+                <TableCell sx={{ width: 40 }}>
+                  <Box component="span" sx={{ position: "absolute", width: "1px", height: "1px", overflow: "hidden", clip: "rect(0,0,0,0)", whiteSpace: "nowrap" }}>Photo</Box>
+                </TableCell>
                 <TableCell>Item</TableCell>
                 <TableCell>SKU</TableCell>
                 <TableCell>Type</TableCell>
@@ -193,7 +195,7 @@ export function InventoryTable({ products }: { products: InventoryProduct[] }) {
                 <TableCell align="right">Cost USD</TableCell>
                 <TableCell align="right">List Price</TableCell>
                 <TableCell align="right">Margin</TableCell>
-                <TableCell><Box component="span" sx={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0,0,0,0)" }}>Actions</Box></TableCell>
+                <TableCell><Box component="span" sx={{ position: "absolute", width: "1px", height: "1px", overflow: "hidden", clip: "rect(0,0,0,0)", whiteSpace: "nowrap" }}>Actions</Box></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>

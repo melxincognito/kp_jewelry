@@ -10,11 +10,12 @@ interface ModalProps {
   open: boolean;
   onClose: () => void;
   title?: string;
+  "aria-label"?: string;
   children: React.ReactNode;
   maxWidth?: "sm" | "md" | "lg";
 }
 
-export function Modal({ open, onClose, title, children, maxWidth = "md" }: ModalProps) {
+export function Modal({ open, onClose, title, "aria-label": ariaLabel, children, maxWidth = "md" }: ModalProps) {
   return (
     <Dialog
       open={open}
@@ -23,6 +24,9 @@ export function Modal({ open, onClose, title, children, maxWidth = "md" }: Modal
       fullWidth
       aria-labelledby={title ? "modal-title" : undefined}
       aria-modal="true"
+      slotProps={{
+        paper: !title && ariaLabel ? { "aria-label": ariaLabel } : undefined,
+      }}
     >
       {title && (
         <DialogTitle id="modal-title" sx={{ pr: 6 }}>

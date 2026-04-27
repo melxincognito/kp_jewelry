@@ -6,6 +6,7 @@ export function LoadingSpinner({ className }: { className?: string }) {
     <CircularProgress
       size={24}
       className={className}
+      aria-label="Loading"
       sx={{ color: "primary.main" }}
     />
   );

@@ -622,7 +622,7 @@ export function ProductForm({ defaultValues, mode }: ProductFormProps) {
           <Switch
             checked={showOnStorefront}
             onChange={(e) => setShowOnStorefront(e.target.checked)}
-            aria-label="Show on storefront"
+            slotProps={{ input: { "aria-label": "Show on storefront" } }}
             sx={{
               "& .MuiSwitch-switchBase.Mui-checked": { color: "#7a5c10" },
               "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {

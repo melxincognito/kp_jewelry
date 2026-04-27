@@ -85,11 +85,8 @@ export function DashboardNav({ unreadCount = 0 }: DashboardNavProps) {
       </Box>
 
       {/* Nav links */}
-      <List
-        sx={{ flex: 1, py: 1, px: 1 }}
-        component="nav"
-        aria-label="Dashboard navigation"
-      >
+      <Box component="nav" aria-label="Dashboard navigation" sx={{ flex: 1 }}>
+      <List sx={{ py: 1, px: 1 }}>
         {NAV_ITEMS.map((item) => {
           const isActive =
             item.href === "/dashboard"
@@ -151,6 +148,7 @@ export function DashboardNav({ unreadCount = 0 }: DashboardNavProps) {
           );
         })}
       </List>
+      </Box>
 
       {/* Bottom: sign out */}
       <Box

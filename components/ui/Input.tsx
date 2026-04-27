@@ -29,9 +29,10 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         className={className}
         slotProps={{
           formHelperText: {
+            role: error ? "alert" : undefined,
             sx: { color: error ? "error.main" : "text.secondary" },
           },
-          htmlInput: props as object,
+          htmlInput: { ...(props as object), ...(required ? { "aria-required": "true" } : {}) },
         }}
         sx={{
           "& .MuiFormHelperText-root": {
